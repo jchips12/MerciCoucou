@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>French Learning for Kids</title>
   
+  <!-- PWA Settings for Mobile/Android -->
   <meta name="theme-color" content="#fef3c7">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -12,9 +13,11 @@
   
   <link rel="manifest" href="manifest.json">
 
-  <!-- Tailwind CSS & Icons -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
@@ -27,31 +30,111 @@
     }
   </style>
 </head>
-<body class="bg-amber-50 min-h-screen flex flex-col justify-between text-slate-800 select-none">
+<body class="bg-amber-50 min-h-screen flex flex-col justify-between text-slate-800 select-none relative overflow-x-hidden">
+
+  <!-- SLIDE-OUT BURGER MENU OVERLAY -->
+  <div id="menuOverlay" onclick="closeMenu()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+
+  <!-- SLIDE-OUT BURGER MENU DRAWER -->
+  <aside id="menuDrawer" class="fixed top-0 left-0 bottom-0 w-72 bg-white shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-5 flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between pb-4 border-b border-amber-200 mb-6">
+        <div class="flex items-center space-x-2">
+          <span class="text-3xl">🇫🇷</span>
+          <div>
+            <h2 class="text-lg font-black text-amber-600">Menu Principal</h2>
+            <p class="text-xs text-amber-800 font-bold">Choose Module</p>
+          </div>
+        </div>
+        <button onclick="closeMenu()" class="text-slate-400 hover:text-slate-600 p-2 rounded-xl text-xl font-bold">
+          ✕
+        </button>
+      </div>
+
+      <!-- MODULE SELECTION LIST -->
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Modules</p>
+      <nav class="space-y-2 mb-6">
+        <button id="modColorsBtn" onclick="selectModule('colors')" 
+                class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md">
+          <span class="text-2xl">🎨</span>
+          <div>
+            <div class="text-base leading-tight">Couleurs</div>
+            <div class="text-xs font-normal opacity-80">Colors</div>
+          </div>
+        </button>
+
+        <button id="modNumbersBtn" onclick="selectModule('numbers')" 
+                class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all">
+          <span class="text-2xl">🔢</span>
+          <div>
+            <div class="text-base leading-tight">Nombres</div>
+            <div class="text-xs font-normal opacity-80">Numbers (1-20)</div>
+          </div>
+        </button>
+
+        <button id="modAlphabetBtn" onclick="selectModule('alphabet')" 
+                class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all">
+          <span class="text-2xl">🔤</span>
+          <div>
+            <div class="text-base leading-tight">Alphabet</div>
+            <div class="text-xs font-normal opacity-80">French Alphabet</div>
+          </div>
+        </button>
+      </nav>
+
+      <!-- PREFERENCES -->
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Settings</p>
+      <div class="space-y-2">
+        <button id="toggleEnglishBtn" onclick="toggleEnglish()" 
+                class="w-full flex items-center justify-between px-4 py-3 bg-blue-50 text-blue-800 hover:bg-blue-100 rounded-2xl font-semibold text-sm transition">
+          <span class="flex items-center space-x-2">
+            <i class="fas fa-language text-lg text-blue-600"></i>
+            <span>English Helper</span>
+          </span>
+          <span id="englishStatusBadge" class="text-xs bg-blue-200 text-blue-900 font-bold px-2 py-0.5 rounded-full">ON</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- BUILD APP QUICK ACTION -->
+    <button onclick="closeMenu(); openAndroidModal()" 
+            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center space-x-2 transition shadow-md">
+      <i class="fab fa-android text-xl"></i>
+      <span>Make Android App</span>
+    </button>
+  </aside>
 
   <!-- HEADER -->
   <header class="bg-white/80 backdrop-blur-md border-b-4 border-amber-200 sticky top-0 z-40 p-3 sm:p-4">
-    <div class="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-2">
-      <div class="flex items-center space-x-2">
-        <span class="text-3xl sm:text-4xl">🇫🇷</span>
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <!-- FRENCH FLAG BURGER MENU TRIGGER BUTTON -->
+        <button onclick="toggleMenu()" title="Open Menu" 
+                class="p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 active:scale-95 text-amber-900 rounded-2xl flex items-center space-x-2 border-2 border-amber-300 transition shadow-sm cursor-pointer">
+          <span class="text-2xl sm:text-3xl leading-none">🇫🇷</span>
+          <i class="fas fa-bars text-lg text-amber-700"></i>
+        </button>
+
         <div>
-          <h1 class="text-xl sm:text-2xl font-black text-amber-600 tracking-wide leading-tight">Apprendre le Français</h1>
-          <p class="text-xs text-amber-800 font-bold hidden sm:block">French Learning for Kids</p>
+          <h1 id="headerTitle" class="text-lg sm:text-2xl font-black text-amber-600 tracking-wide leading-tight">Couleurs en Français</h1>
+          <p id="headerSubtitle" class="text-xs text-amber-800 font-bold hidden sm:block">French Colors for Kids</p>
         </div>
       </div>
 
-      <!-- Controls & Toggles -->
-      <div class="flex items-center space-x-2">
+      <!-- Control Toggles -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Audio Auto-Play Toggle -->
         <button id="toggleAudioBtn" onclick="toggleAutoAudio()" 
-                class="p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-xs sm:text-sm">
-          <i id="audioIcon" class="fas fa-volume-up text-base text-amber-600"></i>
+                class="p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm">
+          <i id="audioIcon" class="fas fa-volume-up text-lg text-amber-600"></i>
           <span class="hidden sm:inline" id="audioToggleText">Auto-Voice: ON</span>
         </button>
 
-        <button id="toggleEnglishBtn" onclick="toggleEnglish()" 
-                class="p-2 sm:px-3 sm:py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-xs sm:text-sm">
-          <i class="fas fa-language text-base text-blue-600"></i>
-          <span class="hidden sm:inline">English Helper</span>
+        <!-- Android APK Guide Modal Button -->
+        <button onclick="openAndroidModal()" 
+                class="p-2 sm:px-3 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl flex items-center space-x-1.5 transition font-bold text-sm shadow-md">
+          <i class="fab fa-android text-xl"></i>
+          <span class="hidden sm:inline">APK</span>
         </button>
       </div>
     </div>
@@ -60,38 +143,23 @@
   <!-- MAIN APP CONTAINER -->
   <main class="flex-grow flex flex-col items-center justify-center p-4 max-w-4xl mx-auto w-full">
 
-    <div class="flex flex-wrap justify-center bg-amber-200/60 p-1.5 rounded-3xl mb-3 space-x-1 sm:space-x-2 border-2 border-amber-300">
-      <button id="modColors" onclick="switchModule('colors')" 
-              class="px-3 sm:px-4 py-2 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 bg-amber-500 text-white shadow-md">
-        🎨 Colors
-      </button>
-      <button id="modNumbers" onclick="switchModule('numbers')" 
-              class="px-3 sm:px-4 py-2 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 text-amber-900 hover:bg-white/50">
-        🔢 Numbers
-      </button>
-      <button id="modAlphabet" onclick="switchModule('alphabet')" 
-              class="px-3 sm:px-4 py-2 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 text-amber-900 hover:bg-white/50">
-        🔤 Alphabet
-      </button>
-    </div>
-
-    <!-- NUMBER RANGE SELECTOR FILTER (Visible only in Numbers module) -->
-    <div id="numberRangeContainer" class="hidden mb-4 bg-white/90 px-4 py-2 rounded-2xl border-2 border-amber-300 flex items-center space-x-3 text-xs sm:text-sm">
-      <span class="font-bold text-amber-800">Number Range:</span>
-      <button id="range10" onclick="setNumberRange(10)" class="px-3 py-1 bg-amber-500 text-white font-bold rounded-xl shadow-sm">1 – 10</button>
-      <button id="range20" onclick="setNumberRange(20)" class="px-3 py-1 bg-amber-100 text-amber-800 font-bold rounded-xl hover:bg-amber-200">1 – 20</button>
-    </div>
-
-    <!-- MODE SWITCH TABS (Learn vs Quiz) -->
-    <div class="flex bg-amber-200/40 p-1 rounded-2xl mb-4 sm:mb-6 space-x-2 border border-amber-300/80">
+    <!-- MODE SWITCH TABS (LEARN / QUIZ) -->
+    <div class="flex bg-amber-200/60 p-1.5 rounded-3xl mb-3 space-x-2 border-2 border-amber-300">
       <button id="tabLearn" onclick="switchMode('learn')" 
-              class="px-4 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-200 bg-white text-amber-800 shadow-sm">
+              class="px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 bg-white text-amber-700 shadow-md">
         📖 Learn Mode
       </button>
       <button id="tabQuiz" onclick="switchMode('quiz')" 
-              class="px-4 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-200 text-amber-900 hover:bg-white/50">
+              class="px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 text-amber-900 hover:bg-white/50">
         🎮 Mini Quiz
       </button>
+    </div>
+
+    <!-- NUMBER RANGE FILTER TOGGLE (visible only when Numbers module is active) -->
+    <div id="numberRangeContainer" class="hidden mb-4 bg-white/80 p-1 rounded-2xl border border-amber-300 flex items-center space-x-1 text-xs font-bold shadow-sm">
+      <span class="px-3 text-slate-500">Range:</span>
+      <button id="numRange10Btn" onclick="setNumberRange(10)" class="px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold transition">1 – 10</button>
+      <button id="numRange20Btn" onclick="setNumberRange(20)" class="px-3 py-1.5 rounded-xl text-slate-700 hover:bg-amber-100 font-bold transition">1 – 20</button>
     </div>
 
     <!-- ==================== LEARN MODE SECTION ==================== -->
@@ -102,39 +170,49 @@
            onclick="handleCardClick(event)" 
            class="w-full max-w-md h-72 sm:h-96 rounded-3xl border-8 border-white custom-shadow transition-all duration-300 transform active:scale-95 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden group">
         
+        <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+        <!-- Speaker Replay Floating Badge -->
         <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md flex items-center space-x-2 group-hover:scale-110 transition-transform">
-          <i class="fas fa-volume-up text-slate-700 text-base"></i>
+          <i class="fas fa-volume-up text-slate-700 text-lg"></i>
           <span class="text-xs font-bold text-slate-600">Tap to Listen</span>
         </div>
 
-        <h2 id="mainDisplayTitle" class="text-6xl sm:text-8xl font-black tracking-wide drop-shadow-md text-white mb-2 transition-all">
+        <!-- French Primary Text Display -->
+        <h2 id="frenchName" class="text-5xl sm:text-7xl font-black tracking-wide drop-shadow-md text-white mb-2 transition-all">
           Rouge
         </h2>
 
+        <!-- English Translation & Phonetics -->
         <div id="englishContainer" class="bg-black/30 backdrop-blur-md px-4 py-2 rounded-2xl text-white mt-2 transition-all">
           <p id="englishName" class="text-xl sm:text-2xl font-bold">Red</p>
           <p id="phoneticText" class="text-xs sm:text-sm font-semibold opacity-80 italic">/roozh/</p>
         </div>
 
+        <!-- Touch Sparkle Effect Prompt -->
         <span class="absolute bottom-3 text-xs text-white/80 font-semibold tracking-wider uppercase">
-          ✨ Tap card to pronounce! ✨
+          ✨ Tap card for audio & sparkles! ✨
         </span>
       </div>
 
-      <!-- NAVIGATION CONTROLS -->
+      <!-- MAIN NAVIGATION CONTROLS -->
       <div class="w-full max-w-md mt-6 grid grid-cols-3 gap-3 sm:gap-4">
+        
+        <!-- PREVIOUS BUTTON -->
         <button onclick="prevItem()" 
                 class="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-sky-700 text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
           <i class="fas fa-chevron-left text-lg"></i>
           <span>Précédent</span>
         </button>
 
+        <!-- RANDOM BUTTON -->
         <button onclick="randomItem()" 
                 class="bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-purple-800 text-xs sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
           <i class="fas fa-dice text-lg"></i>
           <span>Aléatoire</span>
         </button>
 
+        <!-- NEXT BUTTON -->
         <button onclick="nextItem()" 
                 class="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-emerald-700 text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
           <span>Suivant</span>
@@ -142,17 +220,15 @@
         </button>
       </div>
 
-      <!-- SETTINGS BAR -->
-      <div class="mt-6 w-full max-w-md bg-white/80 rounded-2xl p-3 border border-amber-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-700 gap-2">
+      <!-- VOICE SPEED TOGGLE BAR -->
+      <div class="mt-6 w-full max-w-md bg-white/80 rounded-2xl p-3 border border-amber-200 flex items-center justify-between text-xs sm:text-sm text-slate-700">
         <div class="flex items-center space-x-2">
-          <i class="fas fa-volume-up text-amber-500 text-base"></i>
-          <span class="font-bold">Speak on Navigate:</span>
-          <input type="checkbox" id="navAudioCheckbox" checked onchange="toggleNavAudio(this.checked)" class="w-4 h-4 accent-amber-500 cursor-pointer">
+          <i class="fas fa-tachometer-alt text-amber-500 text-lg"></i>
+          <span class="font-bold">Voice Speed:</span>
         </div>
-        <div class="flex items-center space-x-1">
-          <span class="font-bold text-slate-500">Speed:</span>
-          <button onclick="setSpeechRate(0.7)" class="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 font-bold">Slow 🐢</button>
-          <button onclick="setSpeechRate(0.9)" class="px-2 py-1 rounded bg-amber-200 hover:bg-amber-300 font-bold">Normal 🧒</button>
+        <div class="flex bg-amber-100 p-1 rounded-xl space-x-1">
+          <button id="speedSlowBtn" onclick="setSpeechRate(0.7)" class="px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-700">🐢 Slow</button>
+          <button id="speedNormalBtn" onclick="setSpeechRate(0.85)" class="px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs">🧒 Normal</button>
         </div>
       </div>
 
@@ -162,6 +238,7 @@
     <section id="quizSection" class="w-full flex flex-col items-center hidden">
       <div class="bg-white/90 rounded-3xl p-6 border-4 border-amber-200 w-full max-w-md text-center shadow-lg">
         
+        <!-- Score Bar -->
         <div class="flex justify-between items-center mb-4 pb-3 border-b border-amber-100">
           <span class="text-base font-bold text-amber-800">Score: <span id="quizScoreText" class="text-2xl font-black text-amber-600">0</span></span>
           <button onclick="resetQuizScore()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded-xl font-bold">
@@ -169,7 +246,8 @@
           </button>
         </div>
 
-        <p class="text-sm font-semibold text-slate-500 mb-1">Find the matching match for:</p>
+        <!-- Question Prompt -->
+        <p class="text-sm font-semibold text-slate-500 mb-1">Find the matching item for:</p>
         <div class="flex items-center justify-center space-x-2 mb-6">
           <h3 id="quizQuestionText" class="text-3xl sm:text-4xl font-black text-slate-800">Rouge</h3>
           <button onclick="speakWord(currentQuizTarget ? currentQuizTarget.french : '')" class="p-2 bg-amber-100 text-amber-700 rounded-full hover:bg-amber-200 transition">
@@ -177,10 +255,12 @@
           </button>
         </div>
 
+        <!-- Quiz Color / Choice Grid -->
         <div id="quizOptionsGrid" class="grid grid-cols-2 gap-4">
-          <!-- Options populated dynamically -->
+          <!-- Dynamically populated choices -->
         </div>
 
+        <!-- Feedback Message Box -->
         <div id="quizFeedback" class="mt-4 min-h-[3rem] flex items-center justify-center font-bold text-lg rounded-2xl p-2 transition-all opacity-0">
         </div>
       </div>
@@ -188,13 +268,59 @@
 
   </main>
 
-  <footer class="p-3 text-center text-xs font-semibold text-amber-800/70">
-    French Learning for Kids • Colors, Numbers & Alphabet
-  </footer>
+  <!-- ANDROID BUILD GUIDE MODAL -->
+  <div id="androidModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-3xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border-4 border-emerald-400">
+      <button onclick="closeAndroidModal()" class="absolute top-4 right-4 bg-slate-100 text-slate-500 hover:bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg">
+        ✕
+      </button>
+      
+      <div class="flex items-center space-x-3 mb-4">
+        <i class="fab fa-android text-4xl text-emerald-500"></i>
+        <div>
+          <h3 class="text-xl font-black text-slate-800">Convert to Android App</h3>
+          <p class="text-xs text-slate-500">No-code PWA build guide</p>
+        </div>
+      </div>
 
+      <div class="space-y-4 text-xs sm:text-sm text-slate-600">
+        <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
+          <h4 class="font-bold text-emerald-800 text-base mb-1">PWABuilder Method (5 mins)</h4>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>Host this single code repository on GitHub Pages.</li>
+            <li>Visit <a href="https://www.pwabuilder.com" target="_blank" class="text-emerald-600 font-bold underline">PWABuilder.com</a> and enter your website URL.</li>
+            <li>Click <strong>"Package for Stores"</strong> and select <strong>"Android"</strong>.</li>
+            <li>Download your ready-to-install <code>.apk</code> or Google Play package!</li>
+          </ol>
+        </div>
+      </div>
+
+      <button onclick="closeAndroidModal()" class="w-full mt-5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-2xl shadow-lg transition">
+        Got It!
+      </button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // DATASETS FOR MODULES
-    const colorDataset = [
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swContent = `
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(fetch(e.request).catch(() => new Response("Offline")));
+          });
+        `;
+        const blob = new Blob([swContent], { type: 'text/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(err => console.log('SW note:', err));
+      });
+    }
+
+    // ==================== DATASETS ====================
+    const colorsDataset = [
       { french: "Rouge", english: "Red", phonetic: "/roozh/", hex: "#EF4444", textDark: false },
       { french: "Bleu", english: "Blue", phonetic: "/bluh/", hex: "#3B82F6", textDark: false },
       { french: "Jaune", english: "Yellow", phonetic: "/zhohn/", hex: "#FACC15", textDark: true },
@@ -208,61 +334,63 @@
       { french: "Marron", english: "Brown", phonetic: "/mah-rohn/", hex: "#78350F", textDark: false }
     ];
 
-    const numberDataset = [
-      { french: "Un", english: "1", phonetic: "/uhn/", hex: "#F59E0B" },
-      { french: "Deux", english: "2", phonetic: "/duh/", hex: "#10B981" },
-      { french: "Trois", english: "3", phonetic: "/twah/", hex: "#6366F1" },
-      { french: "Quatre", english: "4", phonetic: "/kat-ruh/", hex: "#EC4899" },
-      { french: "Cinq", english: "5", phonetic: "/sank/", hex: "#8B5CF6" },
-      { french: "Six", english: "6", phonetic: "/sees/", hex: "#14B8A6" },
-      { french: "Sept", english: "7", phonetic: "/set/", hex: "#F97316" },
-      { french: "Huit", english: "8", phonetic: "/weet/", hex: "#06B6D4" },
-      { french: "Neuf", english: "9", phonetic: "/nuhf/", hex: "#84CC16" },
-      { french: "Dix", english: "10", phonetic: "/dees/", hex: "#EF4444" },
-      { french: "Onze", english: "11", phonetic: "/ohnz/", hex: "#3B82F6" },
-      { french: "Douze", english: "12", phonetic: "/doo-zuh/", hex: "#10B981" },
-      { french: "Treize", english: "13", phonetic: "/trehz/", hex: "#A855F7" },
-      { french: "Quatorze", english: "14", phonetic: "/kah-torz/", hex: "#F59E0B" },
-      { french: "Quinze", english: "15", phonetic: "/kanz/", hex: "#EC4899" },
-      { french: "Seize", english: "16", phonetic: "/sehz/", hex: "#06B6D4" },
-      { french: "Dix-sept", english: "17", phonetic: "/dees-set/", hex: "#F97316" },
-      { french: "Dix-huit", english: "18", phonetic: "/dees-weet/", hex: "#8B5CF6" },
-      { french: "Dix-neuf", english: "19", phonetic: "/dees-nuhf/", hex: "#84CC16" },
-      { french: "Vingt", english: "20", phonetic: "/van/", hex: "#EF4444" }
+    const numbersDatasetAll = [
+      { french: "Un", english: "1", phonetic: "/uhn/", hex: "#3B82F6", num: 1 },
+      { french: "Deux", english: "2", phonetic: "/duh/", hex: "#10B981", num: 2 },
+      { french: "Trois", english: "3", phonetic: "/twah/", hex: "#F59E0B", num: 3 },
+      { french: "Quatre", english: "4", phonetic: "/kat-ruh/", hex: "#EC4899", num: 4 },
+      { french: "Cinq", english: "5", phonetic: "/sank/", hex: "#8B5CF6", num: 5 },
+      { french: "Six", english: "6", phonetic: "/sees/", hex: "#EF4444", num: 6 },
+      { french: "Sept", english: "7", phonetic: "/set/", hex: "#14B8A6", num: 7 },
+      { french: "Huit", english: "8", phonetic: "/weet/", hex: "#F97316", num: 8 },
+      { french: "Neuf", english: "9", phonetic: "/nuhf/", hex: "#6366F1", num: 9 },
+      { french: "Dix", english: "10", phonetic: "/dees/", hex: "#84CC16", num: 10 },
+      { french: "Onze", english: "11", phonetic: "/ohnz/", hex: "#06B6D4", num: 11 },
+      { french: "Douze", english: "12", phonetic: "/doo-z/", hex: "#A855F7", num: 12 },
+      { french: "Treize", english: "13", phonetic: "/trehz/", hex: "#EAB308", num: 13 },
+      { french: "Quatorze", english: "14", phonetic: "/kah-torz/", hex: "#F43F5E", num: 14 },
+      { french: "Quinze", english: "15", phonetic: "/kanz/", hex: "#10B981", num: 15 },
+      { french: "Seize", english: "16", phonetic: "/sehz/", hex: "#3B82F6", num: 16 },
+      { french: "Dix-sept", english: "17", phonetic: "/dees-set/", hex: "#D97706", num: 17 },
+      { french: "Dix-huit", english: "18", phonetic: "/dees-weet/", hex: "#8B5CF6", num: 18 },
+      { french: "Dix-neuf", english: "19", phonetic: "/dees-nuhf/", hex: "#EC4899", num: 19 },
+      { french: "Vingt", english: "20", phonetic: "/van/", hex: "#059669", num: 20 }
     ];
 
     const alphabetDataset = [
       { french: "A", english: "Ah", phonetic: "/ah/", hex: "#EF4444" },
-      { french: "B", english: "Be", phonetic: "/beh/", hex: "#3B82F6" },
-      { french: "C", english: "Se", phonetic: "/seh/", hex: "#10B981" },
-      { french: "D", english: "De", phonetic: "/deh/", hex: "#F59E0B" },
-      { french: "E", english: "Euh", phonetic: "/euh/", hex: "#EC4899" },
-      { french: "F", english: "Eff", phonetic: "/eff/", hex: "#8B5CF6" },
-      { french: "G", english: "Jhe", phonetic: "/zheh/", hex: "#14B8A6" },
+      { french: "B", english: "Baw", phonetic: "/bay/", hex: "#3B82F6" },
+      { french: "C", english: "Say", phonetic: "/say/", hex: "#10B981" },
+      { french: "D", english: "Day", phonetic: "/day/", hex: "#F59E0B" },
+      { french: "E", english: "Euh", phonetic: "/uh/", hex: "#8B5CF6" },
+      { french: "F", english: "Eff", phonetic: "/eff/", hex: "#EC4899" },
+      { french: "G", english: "Zhey", phonetic: "/zhay/", hex: "#14B8A6" },
       { french: "H", english: "Ash", phonetic: "/ash/", hex: "#F97316" },
-      { french: "I", english: "Ee", phonetic: "/ee/", hex: "#06B6D4" },
-      { french: "J", english: "Jee", phonetic: "/zhee/", hex: "#84CC16" },
-      { french: "K", english: "Kah", phonetic: "/kah/", hex: "#EF4444" },
-      { french: "L", english: "Ell", phonetic: "/ell/", hex: "#3B82F6" },
-      { french: "M", english: "Emm", phonetic: "/emm/", hex: "#10B981" },
-      { french: "N", english: "Enn", phonetic: "/enn/", hex: "#A855F7" },
-      { french: "O", english: "Oh", phonetic: "/oh/", hex: "#F59E0B" },
-      { french: "P", english: "Peh", phonetic: "/peh/", hex: "#EC4899" },
-      { french: "Q", english: "Kew", phonetic: "/koo/", hex: "#06B6D4" },
-      { french: "R", english: "Air", phonetic: "/air/", hex: "#F97316" },
-      { french: "S", english: "Ess", phonetic: "/ess/", hex: "#8B5CF6" },
-      { french: "T", english: "Teh", phonetic: "/teh/", hex: "#84CC16" },
-      { french: "U", english: "Oo", phonetic: "/oo/", hex: "#EF4444" },
-      { french: "V", english: "Veh", phonetic: "/veh/", hex: "#3B82F6" },
-      { french: "W", english: "Double Veh", phonetic: "/doo-bluh-veh/", hex: "#10B981" },
-      { french: "X", english: "Iks", phonetic: "/eeks/", hex: "#A855F7" },
-      { french: "Y", english: "I-grec", phonetic: "/ee-grek/", hex: "#F59E0B" },
-      { french: "Z", english: "Zed", phonetic: "/zed/", hex: "#EC4899" }
+      { french: "I", english: "Eee", phonetic: "/ee/", hex: "#6366F1" },
+      { french: "J", english: "Zhee", phonetic: "/zhee/", hex: "#84CC16" },
+      { french: "K", english: "Kah", phonetic: "/kah/", hex: "#06B6D4" },
+      { french: "L", english: "Ell", phonetic: "/ell/", hex: "#A855F7" },
+      { french: "M", english: "Emm", phonetic: "/emm/", hex: "#EAB308" },
+      { french: "N", english: "Enn", phonetic: "/enn/", hex: "#F43F5E" },
+      { french: "O", english: "Oh", phonetic: "/oh/", hex: "#059669" },
+      { french: "P", english: "Pay", phonetic: "/pay/", hex: "#D97706" },
+      { french: "Q", english: "Koo", phonetic: "/koo/", hex: "#3B82F6" },
+      { french: "R", english: "Air", phonetic: "/air/", hex: "#EF4444" },
+      { french: "S", english: "Ess", phonetic: "/ess/", hex: "#10B981" },
+      { french: "T", english: "Tay", phonetic: "/tay/", hex: "#8B5CF6" },
+      { french: "U", english: "Eew", phonetic: "/oo/", hex: "#EC4899" },
+      { french: "V", english: "Vey", phonetic: "/vay/", hex: "#14B8A6" },
+      { french: "W", english: "Double Vey", phonetic: "/doo-bluh-vay/", hex: "#F97316" },
+      { french: "X", english: "Eeks", phonetic: "/eeks/", hex: "#6366F1" },
+      { french: "Y", english: "Eegrek", phonetic: "/ee-grek/", hex: "#84CC16" },
+      { french: "Z", english: "Zed", phonetic: "/zed/", hex: "#06B6D4" }
     ];
 
-    // App State
-    let currentModule = 'colors'; // 'colors', 'numbers', 'alphabet'
-    let numberLimit = 10; // 10 or 20
+    // App State Variables
+    let currentModule = 'colors';
+    let numberLimit = 10;
+    let activeDataset = colorsDataset;
+    
     let currentIndex = 0;
     let autoPlayAudio = true;
     let showEnglish = true;
@@ -272,87 +400,119 @@
     let quizScore = 0;
     let currentQuizTarget = null;
 
-    function getActiveDataset() {
-      if (currentModule === 'colors') return colorDataset;
-      if (currentModule === 'alphabet') return alphabetDataset;
-      if (currentModule === 'numbers') {
-        return numberDataset.slice(0, numberLimit);
-      }
-      return colorDataset;
-    }
-
+    // Initialize Voice Selection Safely
     function initVoices() {
       if (!synth) return;
       let voices = synth.getVoices();
       frenchVoice = voices.find(v => v.lang.startsWith('fr') || v.lang.includes('FR')) || null;
     }
 
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = initVoices;
+    if (synth && synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = initVoices;
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      initVoices();
-      updateDisplay(false);
-    });
+    // ==================== BURGER MENU CONTROLS ====================
+    function toggleMenu() {
+      const drawer = document.getElementById('menuDrawer');
+      const overlay = document.getElementById('menuOverlay');
+      const isOpen = !drawer.classList.contains('-translate-x-full');
 
-    // MODULE SWITCHING logic
-    function switchModule(moduleName) {
+      if (isOpen) {
+        closeMenu();
+      } else {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100');
+      }
+    }
+
+    function closeMenu() {
+      const drawer = document.getElementById('menuDrawer');
+      const overlay = document.getElementById('menuOverlay');
+      drawer.classList.add('-translate-x-full');
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      overlay.classList.remove('opacity-100');
+    }
+
+    // ==================== MODULE SELECTION ====================
+    function selectModule(moduleName) {
       currentModule = moduleName;
       currentIndex = 0;
 
-      // Update module tab styling
-      ['colors', 'numbers', 'alphabet'].forEach(m => {
-        const btn = document.getElementById('mod' + m.charAt(0).toUpperCase() + m.slice(1));
-        if (m === moduleName) {
-          btn.className = "px-3 sm:px-4 py-2 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 bg-amber-500 text-white shadow-md";
-        } else {
-          btn.className = "px-3 sm:px-4 py-2 rounded-2xl font-bold text-sm sm:text-base transition-all duration-200 text-amber-900 hover:bg-white/50";
-        }
-      });
+      document.getElementById('modColorsBtn').className = moduleName === 'colors' 
+        ? "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md"
+        : "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
 
-      // Show range selector only for numbers
-      const rangeContainer = document.getElementById('numberRangeContainer');
-      if (moduleName === 'numbers') {
-        rangeContainer.classList.remove('hidden');
-      } else {
-        rangeContainer.classList.add('hidden');
+      document.getElementById('modNumbersBtn').className = moduleName === 'numbers' 
+        ? "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md"
+        : "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
+
+      document.getElementById('modAlphabetBtn').className = moduleName === 'alphabet' 
+        ? "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md"
+        : "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
+
+      const numFilter = document.getElementById('numberRangeContainer');
+      const title = document.getElementById('headerTitle');
+      const sub = document.getElementById('headerSubtitle');
+
+      if (moduleName === 'colors') {
+        activeDataset = colorsDataset;
+        numFilter.classList.add('hidden');
+        title.textContent = "Couleurs en Français";
+        sub.textContent = "French Colors for Kids";
+      } else if (moduleName === 'numbers') {
+        numFilter.classList.remove('hidden');
+        activeDataset = numbersDatasetAll.slice(0, numberLimit);
+        title.textContent = "Nombres en Français";
+        sub.textContent = `French Numbers (1-${numberLimit})`;
+      } else if (moduleName === 'alphabet') {
+        activeDataset = alphabetDataset;
+        numFilter.classList.add('hidden');
+        title.textContent = "L'Alphabet Français";
+        sub.textContent = "French Alphabet for Kids";
       }
 
-      updateDisplay(autoPlayAudio);
+      closeMenu();
+      updateDisplay(false);
+      
       if (!document.getElementById('quizSection').classList.contains('hidden')) {
         startNewQuizRound();
       }
     }
 
-    // NUMBER RANGE FILTER
     function setNumberRange(limit) {
       numberLimit = limit;
-      currentIndex = 0;
-      
-      const r10 = document.getElementById('range10');
-      const r20 = document.getElementById('range20');
+      const btn10 = document.getElementById('numRange10Btn');
+      const btn20 = document.getElementById('numRange20Btn');
+      const sub = document.getElementById('headerSubtitle');
 
       if (limit === 10) {
-        r10.className = "px-3 py-1 bg-amber-500 text-white font-bold rounded-xl shadow-sm";
-        r20.className = "px-3 py-1 bg-amber-100 text-amber-800 font-bold rounded-xl hover:bg-amber-200";
+        btn10.className = "px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold transition";
+        btn20.className = "px-3 py-1.5 rounded-xl text-slate-700 hover:bg-amber-100 font-bold transition";
       } else {
-        r20.className = "px-3 py-1 bg-amber-500 text-white font-bold rounded-xl shadow-sm";
-        r10.className = "px-3 py-1 bg-amber-100 text-amber-800 font-bold rounded-xl hover:bg-amber-200";
+        btn20.className = "px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold transition";
+        btn10.className = "px-3 py-1.5 rounded-xl text-slate-700 hover:bg-amber-100 font-bold transition";
       }
 
-      updateDisplay(autoPlayAudio);
-      if (!document.getElementById('quizSection').classList.contains('hidden')) {
-        startNewQuizRound();
-      }
+      sub.textContent = `French Numbers (1-${limit})`;
+      activeDataset = numbersDatasetAll.slice(0, limit);
+      currentIndex = 0;
+      updateDisplay(false);
     }
 
-    // DISPLAY CARD UPDATE
+    // ==================== APP INITIALIZATION ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      initVoices();
+      selectModule('colors');
+    });
+
+    // ==================== ITEM NAVIGATION & DISPLAY ====================
     function updateDisplay(shouldSpeak = autoPlayAudio) {
-      const dataset = getActiveDataset();
-      const item = dataset[currentIndex];
+      if (!activeDataset || activeDataset.length === 0) return;
+
+      const item = activeDataset[currentIndex];
       const card = document.getElementById('displayCard');
-      const title = document.getElementById('mainDisplayTitle');
+      const frenchText = document.getElementById('frenchName');
       const englishText = document.getElementById('englishName');
       const phoneticText = document.getElementById('phoneticText');
 
@@ -367,12 +527,12 @@
       }
 
       if (item.textDark) {
-        title.className = "text-6xl sm:text-8xl font-black tracking-wide text-slate-900 mb-2 transition-all drop-shadow-sm";
+        frenchText.className = "text-5xl sm:text-7xl font-black tracking-wide text-slate-900 mb-2 transition-all drop-shadow-sm";
       } else {
-        title.className = "text-6xl sm:text-8xl font-black tracking-wide text-white mb-2 transition-all drop-shadow-md";
+        frenchText.className = "text-5xl sm:text-7xl font-black tracking-wide text-white mb-2 transition-all drop-shadow-md";
       }
 
-      title.textContent = item.french;
+      frenchText.textContent = item.french;
       englishText.textContent = item.english;
       phoneticText.textContent = item.phonetic;
 
@@ -382,34 +542,31 @@
     }
 
     function nextItem() {
-      const dataset = getActiveDataset();
-      currentIndex = (currentIndex + 1) % dataset.length;
-      updateDisplay();
+      currentIndex = (currentIndex + 1) % activeDataset.length;
+      updateDisplay(autoPlayAudio);
       triggerConfetti(0.8, 0.5);
     }
 
     function prevItem() {
-      const dataset = getActiveDataset();
-      currentIndex = (currentIndex - 1 + dataset.length) % dataset.length;
-      updateDisplay();
+      currentIndex = (currentIndex - 1 + activeDataset.length) % activeDataset.length;
+      updateDisplay(autoPlayAudio);
       triggerConfetti(0.2, 0.5);
     }
 
     function randomItem() {
-      const dataset = getActiveDataset();
+      if (!activeDataset || activeDataset.length <= 1) return;
       let newIndex;
       do {
-        newIndex = Math.floor(Math.random() * dataset.length);
-      } while (newIndex === currentIndex && dataset.length > 1);
+        newIndex = Math.floor(Math.random() * activeDataset.length);
+      } while (newIndex === currentIndex);
       
       currentIndex = newIndex;
-      updateDisplay();
+      updateDisplay(autoPlayAudio);
       triggerConfetti(0.5, 0.6);
     }
 
     function handleCardClick(e) {
-      const dataset = getActiveDataset();
-      const item = dataset[currentIndex];
+      const item = activeDataset[currentIndex];
       speakWord(item.french);
       
       const rect = e.currentTarget.getBoundingClientRect();
@@ -418,14 +575,8 @@
       triggerConfetti(x, y);
     }
 
-    function toggleNavAudio(enabled) {
-      autoPlayAudio = enabled;
-      updateAudioToggleUI();
-    }
-
     function toggleAutoAudio() {
       autoPlayAudio = !autoPlayAudio;
-      document.getElementById('navAudioCheckbox').checked = autoPlayAudio;
       updateAudioToggleUI();
     }
 
@@ -435,60 +586,67 @@
       const text = document.getElementById('audioToggleText');
       
       if (autoPlayAudio) {
-        btn.className = "p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-xs sm:text-sm";
-        icon.className = "fas fa-volume-up text-base text-amber-600";
+        btn.className = "p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm";
+        icon.className = "fas fa-volume-up text-lg text-amber-600";
         if (text) text.textContent = "Auto-Voice: ON";
       } else {
-        btn.className = "p-2 sm:px-3 sm:py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-xs sm:text-sm";
-        icon.className = "fas fa-volume-mute text-base text-slate-500";
+        btn.className = "p-2 sm:px-3 sm:py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm";
+        icon.className = "fas fa-volume-mute text-lg text-slate-500";
         if (text) text.textContent = "Auto-Voice: OFF";
-      }
-    }
-
-    function toggleEnglish() {
-      showEnglish = !showEnglish;
-      const container = document.getElementById('englishContainer');
-      if (showEnglish) {
-        container.classList.remove('hidden');
-      } else {
-        container.classList.add('hidden');
       }
     }
 
     function setSpeechRate(rate) {
       speechRate = rate;
-      const dataset = getActiveDataset();
-      speakWord(dataset[currentIndex].french);
-    }
+      const slowBtn = document.getElementById('speedSlowBtn');
+      const normBtn = document.getElementById('speedNormalBtn');
 
-    function speakWord(text) {
-      if (!synth) return;
-      synth.cancel();
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'fr-FR';
-      utterance.rate = speechRate;
-      utterance.pitch = 1.1;
-
-      if (frenchVoice) {
-        utterance.voice = frenchVoice;
+      if (rate === 0.7) {
+        slowBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs";
+        normBtn.className = "px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-700";
+      } else {
+        normBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs";
+        slowBtn.className = "px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-700";
       }
 
-      synth.speak(utterance);
+      speakWord(activeDataset[currentIndex].french);
+    }
+
+    // ==================== SPEECH ENGINE ====================
+    function speakWord(text) {
+      if (!synth) return;
+      try {
+        synth.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'fr-FR';
+        utterance.rate = speechRate;
+        utterance.pitch = 1.1;
+
+        if (!frenchVoice) {
+          initVoices();
+        }
+        if (frenchVoice) {
+          utterance.voice = frenchVoice;
+        }
+
+        synth.speak(utterance);
+      } catch (err) {
+        console.log("Speech synthesis note:", err);
+      }
     }
 
     function triggerConfetti(originX = 0.5, originY = 0.5) {
       if (typeof confetti === 'function') {
         confetti({
-          particleCount: 20,
-          spread: 50,
+          particleCount: 25,
+          spread: 60,
           origin: { x: originX, y: originY },
           colors: ['#EF4444', '#3B82F6', '#FACC15', '#22C55E', '#EC4899']
         });
       }
     }
 
-    // MODE SWITCHING & QUIZ ENGINE
+    // ==================== MODE SWITCHING & QUIZ ENGINE ====================
     function switchMode(mode) {
       const learnSec = document.getElementById('learnSection');
       const quizSec = document.getElementById('quizSection');
@@ -498,21 +656,22 @@
       if (mode === 'learn') {
         learnSec.classList.remove('hidden');
         quizSec.classList.add('hidden');
-        tabLearn.className = "px-4 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-200 bg-white text-amber-800 shadow-sm";
-        tabQuiz.className = "px-4 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-200 text-amber-900 hover:bg-white/50";
+        tabLearn.className = "px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 bg-white text-amber-700 shadow-md";
+        tabQuiz.className = "px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 text-amber-900 hover:bg-white/50";
       } else {
         learnSec.classList.add('hidden');
         quizSec.classList.remove('hidden');
-        tabQuiz.className = "px-4 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-200 bg-white text-amber-800 shadow-sm";
-        tabLearn.className = "px-4 py-1.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-200 text-amber-900 hover:bg-white/50";
+        tabQuiz.className = "px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 bg-white text-amber-700 shadow-md";
+        tabLearn.className = "px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 text-amber-900 hover:bg-white/50";
         startNewQuizRound();
       }
     }
 
     function startNewQuizRound() {
-      const dataset = getActiveDataset();
-      const targetIndex = Math.floor(Math.random() * dataset.length);
-      currentQuizTarget = dataset[targetIndex];
+      if (!activeDataset || activeDataset.length === 0) return;
+
+      const targetIndex = Math.floor(Math.random() * activeDataset.length);
+      currentQuizTarget = activeDataset[targetIndex];
 
       document.getElementById('quizQuestionText').textContent = currentQuizTarget.french;
       
@@ -521,8 +680,8 @@
       }
 
       let options = [currentQuizTarget];
-      while (options.length < Math.min(4, dataset.length)) {
-        let randomChoice = dataset[Math.floor(Math.random() * dataset.length)];
+      while (options.length < 4 && options.length < activeDataset.length) {
+        let randomChoice = activeDataset[Math.floor(Math.random() * activeDataset.length)];
         if (!options.some(o => o.french === randomChoice.french)) {
           options.push(randomChoice);
         }
@@ -535,9 +694,15 @@
 
       options.forEach(option => {
         const btn = document.createElement('button');
-        btn.className = `h-20 sm:h-24 rounded-2xl border-4 border-white shadow-md transition transform active:scale-95 flex items-center justify-center font-bold text-lg text-white drop-shadow-md ${option.border ? 'border-slate-300' : ''}`;
+        btn.className = `h-24 sm:h-28 rounded-2xl border-4 border-white shadow-md transition transform active:scale-95 flex items-center justify-center font-bold text-xl text-white ${option.border ? 'border-slate-300' : ''}`;
         btn.style.backgroundColor = option.hex;
-        btn.textContent = option.english;
+
+        if (currentModule === 'numbers' || currentModule === 'alphabet') {
+          btn.innerHTML = `<span class="text-3xl font-black drop-shadow">${option.english}</span>`;
+        } else {
+          btn.innerHTML = `<span class="text-sm font-black drop-shadow bg-black/20 px-3 py-1 rounded-xl">${option.english}</span>`;
+        }
+
         btn.onclick = () => handleQuizAnswer(option);
         grid.appendChild(btn);
       });
@@ -572,6 +737,13 @@
       quizScore = 0;
       document.getElementById('quizScoreText').textContent = '0';
       startNewQuizRound();
+    }
+
+    function openAndroidModal() {
+      document.getElementById('androidModal').classList.remove('hidden');
+    }
+    function closeAndroidModal() {
+      document.getElementById('androidModal').classList.add('hidden');
     }
   </script>
 </body>
