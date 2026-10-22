@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>French Colors for Kids</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Fredoka', cursive, sans-serif;
+      touch-action: manipulation;
+    }
+    .custom-shadow {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-amber-50 min-h-screen flex flex-col justify-between text-slate-800 select-none">
+
+  <!-- HEADER -->
+  <header class="bg-white/80 backdrop-blur-md border-b-4 border-amber-200 sticky top-0 z-40 p-3 sm:p-4">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <span class="text-3xl sm:text-4xl">🎨</span>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black text-amber-600 tracking-wide leading-tight">Couleurs en Français</h1>
+          <p class="text-xs text-amber-800 font-bold hidden sm:block">French Colors for Kids</p>
+        </div>
+      </div>
+
+      <!-- Control Toggles -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Audio Auto-Play Toggle -->
+        <button id="toggleAudioBtn" onclick="toggleAutoAudio()" 
+                class="p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm">
+          <i id="audioIcon" class="fas fa-volume-up text-lg text-amber-600"></i>
+          <span class="hidden sm:inline" id="audioToggleText">Auto-Voice: ON</span>
+        </button>
+
+        <!-- English Guide Toggle -->
+        <button id="toggleEnglishBtn" onclick="toggleEnglish()" 
+                class="p-2 sm:px-3 sm:py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm">
+          <i class="fas fa-language text-lg text-blue-600"></i>
+          <span class="hidden sm:inline">English Helper</span>
+        </button>
+
+        <!-- Android APK Guide Modal Button -->
+        <button onclick="openAndroidModal()" 
+                class="p-2 sm:px-3 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl flex items-center space-x-1.5 transition font-bold text-sm shadow-md">
+          <i class="fab fa-android text-xl"></i>
+          <span class="hidden sm:inline">Make Android App</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-grow flex flex-col items-center justify-center p-4 max-w-4xl mx-auto w-full">
+
+    <!-- MODE SWITCH TABS -->
+    <div class="flex bg-amber-200/60 p-1.5 rounded-3xl mb-4 sm:mb-6 space-x-2 border-2 border-amber-300">
+      <button id="tabLearn" onclick="switchMode('learn')" 
+              class="px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 bg-white text-amber-700 shadow-md">
+        📖 Learn Mode
+      </button>
+      <button id="tabQuiz" onclick="switchMode('quiz')" 
+              class="px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 text-amber-900 hover:bg-white/50">
+        🎮 Mini Quiz
+      </button>
+    </div>
+
+    <!-- ==================== LEARN MODE SECTION ==================== -->
+    <section id="learnSection" class="w-full flex flex-col items-center">
+      
+      <!-- MAIN COLOR DISPLAY CARD -->
+      <div id="colorCard" 
+           onclick="handleCardClick(event)" 
+           class="w-full max-w-md h-72 sm:h-96 rounded-3xl border-8 border-white custom-shadow transition-all duration-300 transform active:scale-95 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden group">
+        
+        <!-- Subtle background pattern/glow -->
+        <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+        <!-- Speaker Replay Floating Badge -->
+        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md flex items-center space-x-2 group-hover:scale-110 transition-transform">
+          <i class="fas fa-volume-up text-slate-700 text-lg"></i>
+          <span class="text-xs font-bold text-slate-600">Tap to Listen</span>
+        </div>
+
+        <!-- Color Name Display (French) -->
+        <h2 id="frenchName" class="text-5xl sm:text-7xl font-black tracking-wide drop-shadow-md text-white mb-2 transition-all">
+          Rouge
+        </h2>
+
+        <!-- English Translation & Phonetics (Togglable) -->
+        <div id="englishContainer" class="bg-black/30 backdrop-blur-md px-4 py-2 rounded-2xl text-white mt-2 transition-all">
+          <p id="englishName" class="text-xl sm:text-2xl font-bold">Red</p>
+          <p id="phoneticText" class="text-xs sm:text-sm font-semibold opacity-80 italic">/roozh/</p>
+        </div>
+
+        <!-- Touch Sparkle Effect Prompt -->
+        <span class="absolute bottom-3 text-xs text-white/80 font-semibold tracking-wider uppercase">
+          ✨ Tap card for magic audio & sparkles! ✨
+        </span>
+      </div>
+
+      <!-- MAIN NAVIGATION CONTROLS -->
+      <div class="w-full max-w-md mt-6 grid grid-cols-3 gap-3 sm:gap-4">
+        
+        <!-- PREVIOUS BUTTON -->
+        <button onclick="prevColor()" 
+                class="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-sky-700 text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
+          <i class="fas fa-chevron-left text-lg"></i>
+          <span>Précédent</span>
+        </button>
+
+        <!-- RANDOM BUTTON -->
+        <button onclick="randomColor()" 
+                class="bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-purple-800 text-xs sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
+          <i class="fas fa-dice text-lg"></i>
+          <span>Aléatoire</span>
+        </button>
+
+        <!-- NEXT BUTTON -->
+        <button onclick="nextColor()" 
+                class="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-emerald-700 text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
+          <span>Suivant</span>
+          <i class="fas fa-chevron-right text-lg"></i>
+        </button>
+      </div>
+
+      <!-- VOICE SPEED & AUTO-SPEAK TOGGLE BAR -->
+      <div class="mt-6 w-full max-w-md bg-white/80 rounded-2xl p-3 border border-amber-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-700 gap-2">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-volume-up text-amber-500 text-base"></i>
+          <span class="font-bold">Speak on Navigate:</span>
+          <input type="checkbox" id="navAudioCheckbox" checked onchange="toggleNavAudio(this.checked)" class="w-4 h-4 accent-amber-500 cursor-pointer">
+        </div>
+        <div class="flex items-center space-x-1">
+          <span class="font-bold text-slate-500">Speed:</span>
+          <button onclick="setSpeechRate(0.7)" class="px-2 py-1 rounded bg-amber-100 hover:bg-amber-200 font-bold">Slow 🐢</button>
+          <button onclick="setSpeechRate(0.9)" class="px-2 py-1 rounded bg-amber-200 hover:bg-amber-300 font-bold">Normal 🧒</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== MINI QUIZ SECTION ==================== -->
+    <section id="quizSection" class="w-full flex flex-col items-center hidden">
+      <div class="bg-white/90 rounded-3xl p-6 border-4 border-amber-200 w-full max-w-md text-center shadow-lg">
+        
+        <!-- Score Bar -->
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-amber-100">
+          <span class="text-base font-bold text-amber-800">Score: <span id="quizScoreText" class="text-2xl font-black text-amber-600">0</span></span>
+          <button onclick="resetQuizScore()" class="text-xs bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1.5 rounded-xl font-bold">
+            🔄 Reset
+          </button>
+        </div>
+
+        <!-- Question Prompt -->
+        <p class="text-sm font-semibold text-slate-500 mb-1">Find the matching color for:</p>
+        <div class="flex items-center justify-center space-x-2 mb-6">
+          <h3 id="quizQuestionText" class="text-3xl sm:text-4xl font-black text-slate-800">Rouge</h3>
+          <button onclick="speakWord(currentQuizTarget ? currentQuizTarget.french : '')" class="p-2 bg-amber-100 text-amber-700 rounded-full hover:bg-amber-200 transition">
+            <i class="fas fa-volume-up text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Quiz Color Choice Buttons -->
+        <div id="quizOptionsGrid" class="grid grid-cols-2 gap-4">
+          <!-- Dynamically populated choices -->
+        </div>
+
+        <!-- Feedback Message Box -->
+        <div id="quizFeedback" class="mt-4 min-h-[3rem] flex items-center justify-center font-bold text-lg rounded-2xl p-2 transition-all opacity-0">
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ANDROID BUILD GUIDE MODAL -->
+  <div id="androidModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-3xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border-4 border-emerald-400">
+      <button onclick="closeAndroidModal()" class="absolute top-4 right-4 bg-slate-100 text-slate-500 hover:bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg">
+        ✕
+      </button>
+      
+      <div class="flex items-center space-x-3 mb-4">
+        <i class="fab fa-android text-4xl text-emerald-500"></i>
+        <div>
+          <h3 class="text-xl font-black text-slate-800">Convert to Android App</h3>
+          <p class="text-xs text-slate-500">Easiest no-code / low-code methods</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm text-slate-600">
+        <!-- Option 1 -->
+        <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
+          <h4 class="font-bold text-emerald-800 text-base mb-1">Option 1: PWABuilder (Easiest - 5 mins)</h4>
+          <ol class="list-decimal list-inside space-y-1">
+            <li>Host this single HTML file on GitHub Pages, Netlify, or Vercel.</li>
+            <li>Visit <a href="https://www.pwabuilder.com" target="_blank" class="text-emerald-600 font-bold underline">PWABuilder.com</a> and enter your website URL.</li>
+            <li>Click <strong>"Build My PWA"</strong> and select <strong>"Android"</strong>.</li>
+            <li>Download the ready-to-install <code>.apk</code> or Google Play package!</li>
+          </ol>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="bg-sky-50 p-3 rounded-2xl border border-sky-200">
+          <h4 class="font-bold text-sky-800 text-base mb-1">Option 2: Capacitor / Cordova</h4>
+          <p class="mb-1">Wrap this exact HTML/CSS/JS file into an Android Studio project with modern webview support.</p>
+        </div>
+
+        <!-- Option 3 -->
+        <div class="bg-purple-50 p-3 rounded-2xl border border-purple-200">
+          <h4 class="font-bold text-purple-800 text-base mb-1">Option 3: WebIntoApp</h4>
+          <p>Upload this file directly on <a href="https://www.webintoapp.com" target="_blank" class="text-purple-600 font-bold underline">WebIntoApp.com</a> to create an APK directly in your web browser.</p>
+        </div>
+      </div>
+
+      <button onclick="closeAndroidModal()" class="w-full mt-5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-2xl shadow-lg transition">
+        Got It!
+      </button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="p-3 text-center text-xs font-semibold text-amber-800/70">
+    French Color Learning App for Kids • Interactive Speech & Audio
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // ==================== FRENCH COLORS DATASET ====================
+    const colors = [
+      { french: "Rouge", english: "Red", phonetic: "/roozh/", hex: "#EF4444", textDark: false },
+      { french: "Bleu", english: "Blue", phonetic: "/bluh/", hex: "#3B82F6", textDark: false },
+      { french: "Jaune", english: "Yellow", phonetic: "/zhohn/", hex: "#FACC15", textDark: true },
+      { french: "Vert", english: "Green", phonetic: "/vair/", hex: "#22C55E", textDark: false },
+      { french: "Orange", english: "Orange", phonetic: "/oh-rahnj/", hex: "#F97316", textDark: false },
+      { french: "Rose", english: "Pink", phonetic: "/rohz/", hex: "#EC4899", textDark: false },
+      { french: "Violet", english: "Purple", phonetic: "/vyoh-lay/", hex: "#A855F7", textDark: false },
+      { french: "Noir", english: "Black", phonetic: "/nwahr/", hex: "#1E293B", textDark: false },
+      { french: "Blanc", english: "White", phonetic: "/blahnk/", hex: "#FFFFFF", textDark: true, border: true },
+      { french: "Gris", english: "Gray", phonetic: "/gree/", hex: "#64748B", textDark: false },
+      { french: "Marron", english: "Brown", phonetic: "/mah-rohn/", hex: "#78350F", textDark: false }
+    ];
+
+    // App State Variables
+    let currentIndex = 0;
+    let autoPlayAudio = true; // Speak on navigation toggle
+    let showEnglish = true;
+    let speechRate = 0.85; // Tailored speech speed for children
+    let synth = window.speechSynthesis;
+    let frenchVoice = null;
+    let quizScore = 0;
+    let currentQuizTarget = null;
+
+    // Initialize Voice Selection
+    function initVoices() {
+      if (!synth) return;
+      let voices = synth.getVoices();
+      // Look specifically for French voices
+      frenchVoice = voices.find(v => v.lang.startsWith('fr') || v.lang.includes('FR')) || null;
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = initVoices;
+    }
+
+    // ==================== APP INITIALIZATION ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      initVoices();
+      updateColorDisplay(false); // Don't speak automatically on initial page load
+    });
+
+    // ==================== COLOR NAVIGATION & DISPLAY ====================
+    function updateColorDisplay(shouldSpeak = autoPlayAudio) {
+      const color = colors[currentIndex];
+      const card = document.getElementById('colorCard');
+      const frenchText = document.getElementById('frenchName');
+      const englishText = document.getElementById('englishName');
+      const phoneticText = document.getElementById('phoneticText');
+
+      // Set Card Background
+      card.style.backgroundColor = color.hex;
+
+      // Toggle White Border for Blanc/White color
+      if (color.border) {
+        card.classList.add('border-slate-300');
+        card.classList.remove('border-white');
+      } else {
+        card.classList.add('border-white');
+        card.classList.remove('border-slate-300');
+      }
+
+      // Adjust Text Colors for Readability
+      if (color.textDark) {
+        frenchText.className = "text-5xl sm:text-7xl font-black tracking-wide text-slate-900 mb-2 transition-all drop-shadow-sm";
+      } else {
+        frenchText.className = "text-5xl sm:text-7xl font-black tracking-wide text-white mb-2 transition-all drop-shadow-md";
+      }
+
+      // Update Text Content
+      frenchText.textContent = color.french;
+      englishText.textContent = color.english;
+      phoneticText.textContent = color.phonetic;
+
+      // Speak name if auto-play is enabled for navigation
+      if (shouldSpeak) {
+        speakWord(color.french);
+      }
+    }
+
+    function nextColor() {
+      currentIndex = (currentIndex + 1) % colors.length;
+      updateColorDisplay();
+      triggerConfetti(0.8, 0.5);
+    }
+
+    function prevColor() {
+      currentIndex = (currentIndex - 1 + colors.length) % colors.length;
+      updateColorDisplay();
+      triggerConfetti(0.2, 0.5);
+    }
+
+    function randomColor() {
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * colors.length);
+      } while (newIndex === currentIndex && colors.length > 1);
+      
+      currentIndex = newIndex;
+      updateColorDisplay();
+      triggerConfetti(0.5, 0.6);
+    }
+
+    // Card Tap Event Handler (Always pronounces when clicked directly)
+    function handleCardClick(e) {
+      const color = colors[currentIndex];
+      speakWord(color.french);
+      
+      // Calculate touch coordinates for targeted sparkles
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      triggerConfetti(x, y);
+    }
+
+    // Toggle speech on navigation checkbox & button
+    function toggleNavAudio(enabled) {
+      autoPlayAudio = enabled;
+      updateAudioToggleUI();
+    }
+
+    function toggleAutoAudio() {
+      autoPlayAudio = !autoPlayAudio;
+      document.getElementById('navAudioCheckbox').checked = autoPlayAudio;
+      updateAudioToggleUI();
+    }
+
+    function updateAudioToggleUI() {
+      const btn = document.getElementById('toggleAudioBtn');
+      const icon = document.getElementById('audioIcon');
+      const text = document.getElementById('audioToggleText');
+      
+      if (autoPlayAudio) {
+        btn.className = "p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm";
+        icon.className = "fas fa-volume-up text-lg text-amber-600";
+        if (text) text.textContent = "Auto-Voice: ON";
+      } else {
+        btn.className = "p-2 sm:px-3 sm:py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm";
+        icon.className = "fas fa-volume-mute text-lg text-slate-500";
+        if (text) text.textContent = "Auto-Voice: OFF";
+      }
+    }
+
+    // Toggle English Subtitles
+    function toggleEnglish() {
+      showEnglish = !showEnglish;
+      const container = document.getElementById('englishContainer');
+      if (showEnglish) {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    // Speech Rate adjustment
+    function setSpeechRate(rate) {
+      speechRate = rate;
+      speakWord(colors[currentIndex].french);
+    }
+
+    // ==================== SPEECH SYNTHESIS ENGINE ====================
+    function speakWord(text) {
+      if (!synth) return;
+      
+      // Cancel previous ongoing speech
+      synth.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      utterance.rate = speechRate;
+      utterance.pitch = 1.1; // Slightly higher pitch for friendly tone
+
+      if (frenchVoice) {
+        utterance.voice = frenchVoice;
+      }
+
+      synth.speak(utterance);
+    }
+
+    // ==================== CONFETTI PARTICLES ====================
+    function triggerConfetti(originX = 0.5, originY = 0.5) {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 25,
+          spread: 60,
+          origin: { x: originX, y: originY },
+          colors: ['#EF4444', '#3B82F6', '#FACC15', '#22C55E', '#EC4899']
+        });
+      }
+    }
+
+    // ==================== MODE SWITCHING & QUIZ ENGINE ====================
+    function switchMode(mode) {
+      const learnSec = document.getElementById('learnSection');
+      const quizSec = document.getElementById('quizSection');
+      const tabLearn = document.getElementById('tabLearn');
+      const tabQuiz = document.getElementById('tabQuiz');
+
+      if (mode === 'learn') {
+        learnSec.classList.remove('hidden');
+        quizSec.classList.add('hidden');
+        tabLearn.className = "px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 bg-white text-amber-700 shadow-md";
+        tabQuiz.className = "px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 text-amber-900 hover:bg-white/50";
+      } else {
+        learnSec.classList.add('hidden');
+        quizSec.classList.remove('hidden');
+        tabQuiz.className = "px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 bg-white text-amber-700 shadow-md";
+        tabLearn.className = "px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 text-amber-900 hover:bg-white/50";
+        startNewQuizRound();
+      }
+    }
+
+    function startNewQuizRound() {
+      // Pick random target color
+      const targetIndex = Math.floor(Math.random() * colors.length);
+      currentQuizTarget = colors[targetIndex];
+
+      document.getElementById('quizQuestionText').textContent = currentQuizTarget.french;
+      
+      if (autoPlayAudio) {
+        speakWord(currentQuizTarget.french);
+      }
+
+      // Generate 4 choices including correct color
+      let options = [currentQuizTarget];
+      while (options.length < 4) {
+        let randomChoice = colors[Math.floor(Math.random() * colors.length)];
+        if (!options.some(o => o.french === randomChoice.french)) {
+          options.push(randomChoice);
+        }
+      }
+
+      // Shuffle options
+      options.sort(() => Math.random() - 0.5);
+
+      // Render quiz option buttons
+      const grid = document.getElementById('quizOptionsGrid');
+      grid.innerHTML = '';
+
+      options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = `h-24 sm:h-28 rounded-2xl border-4 border-white shadow-md transition transform active:scale-95 flex items-center justify-center font-bold text-lg ${option.border ? 'border-slate-300' : ''}`;
+        btn.style.backgroundColor = option.hex;
+        btn.onclick = () => handleQuizAnswer(option);
+        grid.appendChild(btn);
+      });
+
+      // Clear feedback
+      const feedback = document.getElementById('quizFeedback');
+      feedback.style.opacity = '0';
+    }
+
+    function handleQuizAnswer(selected) {
+      const feedback = document.getElementById('quizFeedback');
+      if (selected.french === currentQuizTarget.french) {
+        quizScore += 1;
+        document.getElementById('quizScoreText').textContent = quizScore;
+        
+        feedback.textContent = "🎉 BRAVO! C'est super! 🎉";
+        feedback.className = "mt-4 min-h-[3rem] flex items-center justify-center font-bold text-lg rounded-2xl p-2 transition-all bg-emerald-100 text-emerald-800 opacity-100";
+        
+        triggerConfetti(0.5, 0.5);
+        speakWord("Bravo!");
+
+        setTimeout(() => {
+          startNewQuizRound();
+        }, 1400);
+      } else {
+        feedback.textContent = "❌ Essaye encore! (Try again!)";
+        feedback.className = "mt-4 min-h-[3rem] flex items-center justify-center font-bold text-lg rounded-2xl p-2 transition-all bg-rose-100 text-rose-800 opacity-100";
+        speakWord("Non");
+      }
+    }
+
+    function resetQuizScore() {
+      quizScore = 0;
+      document.getElementById('quizScoreText').textContent = '0';
+      startNewQuizRound();
+    }
+
+    // Modal Helpers
+    function openAndroidModal() {
+      document.getElementById('androidModal').classList.remove('hidden');
+    }
+    function closeAndroidModal() {
+      document.getElementById('androidModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
