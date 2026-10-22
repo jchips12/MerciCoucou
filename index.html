@@ -4,6 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>French Colors for Kids</title>
+  
+  <!-- PWA Settings for Mobile/Android -->
+  <meta name="theme-color" content="#fef3c7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="French Colors">
+  
+  <!-- Inline Web App Manifest for PWABuilder -->
+  <link rel="manifest" href='data:application/manifest+json,{
+    "name": "French Colors for Kids",
+    "short_name": "FrenchColors",
+    "description": "Fun French color learning app for kids with pronunciation and mini-quiz",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#fef3c7",
+    "theme_color": "#fef3c7",
+    "icons": [
+      {
+        "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>",
+        "sizes": "192x192 512x512",
+        "type": "image/svg+xml",
+        "purpose": "any maskable"
+      }
+    ]
+  }'>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -237,6 +263,22 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    // Register inline Service Worker for PWABuilder compliance
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swContent = `
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(fetch(e.request).catch(() => new Response("Offline")));
+          });
+        `;
+        const blob = new Blob([swContent], { type: 'text/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration note:', err));
+      });
+    }
+
     // ==================== FRENCH COLORS DATASET ====================
     const colors = [
       { french: "Rouge", english: "Red", phonetic: "/roozh/", hex: "#EF4444", textDark: false },
