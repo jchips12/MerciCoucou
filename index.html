@@ -135,13 +135,6 @@
         </div>
       </div>
     </div>
-
-    <!-- BUILD APP QUICK ACTION -->
-    <button onclick="closeMenu(); openAndroidModal()" 
-            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center space-x-2 transition shadow-md mt-4">
-      <i class="fab fa-android text-xl"></i>
-      <span>Make Android App</span>
-    </button>
   </aside>
 
   <!-- HEADER -->
@@ -159,13 +152,6 @@
           <p id="headerSubtitle" class="text-xs text-amber-800 font-bold hidden sm:block">French Colors for Kids</p>
         </div>
       </div>
-
-      <!-- Android APK Guide Button -->
-      <button onclick="openAndroidModal()" 
-              class="p-2 sm:px-3 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl flex items-center space-x-1.5 transition font-bold text-sm shadow-md">
-        <i class="fab fa-android text-xl"></i>
-        <span class="hidden sm:inline">APK Guide</span>
-      </button>
     </div>
   </header>
 
@@ -264,39 +250,6 @@
     </section>
 
   </main>
-
-  <!-- ANDROID BUILD GUIDE MODAL -->
-  <div id="androidModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-3xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border-4 border-emerald-400">
-      <button onclick="closeAndroidModal()" class="absolute top-4 right-4 bg-slate-100 text-slate-500 hover:bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg">
-        ✕
-      </button>
-      
-      <div class="flex items-center space-x-3 mb-4">
-        <i class="fab fa-android text-4xl text-emerald-500"></i>
-        <div>
-          <h3 class="text-xl font-black text-slate-800">Convert to Android App</h3>
-          <p class="text-xs text-slate-500">No-code PWA build guide</p>
-        </div>
-      </div>
-
-      <div class="space-y-4 text-xs sm:text-sm text-slate-600">
-        <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
-          <h4 class="font-bold text-emerald-800 text-base mb-1">PWABuilder Method (5 mins)</h4>
-          <ol class="list-decimal list-inside space-y-1">
-            <li>Host this code repository on GitHub Pages.</li>
-            <li>Visit <a href="https://www.pwabuilder.com" target="_blank" class="text-emerald-600 font-bold underline">PWABuilder.com</a> and enter your website URL.</li>
-            <li>Click <strong>"Package for Stores"</strong> and select <strong>"Android"</strong>.</li>
-            <li>Download your ready-to-install <code>.apk</code> file!</li>
-          </ol>
-        </div>
-      </div>
-
-      <button onclick="closeAndroidModal()" class="w-full mt-5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-2xl shadow-lg transition">
-        Got It!
-      </button>
-    </div>
-  </div>
 
   <script>
     // Register Service Worker for offline capability
@@ -752,13 +705,6 @@
       quizScore = 0;
       document.getElementById('quizScoreText').textContent = '0';
       startNewQuizRound();
-    }
-
-    function openAndroidModal() {
-      document.getElementById('androidModal').classList.remove('hidden');
-    }
-    function closeAndroidModal() {
-      document.getElementById('androidModal').classList.add('hidden');
     }
   </script>
 </body>
