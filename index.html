@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Canvas Confetti Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
     body {
@@ -32,18 +33,17 @@
 </head>
 <body class="bg-amber-50 min-h-screen flex flex-col justify-between text-slate-800 select-none relative overflow-x-hidden">
 
-  <!-- SLIDE-OUT BURGER MENU OVERLAY -->
+  <!-- SLIDE-OUT MENU OVERLAY -->
   <div id="menuOverlay" onclick="closeMenu()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
 
-  <!-- SLIDE-OUT BURGER MENU DRAWER -->
-  <aside id="menuDrawer" class="fixed top-0 left-0 bottom-0 w-72 bg-white shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-5 flex flex-col justify-between">
+  <aside id="menuDrawer" class="fixed top-0 left-0 bottom-0 w-80 bg-white shadow-2xl z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-5 flex flex-col justify-between overflow-y-auto">
     <div>
       <div class="flex items-center justify-between pb-4 border-b border-amber-200 mb-6">
-        <div class="flex items-center space-x-2">
-          <span class="text-3xl">🇫🇷</span>
+        <div class="flex items-center space-x-3">
+          <span class="text-4xl">🇫🇷</span>
           <div>
             <h2 class="text-lg font-black text-amber-600">Menu Principal</h2>
-            <p class="text-xs text-amber-800 font-bold">Choose Module</p>
+            <p class="text-xs text-amber-800 font-bold">Options & Modules</p>
           </div>
         </div>
         <button onclick="closeMenu()" class="text-slate-400 hover:text-slate-600 p-2 rounded-xl text-xl font-bold">
@@ -53,25 +53,43 @@
 
       <!-- MODULE SELECTION LIST -->
       <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Modules</p>
-      <nav class="space-y-2 mb-6">
+      <nav class="space-y-3 mb-6">
+        <!-- COLORS MODULE BUTTON -->
         <button id="modColorsBtn" onclick="selectModule('colors')" 
                 class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md">
           <span class="text-2xl">🎨</span>
           <div>
             <div class="text-base leading-tight">Couleurs</div>
-            <div class="text-xs font-normal opacity-80">Colors</div>
+            <div class="text-xs font-normal opacity-80">French Colors</div>
           </div>
         </button>
 
-        <button id="modNumbersBtn" onclick="selectModule('numbers')" 
-                class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all">
-          <span class="text-2xl">🔢</span>
-          <div>
-            <div class="text-base leading-tight">Nombres</div>
-            <div class="text-xs font-normal opacity-80">Numbers (1-20)</div>
-          </div>
-        </button>
+        <!-- NUMBERS MODULE CONTAINER -->
+        <div class="bg-amber-50/80 rounded-2xl p-2 border border-amber-200">
+          <button id="modNumbersBtn" onclick="selectModule('numbers')" 
+                  class="w-full flex items-center space-x-3 px-3 py-2 rounded-xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all">
+            <span class="text-2xl">🔢</span>
+            <div>
+              <div class="text-base leading-tight">Nombres</div>
+              <div class="text-xs font-normal opacity-70">French Numbers</div>
+            </div>
+          </button>
 
+          <!-- NUMBER RANGE SELECTORS -->
+          <div class="mt-2 grid grid-cols-3 gap-1 pt-2 border-t border-amber-200/60">
+            <button id="range1-10Btn" onclick="setNumberRange('1-10')" class="py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm">
+              1 – 10
+            </button>
+            <button id="range11-20Btn" onclick="setNumberRange('11-20')" class="py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center">
+              11 – 20
+            </button>
+            <button id="range1-20Btn" onclick="setNumberRange('1-20')" class="py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center">
+              1 – 20
+            </button>
+          </div>
+        </div>
+
+        <!-- ALPHABET MODULE BUTTON -->
         <button id="modAlphabetBtn" onclick="selectModule('alphabet')" 
                 class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all">
           <span class="text-2xl">🔤</span>
@@ -82,9 +100,9 @@
         </button>
       </nav>
 
-      <!-- PREFERENCES -->
       <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Settings</p>
-      <div class="space-y-2">
+      <div class="space-y-2 mb-6">
+        <!-- ENGLISH HELPER TOGGLE -->
         <button id="toggleEnglishBtn" onclick="toggleEnglish()" 
                 class="w-full flex items-center justify-between px-4 py-3 bg-blue-50 text-blue-800 hover:bg-blue-100 rounded-2xl font-semibold text-sm transition">
           <span class="flex items-center space-x-2">
@@ -93,12 +111,34 @@
           </span>
           <span id="englishStatusBadge" class="text-xs bg-blue-200 text-blue-900 font-bold px-2 py-0.5 rounded-full">ON</span>
         </button>
+
+        <!-- SPEAK ON NAVIGATE TOGGLE -->
+        <button id="toggleAutoAudioBtn" onclick="toggleAutoAudio()" 
+                class="w-full flex items-center justify-between px-4 py-3 bg-amber-100 text-amber-900 hover:bg-amber-200 rounded-2xl font-semibold text-sm transition">
+          <span class="flex items-center space-x-2">
+            <i id="audioMenuIcon" class="fas fa-volume-up text-lg text-amber-600"></i>
+            <span>Speak on Navigate</span>
+          </span>
+          <span id="audioStatusBadge" class="text-xs bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full">ON</span>
+        </button>
+
+        <!-- VOICE SPEED SELECTOR -->
+        <div class="p-3 bg-slate-100 rounded-2xl flex items-center justify-between text-xs text-slate-700">
+          <span class="font-bold flex items-center space-x-1.5">
+            <i class="fas fa-tachometer-alt text-amber-500 text-sm"></i>
+            <span>Voice Speed</span>
+          </span>
+          <div class="flex bg-slate-200 p-1 rounded-xl space-x-1">
+            <button id="speedSlowBtn" onclick="setSpeechRate(0.7)" class="px-2.5 py-1 rounded-lg font-bold transition text-xs text-slate-600">🐢 Slow</button>
+            <button id="speedNormalBtn" onclick="setSpeechRate(0.85)" class="px-2.5 py-1 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs">🧒 Normal</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- BUILD APP QUICK ACTION -->
     <button onclick="closeMenu(); openAndroidModal()" 
-            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center space-x-2 transition shadow-md">
+            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center space-x-2 transition shadow-md mt-4">
       <i class="fab fa-android text-xl"></i>
       <span>Make Android App</span>
     </button>
@@ -108,11 +148,10 @@
   <header class="bg-white/80 backdrop-blur-md border-b-4 border-amber-200 sticky top-0 z-40 p-3 sm:p-4">
     <div class="max-w-4xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <!-- FRENCH FLAG BURGER MENU TRIGGER BUTTON -->
+        <!-- ONLY FRENCH FLAG MENU TRIGGER BUTTON -->
         <button onclick="toggleMenu()" title="Open Menu" 
-                class="p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 active:scale-95 text-amber-900 rounded-2xl flex items-center space-x-2 border-2 border-amber-300 transition shadow-sm cursor-pointer">
-          <span class="text-2xl sm:text-3xl leading-none">🇫🇷</span>
-          <i class="fas fa-bars text-lg text-amber-700"></i>
+                class="p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 active:scale-95 text-amber-900 rounded-2xl flex items-center border-2 border-amber-300 transition shadow-sm cursor-pointer">
+          <span class="text-3xl leading-none">🇫🇷</span>
         </button>
 
         <div>
@@ -121,30 +160,19 @@
         </div>
       </div>
 
-      <!-- Control Toggles -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <!-- Audio Auto-Play Toggle -->
-        <button id="toggleAudioBtn" onclick="toggleAutoAudio()" 
-                class="p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm">
-          <i id="audioIcon" class="fas fa-volume-up text-lg text-amber-600"></i>
-          <span class="hidden sm:inline" id="audioToggleText">Auto-Voice: ON</span>
-        </button>
-
-        <!-- Android APK Guide Modal Button -->
-        <button onclick="openAndroidModal()" 
-                class="p-2 sm:px-3 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl flex items-center space-x-1.5 transition font-bold text-sm shadow-md">
-          <i class="fab fa-android text-xl"></i>
-          <span class="hidden sm:inline">APK</span>
-        </button>
-      </div>
+      <!-- Android APK Guide Button -->
+      <button onclick="openAndroidModal()" 
+              class="p-2 sm:px-3 sm:py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl flex items-center space-x-1.5 transition font-bold text-sm shadow-md">
+        <i class="fab fa-android text-xl"></i>
+        <span class="hidden sm:inline">APK Guide</span>
+      </button>
     </div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
   <main class="flex-grow flex flex-col items-center justify-center p-4 max-w-4xl mx-auto w-full">
 
     <!-- MODE SWITCH TABS (LEARN / QUIZ) -->
-    <div class="flex bg-amber-200/60 p-1.5 rounded-3xl mb-3 space-x-2 border-2 border-amber-300">
+    <div class="flex bg-amber-200/60 p-1.5 rounded-3xl mb-4 space-x-2 border-2 border-amber-300">
       <button id="tabLearn" onclick="switchMode('learn')" 
               class="px-5 py-2 rounded-2xl font-bold text-lg transition-all duration-200 bg-white text-amber-700 shadow-md">
         📖 Learn Mode
@@ -155,14 +183,7 @@
       </button>
     </div>
 
-    <!-- NUMBER RANGE FILTER TOGGLE (visible only when Numbers module is active) -->
-    <div id="numberRangeContainer" class="hidden mb-4 bg-white/80 p-1 rounded-2xl border border-amber-300 flex items-center space-x-1 text-xs font-bold shadow-sm">
-      <span class="px-3 text-slate-500">Range:</span>
-      <button id="numRange10Btn" onclick="setNumberRange(10)" class="px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold transition">1 – 10</button>
-      <button id="numRange20Btn" onclick="setNumberRange(20)" class="px-3 py-1.5 rounded-xl text-slate-700 hover:bg-amber-100 font-bold transition">1 – 20</button>
-    </div>
-
-    <!-- ==================== LEARN MODE SECTION ==================== -->
+    <!-- LEARN MODE SECTION -->
     <section id="learnSection" class="w-full flex flex-col items-center">
       
       <!-- MAIN DISPLAY CARD -->
@@ -220,21 +241,8 @@
         </button>
       </div>
 
-      <!-- VOICE SPEED TOGGLE BAR -->
-      <div class="mt-6 w-full max-w-md bg-white/80 rounded-2xl p-3 border border-amber-200 flex items-center justify-between text-xs sm:text-sm text-slate-700">
-        <div class="flex items-center space-x-2">
-          <i class="fas fa-tachometer-alt text-amber-500 text-lg"></i>
-          <span class="font-bold">Voice Speed:</span>
-        </div>
-        <div class="flex bg-amber-100 p-1 rounded-xl space-x-1">
-          <button id="speedSlowBtn" onclick="setSpeechRate(0.7)" class="px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-700">🐢 Slow</button>
-          <button id="speedNormalBtn" onclick="setSpeechRate(0.85)" class="px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs">🧒 Normal</button>
-        </div>
-      </div>
-
     </section>
 
-    <!-- ==================== MINI QUIZ SECTION ==================== -->
     <section id="quizSection" class="w-full flex flex-col items-center hidden">
       <div class="bg-white/90 rounded-3xl p-6 border-4 border-amber-200 w-full max-w-md text-center shadow-lg">
         
@@ -255,7 +263,7 @@
           </button>
         </div>
 
-        <!-- Quiz Color / Choice Grid -->
+        <!-- Quiz Choice Grid -->
         <div id="quizOptionsGrid" class="grid grid-cols-2 gap-4">
           <!-- Dynamically populated choices -->
         </div>
@@ -287,10 +295,10 @@
         <div class="bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
           <h4 class="font-bold text-emerald-800 text-base mb-1">PWABuilder Method (5 mins)</h4>
           <ol class="list-decimal list-inside space-y-1">
-            <li>Host this single code repository on GitHub Pages.</li>
+            <li>Host this code repository on GitHub Pages.</li>
             <li>Visit <a href="https://www.pwabuilder.com" target="_blank" class="text-emerald-600 font-bold underline">PWABuilder.com</a> and enter your website URL.</li>
             <li>Click <strong>"Package for Stores"</strong> and select <strong>"Android"</strong>.</li>
-            <li>Download your ready-to-install <code>.apk</code> or Google Play package!</li>
+            <li>Download your ready-to-install <code>.apk</code> file!</li>
           </ol>
         </div>
       </div>
@@ -301,9 +309,8 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // Register Service Worker
+    // Register Service Worker for offline capability
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swContent = `
@@ -388,7 +395,7 @@
 
     // App State Variables
     let currentModule = 'colors';
-    let numberLimit = 10;
+    let numberRangeMode = '1-10'; // Options: '1-10', '11-20', '1-20'
     let activeDataset = colorsDataset;
     
     let currentIndex = 0;
@@ -400,7 +407,6 @@
     let quizScore = 0;
     let currentQuizTarget = null;
 
-    // Initialize Voice Selection Safely
     function initVoices() {
       if (!synth) return;
       let voices = synth.getVoices();
@@ -411,7 +417,7 @@
       synth.onvoiceschanged = initVoices;
     }
 
-    // ==================== BURGER MENU CONTROLS ====================
+    // ==================== SLIDE-OUT MENU CONTROLS ====================
     function toggleMenu() {
       const drawer = document.getElementById('menuDrawer');
       const overlay = document.getElementById('menuOverlay');
@@ -434,40 +440,37 @@
       overlay.classList.remove('opacity-100');
     }
 
-    // ==================== MODULE SELECTION ====================
+    // ==================== MODULE & RANGE SELECTION ====================
     function selectModule(moduleName) {
       currentModule = moduleName;
       currentIndex = 0;
 
+      // Update button highlights
       document.getElementById('modColorsBtn').className = moduleName === 'colors' 
         ? "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md"
         : "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
 
       document.getElementById('modNumbersBtn').className = moduleName === 'numbers' 
-        ? "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md"
-        : "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
+        ? "w-full flex items-center space-x-3 px-3 py-2 rounded-xl font-bold text-left transition-all bg-amber-500 text-white shadow-sm"
+        : "w-full flex items-center space-x-3 px-3 py-2 rounded-xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
 
       document.getElementById('modAlphabetBtn').className = moduleName === 'alphabet' 
         ? "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md"
         : "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
 
-      const numFilter = document.getElementById('numberRangeContainer');
       const title = document.getElementById('headerTitle');
       const sub = document.getElementById('headerSubtitle');
 
       if (moduleName === 'colors') {
         activeDataset = colorsDataset;
-        numFilter.classList.add('hidden');
         title.textContent = "Couleurs en Français";
         sub.textContent = "French Colors for Kids";
       } else if (moduleName === 'numbers') {
-        numFilter.classList.remove('hidden');
-        activeDataset = numbersDatasetAll.slice(0, numberLimit);
+        updateNumberDataset();
         title.textContent = "Nombres en Français";
-        sub.textContent = `French Numbers (1-${numberLimit})`;
+        sub.textContent = `French Numbers (${numberRangeMode})`;
       } else if (moduleName === 'alphabet') {
         activeDataset = alphabetDataset;
-        numFilter.classList.add('hidden');
         title.textContent = "L'Alphabet Français";
         sub.textContent = "French Alphabet for Kids";
       }
@@ -480,33 +483,46 @@
       }
     }
 
-    function setNumberRange(limit) {
-      numberLimit = limit;
-      const btn10 = document.getElementById('numRange10Btn');
-      const btn20 = document.getElementById('numRange20Btn');
-      const sub = document.getElementById('headerSubtitle');
+    function setNumberRange(rangeKey) {
+      numberRangeMode = rangeKey;
+      
+      // Highlight active number sub-button
+      const b1 = document.getElementById('range1-10Btn');
+      const b2 = document.getElementById('range11-20Btn');
+      const b3 = document.getElementById('range1-20Btn');
 
-      if (limit === 10) {
-        btn10.className = "px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold transition";
-        btn20.className = "px-3 py-1.5 rounded-xl text-slate-700 hover:bg-amber-100 font-bold transition";
-      } else {
-        btn20.className = "px-3 py-1.5 rounded-xl bg-amber-500 text-white font-bold transition";
-        btn10.className = "px-3 py-1.5 rounded-xl text-slate-700 hover:bg-amber-100 font-bold transition";
-      }
+      b1.className = rangeKey === '1-10' 
+        ? "py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm"
+        : "py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center";
 
-      sub.textContent = `French Numbers (1-${limit})`;
-      activeDataset = numbersDatasetAll.slice(0, limit);
-      currentIndex = 0;
-      updateDisplay(false);
+      b2.className = rangeKey === '11-20' 
+        ? "py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm"
+        : "py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center";
+
+      b3.className = rangeKey === '1-20' 
+        ? "py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm"
+        : "py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center";
+
+      // If already in numbers module, apply changes immediately
+      selectModule('numbers');
     }
 
-    // ==================== APP INITIALIZATION ====================
+    function updateNumberDataset() {
+      if (numberRangeMode === '1-10') {
+        activeDataset = numbersDatasetAll.slice(0, 10);
+      } else if (numberRangeMode === '11-20') {
+        activeDataset = numbersDatasetAll.slice(10, 20);
+      } else {
+        activeDataset = numbersDatasetAll.slice(0, 20);
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       initVoices();
       selectModule('colors');
     });
 
-    // ==================== ITEM NAVIGATION & DISPLAY ====================
+    // ==================== DISPLAY & NAVIGATION ====================
     function updateDisplay(shouldSpeak = autoPlayAudio) {
       if (!activeDataset || activeDataset.length === 0) return;
 
@@ -575,24 +591,35 @@
       triggerConfetti(x, y);
     }
 
-    function toggleAutoAudio() {
-      autoPlayAudio = !autoPlayAudio;
-      updateAudioToggleUI();
+    function toggleEnglish() {
+      showEnglish = !showEnglish;
+      const container = document.getElementById('englishContainer');
+      const badge = document.getElementById('englishStatusBadge');
+
+      if (showEnglish) {
+        container.style.display = 'block';
+        badge.textContent = 'ON';
+        badge.className = "text-xs bg-blue-200 text-blue-900 font-bold px-2 py-0.5 rounded-full";
+      } else {
+        container.style.display = 'none';
+        badge.textContent = 'OFF';
+        badge.className = "text-xs bg-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded-full";
+      }
     }
 
-    function updateAudioToggleUI() {
-      const btn = document.getElementById('toggleAudioBtn');
-      const icon = document.getElementById('audioIcon');
-      const text = document.getElementById('audioToggleText');
-      
+    function toggleAutoAudio() {
+      autoPlayAudio = !autoPlayAudio;
+      const badge = document.getElementById('audioStatusBadge');
+      const icon = document.getElementById('audioMenuIcon');
+
       if (autoPlayAudio) {
-        btn.className = "p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm";
+        badge.textContent = 'ON';
+        badge.className = "text-xs bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full";
         icon.className = "fas fa-volume-up text-lg text-amber-600";
-        if (text) text.textContent = "Auto-Voice: ON";
       } else {
-        btn.className = "p-2 sm:px-3 sm:py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-2xl flex items-center space-x-1.5 transition font-semibold text-sm";
+        badge.textContent = 'OFF';
+        badge.className = "text-xs bg-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded-full";
         icon.className = "fas fa-volume-mute text-lg text-slate-500";
-        if (text) text.textContent = "Auto-Voice: OFF";
       }
     }
 
@@ -602,11 +629,11 @@
       const normBtn = document.getElementById('speedNormalBtn');
 
       if (rate === 0.7) {
-        slowBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs";
-        normBtn.className = "px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-700";
+        slowBtn.className = "px-2.5 py-1 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs";
+        normBtn.className = "px-2.5 py-1 rounded-lg font-bold transition text-xs text-slate-600";
       } else {
-        normBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs";
-        slowBtn.className = "px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-700";
+        normBtn.className = "px-2.5 py-1 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs";
+        slowBtn.className = "px-2.5 py-1 rounded-lg font-bold transition text-xs text-slate-600";
       }
 
       speakWord(activeDataset[currentIndex].french);
@@ -646,7 +673,6 @@
       }
     }
 
-    // ==================== MODE SWITCHING & QUIZ ENGINE ====================
     function switchMode(mode) {
       const learnSec = document.getElementById('learnSection');
       const quizSec = document.getElementById('quizSection');
