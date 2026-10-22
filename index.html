@@ -64,6 +64,16 @@
           </div>
         </button>
 
+        <!-- DAYS OF THE WEEK MODULE BUTTON -->
+        <button id="modDaysBtn" onclick="selectModule('days')" 
+                class="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all">
+          <span class="text-2xl">📅</span>
+          <div>
+            <div class="text-base leading-tight">Jours de la semaine</div>
+            <div class="text-xs font-normal opacity-80">Days of the Week</div>
+          </div>
+        </button>
+
         <!-- NUMBERS MODULE CONTAINER -->
         <div class="bg-amber-50/80 rounded-2xl p-2 border border-amber-200">
           <button id="modNumbersBtn" onclick="selectModule('numbers')" 
@@ -141,7 +151,7 @@
   <header class="bg-white/80 backdrop-blur-md border-b-4 border-amber-200 sticky top-0 z-40 p-3 sm:p-4">
     <div class="max-w-4xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <!-- ONLY FRENCH FLAG MENU TRIGGER BUTTON -->
+        <!-- MENU TRIGGER BUTTON -->
         <button onclick="toggleMenu()" title="Open Menu" 
                 class="p-2 sm:px-3 sm:py-2 bg-amber-100 hover:bg-amber-200 active:scale-95 text-amber-900 rounded-2xl flex items-center border-2 border-amber-300 transition shadow-sm cursor-pointer">
           <span class="text-3xl leading-none">🇫🇷</span>
@@ -180,7 +190,7 @@
         <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
         <!-- French Primary Text Display -->
-        <h2 id="frenchName" class="text-6xl sm:text-8xl font-black tracking-wide drop-shadow-md text-white mb-4 transition-all">
+        <h2 id="frenchName" class="text-5xl sm:text-7xl font-black tracking-wide drop-shadow-md text-white mb-4 transition-all">
           Rouge
         </h2>
 
@@ -218,6 +228,7 @@
 
     </section>
 
+    <!-- QUIZ MODE SECTION -->
     <section id="quizSection" class="w-full flex flex-col items-center hidden">
       <div class="bg-white/90 rounded-3xl p-6 border-4 border-amber-200 w-full max-w-md text-center shadow-lg">
         
@@ -232,7 +243,7 @@
         <!-- Question Prompt -->
         <p class="text-sm font-semibold text-slate-500 mb-1">Find the matching item for:</p>
         <div class="flex items-center justify-center space-x-2 mb-6">
-          <h3 id="quizQuestionText" class="text-3xl sm:text-4xl font-black text-slate-800">Rouge</h3>
+          <h3 id="quizQuestionText" class="text-3xl sm:text-4xl font-black text-slate-800">Lundi</h3>
           <button onclick="speakWord(currentQuizTarget ? currentQuizTarget.french : '')" class="p-2 bg-amber-100 text-amber-700 rounded-full hover:bg-amber-200 transition">
             <i class="fas fa-volume-up text-lg"></i>
           </button>
@@ -281,6 +292,17 @@
       { french: "Blanc", english: "White", phonetic: "/blahnk/", hex: "#FFFFFF", textDark: true, border: true },
       { french: "Gris", english: "Gray", phonetic: "/gree/", hex: "#64748B", textDark: false },
       { french: "Marron", english: "Brown", phonetic: "/mah-rohn/", hex: "#78350F", textDark: false }
+    ];
+
+    // Days of the Week dataset starts on Lundi (Monday) per French convention
+    const daysDataset = [
+      { french: "Lundi", english: "Monday", phonetic: "/luhn-dee/", hex: "#3B82F6", textDark: false },
+      { french: "Mardi", english: "Tuesday", phonetic: "/mahr-dee/", hex: "#10B981", textDark: false },
+      { french: "Mercredi", english: "Wednesday", phonetic: "/mair-kruh-dee/", hex: "#F59E0B", textDark: true },
+      { french: "Jeudi", english: "Thursday", phonetic: "/zhuh-dee/", hex: "#EC4899", textDark: false },
+      { french: "Vendredi", english: "Friday", phonetic: "/vahn-druh-dee/", hex: "#8B5CF6", textDark: false },
+      { french: "Samedi", english: "Saturday", phonetic: "/sahm-dee/", hex: "#F97316", textDark: false },
+      { french: "Dimanche", english: "Sunday", phonetic: "/dee-mahnsh/", hex: "#EF4444", textDark: false }
     ];
 
     const numbersDatasetAll = [
@@ -392,6 +414,10 @@
         ? "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md"
         : "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
 
+      document.getElementById('modDaysBtn').className = moduleName === 'days' 
+        ? "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left transition-all bg-amber-500 text-white shadow-md"
+        : "w-full flex items-center space-x-3 px-4 py-3 rounded-2xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
+
       document.getElementById('modNumbersBtn').className = moduleName === 'numbers' 
         ? "w-full flex items-center space-x-3 px-3 py-2 rounded-xl font-bold text-left transition-all bg-amber-500 text-white shadow-sm"
         : "w-full flex items-center space-x-3 px-3 py-2 rounded-xl font-bold text-left text-slate-700 hover:bg-amber-100 transition-all";
@@ -407,6 +433,10 @@
         activeDataset = colorsDataset;
         title.textContent = "Couleurs en Français";
         sub.textContent = "French Colors for Kids";
+      } else if (moduleName === 'days') {
+        activeDataset = daysDataset;
+        title.textContent = "Jours de la Semaine";
+        sub.textContent = "Days of the Week";
       } else if (moduleName === 'numbers') {
         updateNumberDataset();
         title.textContent = "Nombres en Français";
@@ -428,7 +458,6 @@
     function setNumberRange(rangeKey) {
       numberRangeMode = rangeKey;
       
-      // Highlight active number sub-button
       const b1 = document.getElementById('range1-10Btn');
       const b2 = document.getElementById('range11-20Btn');
       const b3 = document.getElementById('range1-20Btn');
@@ -445,7 +474,6 @@
         ? "py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm"
         : "py-1.5 px-1 rounded-lg text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center";
 
-      // If already in numbers module, apply changes immediately
       selectModule('numbers');
     }
 
