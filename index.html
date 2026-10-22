@@ -189,31 +189,20 @@
       <!-- MAIN DISPLAY CARD -->
       <div id="displayCard" 
            onclick="handleCardClick(event)" 
-           class="w-full max-w-md h-72 sm:h-96 rounded-3xl border-8 border-white custom-shadow transition-all duration-300 transform active:scale-95 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden group">
+           class="w-full max-w-md h-80 sm:h-[28rem] rounded-3xl border-8 border-white custom-shadow transition-all duration-300 transform active:scale-95 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden group">
         
         <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-        <!-- Speaker Replay Floating Badge -->
-        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md flex items-center space-x-2 group-hover:scale-110 transition-transform">
-          <i class="fas fa-volume-up text-slate-700 text-lg"></i>
-          <span class="text-xs font-bold text-slate-600">Tap to Listen</span>
-        </div>
-
         <!-- French Primary Text Display -->
-        <h2 id="frenchName" class="text-5xl sm:text-7xl font-black tracking-wide drop-shadow-md text-white mb-2 transition-all">
+        <h2 id="frenchName" class="text-6xl sm:text-8xl font-black tracking-wide drop-shadow-md text-white mb-4 transition-all">
           Rouge
         </h2>
 
         <!-- English Translation & Phonetics -->
-        <div id="englishContainer" class="bg-black/30 backdrop-blur-md px-4 py-2 rounded-2xl text-white mt-2 transition-all">
-          <p id="englishName" class="text-xl sm:text-2xl font-bold">Red</p>
-          <p id="phoneticText" class="text-xs sm:text-sm font-semibold opacity-80 italic">/roozh/</p>
+        <div id="englishContainer" class="bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl text-white mt-2 transition-all">
+          <p id="englishName" class="text-2xl sm:text-4xl font-bold">Red</p>
+          <p id="phoneticText" class="text-sm sm:text-lg font-semibold opacity-85 italic mt-1">/roozh/</p>
         </div>
-
-        <!-- Touch Sparkle Effect Prompt -->
-        <span class="absolute bottom-3 text-xs text-white/80 font-semibold tracking-wider uppercase">
-          ✨ Tap card for audio & sparkles! ✨
-        </span>
       </div>
 
       <!-- MAIN NAVIGATION CONTROLS -->
