@@ -1,23 +1,23 @@
 {
-  "name": "French Colors for Kids",
-  "short_name": "FrenchColors",
-  "description": "Fun French color learning app for kids with pronunciation and mini-quiz",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#fef3c7",
-  "theme_color": "#fef3c7",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3209/3209995.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3209/3209995.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+"name": "French Learning for Kids",
+"short_name": "FrenchKids",
+"description": "Fun French colors, numbers and alphabet learning app for kids with pronunciation and mini-quiz",
+"start_url": "./",
+"display": "standalone",
+"background_color": "#fef3c7",
+"theme_color": "#fef3c7",
+"icons": [
+{
+"src": "https://cdn-icons-png.flaticon.com/512/29/29302.png",
+"sizes": "192x192",
+"type": "image/png",
+"purpose": "any maskable"
+},
+{
+"src": "https://cdn-icons-png.flaticon.com/512/29/29302.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any maskable"
+}
+]
 }
