@@ -222,56 +222,68 @@
       <!-- MAIN DISPLAY CARD -->
       <div id="displayCard" 
            onclick="handleCardClick(event)" 
-           class="w-full max-w-md min-h-[22rem] sm:min-h-[28rem] rounded-3xl border-8 border-white custom-shadow transition-all duration-300 transform active:scale-95 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden group">
+           class="w-full max-w-md min-h-[22rem] sm:min-h-[27rem] rounded-3xl border-8 border-white custom-shadow transition-all duration-300 transform active:scale-95 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden group">
         
         <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-        <!-- Level 1 Equation Pill (e.g., M + A) -->
-        <div id="readingEquation" class="hidden items-center justify-center gap-2 mb-3 z-10"></div>
+        <!-- Top Card Header: Progress Counter + Tap Hint -->
+        <div class="w-full flex items-center justify-between mb-2 z-10">
+          <span id="cardProgressBadge" class="text-xs sm:text-sm font-black px-3 py-1 rounded-full bg-black/15 text-white">
+            1 / 11
+          </span>
+          <span id="cardTapHint" class="text-xs font-bold px-3 py-1 rounded-full bg-black/15 text-white">
+            🔊 Tap to hear
+          </span>
+        </div>
 
-        <!-- Custom SVG Illustration Container -->
-        <div id="cardIllustration" class="w-28 h-28 sm:w-36 sm:h-36 mb-2 hidden items-center justify-center filter drop-shadow-md"></div>
+        <div class="flex-grow flex flex-col items-center justify-center w-full">
+          <!-- Level 1 Equation Pill (e.g., M + A) -->
+          <div id="readingEquation" class="hidden items-center justify-center gap-2 mb-3 z-10"></div>
 
-        <!-- Emoji Icon Display for Vocab / Words -->
-        <div id="cardIcon" class="text-6xl sm:text-7xl mb-2 hidden filter drop-shadow-md">✈️</div>
+          <!-- Custom SVG Illustration Container -->
+          <div id="cardIllustration" class="w-28 h-28 sm:w-36 sm:h-36 mb-2 hidden items-center justify-center filter drop-shadow-md"></div>
 
-        <!-- French Primary Text Display -->
-        <h2 id="frenchName" class="text-5xl sm:text-7xl font-black tracking-wide drop-shadow-md text-white mb-3 transition-all">
-          Rouge
-        </h2>
+          <!-- Emoji Icon Display for Vocab / Words -->
+          <div id="cardIcon" class="text-6xl sm:text-7xl mb-2 hidden filter drop-shadow-md">✈️</div>
 
-        <!-- Interactive Syllables / Word Chunks Container (Reading Mode) -->
-        <div id="readingChunksContainer" class="hidden flex-wrap items-center justify-center gap-2 mb-3 z-10"></div>
+          <!-- French Primary Text Display -->
+          <h2 id="frenchName" class="text-5xl sm:text-7xl font-black tracking-wide drop-shadow-md text-white mb-3 transition-all">
+            Rouge
+          </h2>
 
-        <!-- English Translation & Phonetics -->
-        <div id="englishContainer" class="bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl text-white mt-1 transition-all">
-          <p id="englishName" class="text-2xl sm:text-4xl font-bold">Red</p>
-          <p id="phoneticText" class="text-sm sm:text-lg font-semibold opacity-85 italic mt-1">/roozh/</p>
+          <!-- Interactive Syllables / Word Chunks Container (Reading Mode) -->
+          <div id="readingChunksContainer" class="hidden flex-wrap items-center justify-center gap-2 mb-3 z-10"></div>
+
+          <!-- English Translation & Phonetics -->
+          <div id="englishContainer" class="bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl text-white mt-1 transition-all">
+            <p id="englishName" class="text-2xl sm:text-4xl font-bold">Red</p>
+            <p id="phoneticText" class="text-sm sm:text-lg font-semibold opacity-85 italic mt-1">/roozh/</p>
+          </div>
         </div>
       </div>
 
-      <!-- MAIN NAVIGATION CONTROLS -->
-      <div class="w-full max-w-md mt-6 grid grid-cols-3 gap-3 sm:gap-4">
+      <!-- MAIN NAVIGATION CONTROLS (ICON-FORWARD FOR KIDS, NO SWIPE) -->
+      <div class="w-full max-w-md mt-5 grid grid-cols-3 gap-3 sm:gap-4">
         
         <!-- PREVIOUS BUTTON -->
-        <button onclick="prevItem()" 
-                class="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-sky-700 text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
-          <i class="fas fa-chevron-left text-lg"></i>
-          <span>Précédent</span>
+        <button onclick="prevItem()" aria-label="Previous"
+                class="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-sky-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 shadow-lg transition transform active:translate-y-1 cursor-pointer">
+          <i class="fas fa-arrow-left text-2xl sm:text-2xl"></i>
+          <span class="text-xs sm:text-sm uppercase tracking-wider opacity-95">Back</span>
         </button>
 
         <!-- RANDOM BUTTON -->
-        <button onclick="randomItem()" 
-                class="bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-purple-800 text-xs sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
-          <i class="fas fa-dice text-lg"></i>
-          <span>Aléatoire</span>
+        <button onclick="randomItem()" aria-label="Random"
+                class="bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-purple-800 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 shadow-lg transition transform active:translate-y-1 cursor-pointer">
+          <i class="fas fa-dice text-2xl sm:text-2xl"></i>
+          <span class="text-xs sm:text-sm uppercase tracking-wider opacity-95">Mix</span>
         </button>
 
         <!-- NEXT BUTTON -->
-        <button onclick="nextItem()" 
-                class="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-black py-4 px-2 rounded-2xl border-b-4 border-emerald-700 text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg transition transform active:translate-y-1">
-          <span>Suivant</span>
-          <i class="fas fa-chevron-right text-lg"></i>
+        <button onclick="nextItem()" aria-label="Next"
+                class="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-emerald-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 shadow-lg transition transform active:translate-y-1 cursor-pointer">
+          <span class="text-xs sm:text-sm uppercase tracking-wider opacity-95">Next</span>
+          <i class="fas fa-arrow-right text-2xl sm:text-2xl"></i>
         </button>
       </div>
 
@@ -811,22 +823,53 @@
 
       const item = activeDataset[currentIndex];
       const card = document.getElementById('displayCard');
+      const progressBadge = document.getElementById('cardProgressBadge');
+      const tapHint = document.getElementById('cardTapHint');
       const readingEquation = document.getElementById('readingEquation');
       const readingChunks = document.getElementById('readingChunksContainer');
       const cardIllustration = document.getElementById('cardIllustration');
       const cardIcon = document.getElementById('cardIcon');
       const frenchText = document.getElementById('frenchName');
+      const englishContainer = document.getElementById('englishContainer');
       const englishText = document.getElementById('englishName');
       const phoneticText = document.getElementById('phoneticText');
 
-      card.style.backgroundColor = item.hex;
+      // Update Progress Counter (e.g., 1 / 10)
+      progressBadge.textContent = `${currentIndex + 1} / ${activeDataset.length}`;
 
-      if (item.border) {
-        card.classList.add('border-slate-300');
-        card.classList.remove('border-white');
+      // Full-color cards for Colors & 4 Seasons; Storybook ivory cards with dynamic colored borders for Reading/Numbers/Alphabet/Vocab/Days
+      const isFullColorModule = (currentModule === 'colors' || currentModule === 'seasons');
+
+      if (isFullColorModule) {
+        card.style.backgroundColor = item.hex;
+        card.style.borderColor = item.border ? '#CBD5E1' : '#FFFFFF';
+        card.style.boxShadow = '';
+
+        const badgeTone = item.textDark
+          ? "text-xs sm:text-sm font-black px-3 py-1 rounded-full bg-black/10 text-slate-900"
+          : "text-xs sm:text-sm font-black px-3 py-1 rounded-full bg-black/20 text-white";
+        progressBadge.className = badgeTone;
+        tapHint.className = badgeTone;
+
+        englishContainer.style.backgroundColor = '';
+        englishContainer.style.borderColor = 'transparent';
+        englishContainer.className = "bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl text-white mt-1 transition-all";
+        englishText.className = "text-2xl sm:text-4xl font-bold text-white";
+        phoneticText.className = "text-sm sm:text-lg font-semibold opacity-90 italic mt-1 text-white";
       } else {
-        card.classList.add('border-white');
-        card.classList.remove('border-slate-300');
+        // Storybook Card Style: warm crisp ivory background + dynamic item hex border
+        card.style.backgroundColor = '#FFFDF9';
+        card.style.borderColor = item.hex;
+        card.style.boxShadow = `0 12px 28px -6px ${item.hex}33, 0 4px 12px -2px rgba(15, 23, 42, 0.08)`;
+
+        progressBadge.className = "text-xs sm:text-sm font-black px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200";
+        tapHint.className = "text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
+
+        englishContainer.style.backgroundColor = `${item.hex}14`;
+        englishContainer.style.borderColor = `${item.hex}44`;
+        englishContainer.className = "border-2 px-6 py-3 rounded-2xl text-slate-800 mt-1 transition-all";
+        englishText.className = "text-2xl sm:text-4xl font-black text-slate-800";
+        phoneticText.className = "text-sm sm:text-lg font-bold italic mt-0.5 text-slate-600";
       }
 
       // Reset Reading Equation & Chunks
@@ -845,7 +888,8 @@
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.textContent = part;
-          btn.className = "px-4 py-1.5 bg-white/95 hover:bg-white text-slate-900 font-black text-2xl sm:text-3xl rounded-2xl shadow-md active:scale-90 transition";
+          btn.style.borderColor = item.hex;
+          btn.className = "px-4 py-1.5 bg-white hover:bg-slate-50 text-slate-900 font-black text-2xl sm:text-3xl rounded-2xl border-2 shadow-sm active:scale-90 transition cursor-pointer";
           btn.onclick = (e) => {
             e.stopPropagation();
             speakWord(part.toLowerCase());
@@ -855,7 +899,7 @@
           if (idx < item.parts.length - 1) {
             const plus = document.createElement('span');
             plus.textContent = "+";
-            plus.className = "text-white font-black text-2xl drop-shadow";
+            plus.className = "text-slate-400 font-black text-2xl";
             readingEquation.appendChild(plus);
           }
         });
@@ -878,36 +922,47 @@
         cardIllustration.classList.remove('flex');
       }
 
-      // Adjust font size dynamically for sentences vs words vs letters
-      let sizeClasses = "text-5xl sm:text-7xl";
-      if (item.french.length > 15) {
-        sizeClasses = "text-3xl sm:text-4xl leading-snug";
-      } else if (item.french.length > 10) {
-        sizeClasses = "text-4xl sm:text-6xl";
+      // Primary Display Text: For Numbers, show the big digit (1..20) in center and French word below
+      const isNumberModule = (currentModule === 'numbers');
+      const primaryDisplayText = isNumberModule ? String(item.num) : item.french;
+
+      // Adjust font size dynamically for digits vs sentences vs words
+      let sizeClasses = isNumberModule ? "text-7xl sm:text-8xl" : "text-5xl sm:text-7xl";
+      if (!isNumberModule) {
+        if (item.french.length > 15) {
+          sizeClasses = "text-3xl sm:text-4xl leading-snug";
+        } else if (item.french.length > 10) {
+          sizeClasses = "text-4xl sm:text-6xl";
+        }
       }
 
-      if (item.textDark) {
-        frenchText.className = `${sizeClasses} font-black tracking-wide text-slate-900 mb-2 transition-all drop-shadow-sm`;
+      if (isFullColorModule) {
+        if (item.textDark) {
+          frenchText.className = `${sizeClasses} font-black tracking-wide text-slate-900 mb-3 transition-all drop-shadow-sm`;
+        } else {
+          frenchText.className = `${sizeClasses} font-black tracking-wide text-white mb-3 transition-all drop-shadow-md`;
+        }
       } else {
-        frenchText.className = `${sizeClasses} font-black tracking-wide text-white mb-2 transition-all drop-shadow-md`;
+        // Crisp high-contrast dark slate ink on Storybook cards
+        frenchText.className = `${sizeClasses} font-black tracking-wide text-slate-800 mb-3 transition-all`;
       }
 
-      frenchText.textContent = item.french;
+      frenchText.textContent = primaryDisplayText;
 
       // Level 2 Interactive Color-Coded Syllables (e.g., VÉ · LO)
       if (currentModule === 'reading' && item.syllables) {
         readingChunks.classList.remove('hidden');
         readingChunks.classList.add('flex');
         const pillColors = [
-          "bg-amber-300 text-slate-900 border-amber-100",
-          "bg-white text-slate-900 border-slate-200",
-          "bg-sky-200 text-slate-900 border-sky-100"
+          "bg-sky-100 text-sky-950 border-sky-300",
+          "bg-amber-100 text-amber-950 border-amber-300",
+          "bg-emerald-100 text-emerald-950 border-emerald-300"
         ];
         item.syllables.forEach((syl, idx) => {
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.textContent = syl;
-          btn.className = `px-4 py-1.5 rounded-2xl font-black text-xl sm:text-2xl border-2 shadow-md active:scale-90 transition ${pillColors[idx % pillColors.length]}`;
+          btn.className = `px-4 py-1.5 rounded-2xl font-black text-xl sm:text-2xl border-2 shadow-sm active:scale-90 transition cursor-pointer ${pillColors[idx % pillColors.length]}`;
           btn.onclick = (e) => {
             e.stopPropagation();
             speakWord(syl.toLowerCase());
@@ -924,7 +979,7 @@
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.textContent = w;
-          btn.className = "px-3 py-1 bg-white/95 hover:bg-amber-200 text-slate-900 font-black text-base sm:text-lg rounded-xl shadow-sm active:scale-90 transition";
+          btn.className = "px-3 py-1 bg-slate-100 hover:bg-amber-100 text-slate-900 border border-slate-300 font-black text-base sm:text-lg rounded-xl shadow-sm active:scale-90 transition cursor-pointer";
           btn.onclick = (e) => {
             e.stopPropagation();
             speakWord(w);
@@ -933,7 +988,8 @@
         });
       }
 
-      englishText.textContent = item.english;
+      // Helper Box Text: For Numbers, show the French word (e.g., "Un") + phonetic ("/uhn/")
+      englishText.textContent = isNumberModule ? item.french : item.english;
       phoneticText.textContent = item.phonetic;
 
       if (shouldSpeak) {
