@@ -122,6 +122,18 @@
             <button id="speedNormalBtn" onclick="setSpeechRate(0.85)" class="px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs">🧒 Normal</button>
           </div>
         </div>
+
+        <!-- LETTER CASE SELECTOR (UPPERCASE / LOWERCASE) -->
+        <div class="p-3.5 bg-slate-100 rounded-2xl flex items-center justify-between text-sm text-slate-700">
+          <span class="font-bold flex items-center space-x-2">
+            <i class="fas fa-font text-amber-500 text-lg"></i>
+            <span>Letter Case</span>
+          </span>
+          <div class="flex bg-slate-200 p-1 rounded-xl space-x-1">
+            <button id="caseUpperBtn" onclick="setLetterCase(true)" class="px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs">ABC</button>
+            <button id="caseLowerBtn" onclick="setLetterCase(false)" class="px-3 py-1.5 rounded-lg font-black transition text-xs text-slate-600">abc</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -226,16 +238,6 @@
         
         <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-        <!-- Top Card Header: Progress Counter + Tap Hint -->
-        <div class="w-full flex items-center justify-between mb-2 z-10">
-          <span id="cardProgressBadge" class="text-xs sm:text-sm font-black px-3 py-1 rounded-full bg-black/15 text-white">
-            1 / 11
-          </span>
-          <span id="cardTapHint" class="text-xs font-bold px-3 py-1 rounded-full bg-black/15 text-white">
-            🔊 Tap to hear
-          </span>
-        </div>
-
         <div class="flex-grow flex flex-col items-center justify-center w-full">
           <!-- Level 1 Equation Pill (e.g., M + A) -->
           <div id="readingEquation" class="hidden items-center justify-center gap-2 mb-3 z-10"></div>
@@ -262,28 +264,31 @@
         </div>
       </div>
 
-      <!-- MAIN NAVIGATION CONTROLS (ICON-FORWARD FOR KIDS, NO SWIPE) -->
+      <!-- MAIN NAVIGATION CONTROLS (ICON-ONLY WITH MATCHING BOLD WEIGHT) -->
       <div class="w-full max-w-md mt-5 grid grid-cols-3 gap-3 sm:gap-4">
         
         <!-- PREVIOUS BUTTON -->
         <button onclick="prevItem()" aria-label="Previous"
-                class="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-sky-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 shadow-lg transition transform active:translate-y-1 cursor-pointer">
-          <i class="fas fa-arrow-left text-2xl sm:text-2xl"></i>
-          <span class="text-xs sm:text-sm uppercase tracking-wider opacity-95">Back</span>
+                class="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-sky-700 flex items-center justify-center shadow-lg transition transform active:translate-y-1 cursor-pointer">
+          <svg viewBox="0 0 24 24" class="w-8 h-8 sm:w-9 sm:h-9" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
         </button>
 
         <!-- RANDOM BUTTON -->
         <button onclick="randomItem()" aria-label="Random"
-                class="bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-purple-800 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 shadow-lg transition transform active:translate-y-1 cursor-pointer">
-          <i class="fas fa-dice text-2xl sm:text-2xl"></i>
-          <span class="text-xs sm:text-sm uppercase tracking-wider opacity-95">Mix</span>
+                class="bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-purple-800 flex items-center justify-center shadow-lg transition transform active:translate-y-1 cursor-pointer">
+          <i class="fas fa-dice text-3xl sm:text-4xl leading-none"></i>
         </button>
 
         <!-- NEXT BUTTON -->
         <button onclick="nextItem()" aria-label="Next"
-                class="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-emerald-700 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 shadow-lg transition transform active:translate-y-1 cursor-pointer">
-          <span class="text-xs sm:text-sm uppercase tracking-wider opacity-95">Next</span>
-          <i class="fas fa-arrow-right text-2xl sm:text-2xl"></i>
+                class="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-emerald-700 flex items-center justify-center shadow-lg transition transform active:translate-y-1 cursor-pointer">
+          <svg viewBox="0 0 24 24" class="w-8 h-8 sm:w-9 sm:h-9" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </button>
       </div>
 
@@ -291,7 +296,7 @@
 
   </main>
 
-  <script>
+    <script>
     // Register Service Worker for offline capability
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -306,6 +311,103 @@
         const swUrl = URL.createObjectURL(blob);
         navigator.serviceWorker.register(swUrl).catch(err => console.log('SW note:', err));
       });
+    }
+
+    // ==================== NAVIGATION & MODAL CONTROLLERS ====================
+    function goHome() {
+      currentView = 'home';
+      document.getElementById('homeSection').classList.remove('hidden');
+      document.getElementById('learnSection').classList.add('hidden');
+      document.getElementById('headerTitle').textContent = "Apprendre le Français";
+      document.getElementById('headerSubtitle').textContent = "Choose a Learning Module";
+      closeSettings();
+    }
+
+    function selectModule(moduleKey) {
+      currentView = 'module';
+      currentModule = moduleKey;
+      currentIndex = 0;
+
+      document.getElementById('homeSection').classList.add('hidden');
+      document.getElementById('learnSection').classList.remove('hidden');
+
+      const titles = {
+        colors: { title: "Couleurs", sub: "French Colors" },
+        vocab: { title: "Vocabulaire", sub: "French Vocabulary (A–Z)" },
+        days: { title: "Jours de la Semaine", sub: "Days of the Week" },
+        numbers: { title: "Nombres", sub: `French Numbers (${numberRangeMode})` },
+        alphabet: { title: "Alphabet", sub: "French Alphabet (A–Z)" },
+        seasons: { title: "Les Quatre Saisons", sub: "The Four Seasons" },
+        reading: { title: "Je Lis (Reading)", sub: readingLevel === 1 ? "Level 1: Syllables" : readingLevel === 2 ? "Level 2: Easy Words" : "Level 3: Short Sentences" }
+      };
+
+      document.getElementById('headerTitle').textContent = titles[moduleKey].title;
+      document.getElementById('headerSubtitle').textContent = titles[moduleKey].sub;
+
+      if (moduleKey === 'colors') activeDataset = colorsDataset;
+      else if (moduleKey === 'vocab') activeDataset = vocabDataset;
+      else if (moduleKey === 'days') activeDataset = daysDataset;
+      else if (moduleKey === 'numbers') updateNumberDataset();
+      else if (moduleKey === 'alphabet') activeDataset = alphabetDataset;
+      else if (moduleKey === 'seasons') activeDataset = seasonsDataset;
+      else if (moduleKey === 'reading') updateReadingDataset();
+
+      updateDisplay(autoPlayAudio);
+    }
+
+    function openSettings() {
+      const overlay = document.getElementById('settingsOverlay');
+      const modal = document.getElementById('settingsModal');
+      const numGroup = document.getElementById('numberRangeSettingGroup');
+      const readGroup = document.getElementById('readingLevelSettingGroup');
+      const modSpecific = document.getElementById('moduleSpecificSettings');
+
+      numGroup.classList.add('hidden');
+      readGroup.classList.add('hidden');
+      modSpecific.classList.add('hidden');
+
+      if (currentView === 'module') {
+        if (currentModule === 'numbers') {
+          numGroup.classList.remove('hidden');
+          modSpecific.classList.remove('hidden');
+        } else if (currentModule === 'reading') {
+          readGroup.classList.remove('hidden');
+          modSpecific.classList.remove('hidden');
+        }
+      }
+
+      overlay.classList.remove('opacity-0', 'pointer-events-none');
+      modal.classList.remove('scale-95');
+      modal.classList.add('scale-100');
+    }
+
+    function closeSettings() {
+      const overlay = document.getElementById('settingsOverlay');
+      const modal = document.getElementById('settingsModal');
+
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      modal.classList.remove('scale-100');
+      modal.classList.add('scale-95');
+    }
+
+    function setReadingLevel(lvl) {
+      readingLevel = lvl;
+      const b1 = document.getElementById('readLevel1Btn');
+      const b2 = document.getElementById('readLevel2Btn');
+      const b3 = document.getElementById('readLevel3Btn');
+
+      b1.className = lvl === 1 ? "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight" : "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
+      b2.className = lvl === 2 ? "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight" : "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
+      b3.className = lvl === 3 ? "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight" : "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
+
+      document.getElementById('homeReadingSub').textContent = lvl === 1 ? "Level 1: Syllables" : lvl === 2 ? "Level 2: Words" : "Level 3: Sentences";
+
+      if (currentView === 'module' && currentModule === 'reading') {
+        currentIndex = 0;
+        updateReadingDataset();
+        document.getElementById('headerSubtitle').textContent = lvl === 1 ? "Level 1: Syllables" : lvl === 2 ? "Level 2: Easy Words" : "Level 3: Short Sentences";
+        updateDisplay(autoPlayAudio);
+      }
     }
 
     // ==================== CUSTOM SVG ILLUSTRATIONS ====================
@@ -628,138 +730,31 @@
     let currentIndex = 0;
     let autoPlayAudio = true;
     let showEnglish = true;
+    let useUppercase = true;
     let speechRate = 0.85;
     let synth = window.speechSynthesis;
     let frenchVoice = null;
 
-    function initVoices() {
-      if (!synth) return;
-      let voices = synth.getVoices();
-      frenchVoice = voices.find(v => v.lang.startsWith('fr') || v.lang.includes('FR')) || null;
+    function formatDisplayCase(text) {
+      if (!text) return '';
+      return useUppercase ? text.toLocaleUpperCase('fr-FR') : text.toLocaleLowerCase('fr-FR');
     }
 
-    if (synth && synth.onvoiceschanged !== undefined) {
-      synth.onvoiceschanged = initVoices;
-    }
+    function setLetterCase(isUpper) {
+      useUppercase = isUpper;
+      const upperBtn = document.getElementById('caseUpperBtn');
+      const lowerBtn = document.getElementById('caseLowerBtn');
 
-    // ==================== CONTEXT-AWARE SETTINGS MODAL ====================
-    function openSettings() {
-      const overlay = document.getElementById('settingsOverlay');
-      const modal = document.getElementById('settingsModal');
-      const modSpecific = document.getElementById('moduleSpecificSettings');
-      const numGroup = document.getElementById('numberRangeSettingGroup');
-      const readGroup = document.getElementById('readingLevelSettingGroup');
-
-      numGroup.classList.add('hidden');
-      readGroup.classList.add('hidden');
-
-      if (currentView === 'module' && currentModule === 'numbers') {
-        modSpecific.classList.remove('hidden');
-        numGroup.classList.remove('hidden');
-      } else if (currentView === 'module' && currentModule === 'reading') {
-        modSpecific.classList.remove('hidden');
-        readGroup.classList.remove('hidden');
+      if (useUppercase) {
+        upperBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs";
+        lowerBtn.className = "px-3 py-1.5 rounded-lg font-black transition text-xs text-slate-600";
       } else {
-        modSpecific.classList.add('hidden');
+        lowerBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs";
+        upperBtn.className = "px-3 py-1.5 rounded-lg font-black transition text-xs text-slate-600";
       }
 
-      overlay.classList.remove('opacity-0', 'pointer-events-none');
-      overlay.classList.add('opacity-100');
-      modal.classList.remove('scale-95');
-      modal.classList.add('scale-100');
-    }
-
-    function closeSettings() {
-      const overlay = document.getElementById('settingsOverlay');
-      const modal = document.getElementById('settingsModal');
-
-      overlay.classList.add('opacity-0', 'pointer-events-none');
-      overlay.classList.remove('opacity-100');
-      modal.classList.add('scale-95');
-      modal.classList.remove('scale-100');
-    }
-
-    // ==================== HOME & MODULE NAVIGATION ====================
-    function goHome() {
-      if (synth) synth.cancel();
-      currentView = 'home';
-
-      document.getElementById('homeSection').classList.remove('hidden');
-      document.getElementById('learnSection').classList.add('hidden');
-
-      document.getElementById('headerTitle').textContent = "Apprendre le Français";
-      document.getElementById('headerSubtitle').textContent = "Choose a Learning Module";
-    }
-
-    function selectModule(moduleName) {
-      currentView = 'module';
-      currentModule = moduleName;
-      currentIndex = 0;
-
-      document.getElementById('homeSection').classList.add('hidden');
-      document.getElementById('learnSection').classList.remove('hidden');
-
-      const title = document.getElementById('headerTitle');
-      const sub = document.getElementById('headerSubtitle');
-
-      if (moduleName === 'colors') {
-        activeDataset = colorsDataset;
-        title.textContent = "Couleurs en Français";
-        sub.textContent = "French Colors";
-      } else if (moduleName === 'vocab') {
-        activeDataset = vocabDataset;
-        title.textContent = "Vocabulaire (A–Z)";
-        sub.textContent = "French Vocabulary Words";
-      } else if (moduleName === 'days') {
-        activeDataset = daysDataset;
-        title.textContent = "Jours de la Semaine";
-        sub.textContent = "Days of the Week";
-      } else if (moduleName === 'numbers') {
-        updateNumberDataset();
-        title.textContent = "Nombres en Français";
-        sub.textContent = `French Numbers (${numberRangeMode})`;
-      } else if (moduleName === 'alphabet') {
-        activeDataset = alphabetDataset;
-        title.textContent = "L'Alphabet Français";
-        sub.textContent = "French Alphabet";
-      } else if (moduleName === 'seasons') {
-        activeDataset = seasonsDataset;
-        title.textContent = "Les Quatre Saisons";
-        sub.textContent = "The 4 Seasons";
-      } else if (moduleName === 'reading') {
-        updateReadingDataset();
-        title.textContent = "Je Lis (Lecture)";
-        sub.textContent = getReadingLevelLabel(readingLevel);
-      }
-
-      updateDisplay(autoPlayAudio);
-    }
-
-    function getReadingLevelLabel(lvl) {
-      if (lvl === 1) return "Level 1: Les Syllabes";
-      if (lvl === 2) return "Level 2: Mots Faciles";
-      return "Level 3: Petites Phrases";
-    }
-
-    function setReadingLevel(lvl) {
-      readingLevel = lvl;
-
-      const b1 = document.getElementById('readLevel1Btn');
-      const b2 = document.getElementById('readLevel2Btn');
-      const b3 = document.getElementById('readLevel3Btn');
-
-      const activeClass = "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight";
-      const inactiveClass = "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
-
-      b1.className = lvl === 1 ? activeClass : inactiveClass;
-      b2.className = lvl === 2 ? activeClass : inactiveClass;
-      b3.className = lvl === 3 ? activeClass : inactiveClass;
-
-      if (currentView === 'module' && currentModule === 'reading') {
-        currentIndex = 0;
-        updateReadingDataset();
-        document.getElementById('headerSubtitle').textContent = getReadingLevelLabel(readingLevel);
-        updateDisplay(autoPlayAudio);
+      if (currentView === 'module') {
+        updateDisplay(false);
       }
     }
 
@@ -823,8 +818,6 @@
 
       const item = activeDataset[currentIndex];
       const card = document.getElementById('displayCard');
-      const progressBadge = document.getElementById('cardProgressBadge');
-      const tapHint = document.getElementById('cardTapHint');
       const readingEquation = document.getElementById('readingEquation');
       const readingChunks = document.getElementById('readingChunksContainer');
       const cardIllustration = document.getElementById('cardIllustration');
@@ -834,9 +827,6 @@
       const englishText = document.getElementById('englishName');
       const phoneticText = document.getElementById('phoneticText');
 
-      // Update Progress Counter (e.g., 1 / 10)
-      progressBadge.textContent = `${currentIndex + 1} / ${activeDataset.length}`;
-
       // Full-color cards for Colors & 4 Seasons; Storybook ivory cards with dynamic colored borders for Reading/Numbers/Alphabet/Vocab/Days
       const isFullColorModule = (currentModule === 'colors' || currentModule === 'seasons');
 
@@ -844,12 +834,6 @@
         card.style.backgroundColor = item.hex;
         card.style.borderColor = item.border ? '#CBD5E1' : '#FFFFFF';
         card.style.boxShadow = '';
-
-        const badgeTone = item.textDark
-          ? "text-xs sm:text-sm font-black px-3 py-1 rounded-full bg-black/10 text-slate-900"
-          : "text-xs sm:text-sm font-black px-3 py-1 rounded-full bg-black/20 text-white";
-        progressBadge.className = badgeTone;
-        tapHint.className = badgeTone;
 
         englishContainer.style.backgroundColor = '';
         englishContainer.style.borderColor = 'transparent';
@@ -861,9 +845,6 @@
         card.style.backgroundColor = '#FFFDF9';
         card.style.borderColor = item.hex;
         card.style.boxShadow = `0 12px 28px -6px ${item.hex}33, 0 4px 12px -2px rgba(15, 23, 42, 0.08)`;
-
-        progressBadge.className = "text-xs sm:text-sm font-black px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200";
-        tapHint.className = "text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
 
         englishContainer.style.backgroundColor = `${item.hex}14`;
         englishContainer.style.borderColor = `${item.hex}44`;
@@ -880,14 +861,14 @@
       readingChunks.classList.add('hidden');
       readingChunks.classList.remove('flex');
 
-      // Level 1 Reading Equation (e.g., M + A)
+      // Level 1 Reading Equation (e.g., M + A or m + a)
       if (currentModule === 'reading' && item.parts) {
         readingEquation.classList.remove('hidden');
         readingEquation.classList.add('flex');
         item.parts.forEach((part, idx) => {
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.textContent = part;
+          btn.textContent = formatDisplayCase(part);
           btn.style.borderColor = item.hex;
           btn.className = "px-4 py-1.5 bg-white hover:bg-slate-50 text-slate-900 font-black text-2xl sm:text-3xl rounded-2xl border-2 shadow-sm active:scale-90 transition cursor-pointer";
           btn.onclick = (e) => {
@@ -924,11 +905,12 @@
 
       // Primary Display Text: For Numbers, show the big digit (1..20) in center and French word below
       const isNumberModule = (currentModule === 'numbers');
-      const primaryDisplayText = isNumberModule ? String(item.num) : item.french;
+      const isAlphabetModule = (currentModule === 'alphabet');
+      const primaryDisplayText = isNumberModule ? String(item.num) : formatDisplayCase(item.french);
 
-      // Adjust font size dynamically for digits vs sentences vs words
-      let sizeClasses = isNumberModule ? "text-7xl sm:text-8xl" : "text-5xl sm:text-7xl";
-      if (!isNumberModule) {
+      // Uniform giant font size for both Numbers (1-20) and Alphabet (A-Z / a-z)
+      let sizeClasses = (isNumberModule || isAlphabetModule) ? "text-7xl sm:text-8xl" : "text-5xl sm:text-7xl";
+      if (!isNumberModule && !isAlphabetModule) {
         if (item.french.length > 15) {
           sizeClasses = "text-3xl sm:text-4xl leading-snug";
         } else if (item.french.length > 10) {
@@ -949,7 +931,7 @@
 
       frenchText.textContent = primaryDisplayText;
 
-      // Level 2 Interactive Color-Coded Syllables (e.g., VÉ · LO)
+      // Level 2 Interactive Color-Coded Syllables (e.g., VÉ · LO or vé · lo)
       if (currentModule === 'reading' && item.syllables) {
         readingChunks.classList.remove('hidden');
         readingChunks.classList.add('flex');
@@ -961,7 +943,7 @@
         item.syllables.forEach((syl, idx) => {
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.textContent = syl;
+          btn.textContent = formatDisplayCase(syl);
           btn.className = `px-4 py-1.5 rounded-2xl font-black text-xl sm:text-2xl border-2 shadow-sm active:scale-90 transition cursor-pointer ${pillColors[idx % pillColors.length]}`;
           btn.onclick = (e) => {
             e.stopPropagation();
@@ -971,14 +953,14 @@
         });
       }
 
-      // Level 3 Interactive Word-by-Word Pills (e.g., Le | chat | dort.)
+      // Level 3 Interactive Word-by-Word Pills
       if (currentModule === 'reading' && item.words) {
         readingChunks.classList.remove('hidden');
         readingChunks.classList.add('flex');
         item.words.forEach((w) => {
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.textContent = w;
+          btn.textContent = formatDisplayCase(w);
           btn.className = "px-3 py-1 bg-slate-100 hover:bg-amber-100 text-slate-900 border border-slate-300 font-black text-base sm:text-lg rounded-xl shadow-sm active:scale-90 transition cursor-pointer";
           btn.onclick = (e) => {
             e.stopPropagation();
@@ -988,8 +970,8 @@
         });
       }
 
-      // Helper Box Text: For Numbers, show the French word (e.g., "Un") + phonetic ("/uhn/")
-      englishText.textContent = isNumberModule ? item.french : item.english;
+      // Helper Box Text: For Numbers, show the French word (formatted in selected case) + phonetic ("/uhn/")
+      englishText.textContent = isNumberModule ? formatDisplayCase(item.french) : item.english;
       phoneticText.textContent = item.phonetic;
 
       if (shouldSpeak) {
@@ -1083,6 +1065,19 @@
     }
 
     // ==================== SPEECH ENGINE ====================
+    function initVoices() {
+      if (!synth) return;
+      const voices = synth.getVoices();
+      if (voices && voices.length > 0) {
+        // Try to find a French voice
+        frenchVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('fr')) || voices[0];
+      }
+    }
+
+    if (typeof synth !== 'undefined' && synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = initVoices;
+    }
+
     function speakWord(text) {
       if (!synth) return;
       try {
