@@ -94,10 +94,10 @@
             <span>Alphabet Pronunciation</span>
           </p>
           <div class="grid grid-cols-2 gap-2 bg-amber-50 p-1.5 rounded-2xl border border-amber-200">
-            <button id="alphaModeLetterBtn" onclick="setAlphabetAudioMode('letter')" class="py-2 px-2 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight">
+            <button id="alphaModeLetterBtn" onclick="setAlphabetAudioMode('letter')" class="py-2 px-2 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight">
               Letter Name<br><span class="text-[10px] opacity-90">(Ah, Bay, Say)</span>
             </button>
-            <button id="alphaModeSoundBtn" onclick="setAlphabetAudioMode('sound')" class="py-2 px-2 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight">
+            <button id="alphaModeSoundBtn" onclick="setAlphabetAudioMode('sound')" class="py-2 px-2 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight">
               Phonic Sound<br><span class="text-[10px] opacity-90">(/a/, /b/, /s/)</span>
             </button>
           </div>
@@ -139,15 +139,16 @@
           </div>
         </div>
 
-        <!-- LETTER CASE SELECTOR (UPPERCASE / LOWERCASE) -->
+        <!-- LETTER CASE SELECTOR (LOWERCASE / UPPERCASE / COMBINED) -->
         <div class="p-3.5 bg-slate-100 rounded-2xl flex items-center justify-between text-sm text-slate-700">
           <span class="font-bold flex items-center space-x-2">
             <i class="fas fa-font text-amber-500 text-lg"></i>
             <span>Letter Case</span>
           </span>
           <div class="flex bg-slate-200 p-1 rounded-xl space-x-1">
-            <button id="caseUpperBtn" onclick="setLetterCase(true)" class="px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs">ABC</button>
-            <button id="caseLowerBtn" onclick="setLetterCase(false)" class="px-3 py-1.5 rounded-lg font-black transition text-xs text-slate-600">abc</button>
+            <button id="caseLowerBtn" onclick="setLetterCase('lower')" class="px-2.5 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs">abc</button>
+            <button id="caseUpperBtn" onclick="setLetterCase('upper')" class="px-2.5 py-1.5 rounded-lg font-black transition text-xs text-slate-600">ABC</button>
+            <button id="caseBothBtn" onclick="setLetterCase('both')" class="px-2.5 py-1.5 rounded-lg font-black transition text-xs text-slate-600">Aa</button>
           </div>
         </div>
       </div>
@@ -414,7 +415,8 @@
         pendingSpeakOnSettingsClose = false;
         if (autoPlayAudio) {
           const item = activeDataset[currentIndex];
-          speakWord(getSpeakableText(item));
+          const speakText = getSpeakableText(item);
+          if (speakText) speakWord(speakText);
         }
       } else {
         pendingSpeakOnSettingsClose = false;
@@ -688,27 +690,27 @@
       { french: "C", english: "Say", phonetic: "/say/", soundSpeak: "keu", soundLabel: "Sound: /kuh/ or /sss/", soundPhonetic: "like in citron / canard", hex: "#10B981" },
       { french: "D", english: "Day", phonetic: "/day/", soundSpeak: "deu", soundLabel: "Sound: /duh/", soundPhonetic: "like in dinosaure", hex: "#F59E0B" },
       { french: "E", english: "Euh", phonetic: "/uh/", soundSpeak: "euh", soundLabel: "Sound: /uh/", soundPhonetic: "like in le", hex: "#8B5CF6" },
-      { french: "F", english: "Eff", phonetic: "/eff/", soundSpeak: "fff", soundLabel: "Sound: /fff/", soundPhonetic: "like in fantôme", hex: "#EC4899" },
+      { french: "F", english: "Eff", phonetic: "/eff/", soundSpeak: "feuh", soundLabel: "Sound: /fff/", soundPhonetic: "like in fantôme", hex: "#EC4899" },
       { french: "G", english: "Zhey", phonetic: "/zhay/", soundSpeak: "gueu", soundLabel: "Sound: /guh/ or /zh/", soundPhonetic: "like in gâteau", hex: "#14B8A6" },
-      { french: "H", english: "Ash", phonetic: "/ash/", soundSpeak: "h", soundLabel: "Silent in French!", soundPhonetic: "like in hibou", hex: "#F97316" },
+      { french: "H", english: "Ash", phonetic: "/ash/", soundSpeak: "", silentSound: true, soundLabel: "🤫 Silent in French!", soundPhonetic: "like in hibou", hex: "#F97316" },
       { french: "I", english: "Eee", phonetic: "/ee/", soundSpeak: "i", soundLabel: "Sound: /eee/", soundPhonetic: "like in igloo", hex: "#6366F1" },
       { french: "J", english: "Zhee", phonetic: "/zhee/", soundSpeak: "jeu", soundLabel: "Sound: /zhuh/", soundPhonetic: "like in jupe", hex: "#84CC16" },
       { french: "K", english: "Kah", phonetic: "/kah/", soundSpeak: "keu", soundLabel: "Sound: /kuh/", soundPhonetic: "like in kangourou", hex: "#06B6D4" },
-      { french: "L", english: "Ell", phonetic: "/ell/", soundSpeak: "lll", soundLabel: "Sound: /lll/", soundPhonetic: "like in lune", hex: "#A855F7" },
-      { french: "M", english: "Emm", phonetic: "/emm/", soundSpeak: "mmm", soundLabel: "Sound: /mmm/", soundPhonetic: "like in maman", hex: "#EAB308" },
-      { french: "N", english: "Enn", phonetic: "/enn/", soundSpeak: "nnn", soundLabel: "Sound: /nnn/", soundPhonetic: "like in neige", hex: "#F43F5E" },
+      { french: "L", english: "Ell", phonetic: "/ell/", soundSpeak: "leuh", soundLabel: "Sound: /lll/", soundPhonetic: "like in lune", hex: "#A855F7" },
+      { french: "M", english: "Emm", phonetic: "/emm/", soundSpeak: "meuh", soundLabel: "Sound: /mmm/", soundPhonetic: "like in maman", hex: "#EAB308" },
+      { french: "N", english: "Enn", phonetic: "/enn/", soundSpeak: "neuh", soundLabel: "Sound: /nnn/", soundPhonetic: "like in neige", hex: "#F43F5E" },
       { french: "O", english: "Oh", phonetic: "/oh/", soundSpeak: "o", soundLabel: "Sound: /oh/", soundPhonetic: "like in orange", hex: "#059669" },
       { french: "P", english: "Pay", phonetic: "/pay/", soundSpeak: "peu", soundLabel: "Sound: /puh/", soundPhonetic: "like in papa", hex: "#D97706" },
       { french: "Q", english: "Koo", phonetic: "/koo/", soundSpeak: "keu", soundLabel: "Sound: /kuh/", soundPhonetic: "like in quatre", hex: "#3B82F6" },
-      { french: "R", english: "Air", phonetic: "/air/", soundSpeak: "rrr", soundLabel: "Sound: /rrr/", soundPhonetic: "like in robot", hex: "#EF4444" },
-      { french: "S", english: "Ess", phonetic: "/ess/", soundSpeak: "sss", soundLabel: "Sound: /sss/", soundPhonetic: "like in soleil", hex: "#10B981" },
+      { french: "R", english: "Air", phonetic: "/air/", soundSpeak: "reuh", soundLabel: "Sound: /rrr/", soundPhonetic: "like in robot", hex: "#EF4444" },
+      { french: "S", english: "Ess", phonetic: "/ess/", soundSpeak: "seuh", soundLabel: "Sound: /sss/", soundPhonetic: "like in soleil", hex: "#10B981" },
       { french: "T", english: "Tay", phonetic: "/tay/", soundSpeak: "teu", soundLabel: "Sound: /tuh/", soundPhonetic: "like in tortue", hex: "#8B5CF6" },
       { french: "U", english: "Eew", phonetic: "/oo/", soundSpeak: "u", soundLabel: "Sound: /ew/", soundPhonetic: "like in lune", hex: "#EC4899" },
-      { french: "V", english: "Vey", phonetic: "/vay/", soundSpeak: "vvv", soundLabel: "Sound: /vvv/", soundPhonetic: "like in vélo", hex: "#14B8A6" },
-      { french: "W", english: "Double Vey", phonetic: "/doo-bluh-vay/", soundSpeak: "vvv", soundLabel: "Sound: /vvv/ or /w/", soundPhonetic: "like in wagon", hex: "#F97316" },
-      { french: "X", english: "Eeks", phonetic: "/eeks/", soundSpeak: "ks", soundLabel: "Sound: /ks/", soundPhonetic: "like in xylophone", hex: "#6366F1" },
+      { french: "V", english: "Vey", phonetic: "/vay/", soundSpeak: "veuh", soundLabel: "Sound: /vvv/", soundPhonetic: "like in vélo", hex: "#14B8A6" },
+      { french: "W", english: "Double Vey", phonetic: "/doo-bluh-vay/", soundSpeak: "veuh", soundLabel: "Sound: /vvv/ or /w/", soundPhonetic: "like in wagon", hex: "#F97316" },
+      { french: "X", english: "Eeks", phonetic: "/eeks/", soundSpeak: "kseuh", soundLabel: "Sound: /ks/", soundPhonetic: "like in xylophone", hex: "#6366F1" },
       { french: "Y", english: "Eegrek", phonetic: "/ee-grek/", soundSpeak: "i", soundLabel: "Sound: /eee/", soundPhonetic: "like in pyjama", hex: "#84CC16" },
-      { french: "Z", english: "Zed", phonetic: "/zed/", soundSpeak: "zzz", soundLabel: "Sound: /zzz/", soundPhonetic: "like in zoo", hex: "#06B6D4" }
+      { french: "Z", english: "Zed", phonetic: "/zed/", soundSpeak: "zeuh", soundLabel: "Sound: /zzz/", soundPhonetic: "like in zoo", hex: "#06B6D4" }
     ];
 
     // Reading Module Datasets (Levels 1, 2, 3)
@@ -776,43 +778,82 @@
     let currentModule = 'colors';
     let numberRangeMode = '1-10'; // Options: '1-10', '11-20', '1-20'
     let readingLevel = 1; // Options: 1, 2, 3
-    let alphabetAudioMode = 'letter'; // Options: 'letter' or 'sound'
+    let alphabetAudioMode = 'sound'; // Defaults to 'sound' (Phonic Sound)
     let pendingSpeakOnSettingsClose = false;
     let activeDataset = colorsDataset;
     
     let currentIndex = 0;
     let autoPlayAudio = true;
     let showEnglish = true;
-    let useUppercase = true;
+    let letterCaseMode = 'lower'; // Defaults to 'lower' ('lower', 'upper', 'both')
     let speechRate = 0.85;
     let synth = window.speechSynthesis;
     let frenchVoice = null;
 
+    // Phonetic map so standalone letters/syllables (like "é" or consonants) speak natural French sounds instead of accent/letter names
+    const phoneticChunkMap = {
+      'é': 'hé',
+      'b': 'beu',
+      'c': 'keu',
+      'd': 'deu',
+      'f': 'feuh',
+      'g': 'gueu',
+      'j': 'jeu',
+      'k': 'keu',
+      'l': 'leuh',
+      'm': 'meuh',
+      'n': 'neuh',
+      'p': 'peu',
+      'q': 'keu',
+      'r': 'reuh',
+      's': 'seuh',
+      't': 'teu',
+      'v': 'veuh',
+      'w': 'veuh',
+      'x': 'kseuh',
+      'z': 'zeuh',
+      'bé': 'bay',
+      'vé': 'vay',
+      'fé': 'fay'
+    };
+
     function getSpeakableText(item) {
       if (!item) return '';
       if (currentModule === 'alphabet' && alphabetAudioMode === 'sound') {
+        if (item.silentSound) return '';
         return item.soundSpeak || item.french.toLowerCase();
       }
       return item.speakText || item.french;
     }
 
-    function formatDisplayCase(text) {
+    function formatDisplayCase(text, isSingleLetter = false) {
       if (!text) return '';
-      return useUppercase ? text.toLocaleUpperCase('fr-FR') : text.toLocaleLowerCase('fr-FR');
+      if (letterCaseMode === 'upper') {
+        return text.toLocaleUpperCase('fr-FR');
+      }
+      if (letterCaseMode === 'lower') {
+        return text.toLocaleLowerCase('fr-FR');
+      }
+      // 'both' (Aa): Show "A a" for single alphabet letters, and Title Case ("Avion", "Vélo") for words/syllables
+      if (isSingleLetter && text.length === 1) {
+        return `${text.toLocaleUpperCase('fr-FR')} ${text.toLocaleLowerCase('fr-FR')}`;
+      }
+      const lower = text.toLocaleLowerCase('fr-FR');
+      return lower.charAt(0).toLocaleUpperCase('fr-FR') + lower.slice(1);
     }
 
-    function setLetterCase(isUpper) {
-      useUppercase = isUpper;
-      const upperBtn = document.getElementById('caseUpperBtn');
+    function setLetterCase(mode) {
+      letterCaseMode = mode;
       const lowerBtn = document.getElementById('caseLowerBtn');
+      const upperBtn = document.getElementById('caseUpperBtn');
+      const bothBtn = document.getElementById('caseBothBtn');
 
-      if (useUppercase) {
-        upperBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs";
-        lowerBtn.className = "px-3 py-1.5 rounded-lg font-black transition text-xs text-slate-600";
-      } else {
-        lowerBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs";
-        upperBtn.className = "px-3 py-1.5 rounded-lg font-black transition text-xs text-slate-600";
-      }
+      const activeClass = "px-2.5 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs";
+      const inactiveClass = "px-2.5 py-1.5 rounded-lg font-black transition text-xs text-slate-600";
+
+      lowerBtn.className = mode === 'lower' ? activeClass : inactiveClass;
+      upperBtn.className = mode === 'upper' ? activeClass : inactiveClass;
+      bothBtn.className = mode === 'both' ? activeClass : inactiveClass;
 
       if (currentView === 'module') {
         updateDisplay(false);
@@ -968,9 +1009,9 @@
       // Primary Display Text: For Numbers, show the big digit (1..20) in center and French word below
       const isNumberModule = (currentModule === 'numbers');
       const isAlphabetModule = (currentModule === 'alphabet');
-      const primaryDisplayText = isNumberModule ? String(item.num) : formatDisplayCase(item.french);
+      const primaryDisplayText = isNumberModule ? String(item.num) : formatDisplayCase(item.french, isAlphabetModule);
 
-      // Uniform giant font size for both Numbers (1-20) and Alphabet (A-Z / a-z)
+      // Uniform giant font size for both Numbers (1-20) and Alphabet (A-Z / a-z / A a)
       let sizeClasses = (isNumberModule || isAlphabetModule) ? "text-7xl sm:text-8xl" : "text-5xl sm:text-7xl";
       if (!isNumberModule && !isAlphabetModule) {
         if (item.french.length > 15) {
@@ -1045,7 +1086,10 @@
       }
 
       if (shouldSpeak) {
-        speakWord(getSpeakableText(item));
+        const speakText = getSpeakableText(item);
+        if (speakText) {
+          speakWord(speakText);
+        }
       }
     }
 
@@ -1075,7 +1119,10 @@
 
     function handleCardClick(e) {
       const item = activeDataset[currentIndex];
-      speakWord(getSpeakableText(item));
+      const speakText = getSpeakableText(item);
+      if (speakText) {
+        speakWord(speakText);
+      }
       
       const rect = e.currentTarget.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
@@ -1148,10 +1195,13 @@
     }
 
     function speakWord(text) {
-      if (!synth) return;
+      if (!synth || !text) return;
       try {
         synth.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
+        const normalized = text.trim().toLowerCase();
+        const spokenString = phoneticChunkMap[normalized] || text;
+
+        const utterance = new SpeechSynthesisUtterance(spokenString);
         utterance.lang = 'fr-FR';
         utterance.rate = speechRate;
         utterance.pitch = 1.1;
