@@ -86,6 +86,22 @@
             </button>
           </div>
         </div>
+
+        <!-- ALPHABET AUDIO MODE SELECTOR -->
+        <div id="alphabetAudioSettingGroup" class="hidden">
+          <p class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+            <span>🔤</span>
+            <span>Alphabet Pronunciation</span>
+          </p>
+          <div class="grid grid-cols-2 gap-2 bg-amber-50 p-1.5 rounded-2xl border border-amber-200">
+            <button id="alphaModeLetterBtn" onclick="setAlphabetAudioMode('letter')" class="py-2 px-2 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight">
+              Letter Name<br><span class="text-[10px] opacity-90">(Ah, Bay, Say)</span>
+            </button>
+            <button id="alphaModeSoundBtn" onclick="setAlphabetAudioMode('sound')" class="py-2 px-2 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight">
+              Phonic Sound<br><span class="text-[10px] opacity-90">(/a/, /b/, /s/)</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- COMMON SETTINGS (ALWAYS VISIBLE) -->
@@ -360,10 +376,12 @@
       const modal = document.getElementById('settingsModal');
       const numGroup = document.getElementById('numberRangeSettingGroup');
       const readGroup = document.getElementById('readingLevelSettingGroup');
+      const alphaGroup = document.getElementById('alphabetAudioSettingGroup');
       const modSpecific = document.getElementById('moduleSpecificSettings');
 
       numGroup.classList.add('hidden');
       readGroup.classList.add('hidden');
+      alphaGroup.classList.add('hidden');
       modSpecific.classList.add('hidden');
 
       if (currentView === 'module') {
@@ -372,6 +390,9 @@
           modSpecific.classList.remove('hidden');
         } else if (currentModule === 'reading') {
           readGroup.classList.remove('hidden');
+          modSpecific.classList.remove('hidden');
+        } else if (currentModule === 'alphabet') {
+          alphaGroup.classList.remove('hidden');
           modSpecific.classList.remove('hidden');
         }
       }
@@ -388,6 +409,35 @@
       overlay.classList.add('opacity-0', 'pointer-events-none');
       modal.classList.remove('scale-100');
       modal.classList.add('scale-95');
+
+      if (pendingSpeakOnSettingsClose && currentView === 'module' && activeDataset[currentIndex]) {
+        pendingSpeakOnSettingsClose = false;
+        if (autoPlayAudio) {
+          const item = activeDataset[currentIndex];
+          speakWord(getSpeakableText(item));
+        }
+      } else {
+        pendingSpeakOnSettingsClose = false;
+      }
+    }
+
+    function setAlphabetAudioMode(mode) {
+      alphabetAudioMode = mode;
+      const letterBtn = document.getElementById('alphaModeLetterBtn');
+      const soundBtn = document.getElementById('alphaModeSoundBtn');
+
+      letterBtn.className = mode === 'letter'
+        ? "py-2 px-2 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight"
+        : "py-2 px-2 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
+
+      soundBtn.className = mode === 'sound'
+        ? "py-2 px-2 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight"
+        : "py-2 px-2 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
+
+      if (currentView === 'module' && currentModule === 'alphabet') {
+        pendingSpeakOnSettingsClose = true;
+        updateDisplay(false);
+      }
     }
 
     function setReadingLevel(lvl) {
@@ -404,9 +454,10 @@
 
       if (currentView === 'module' && currentModule === 'reading') {
         currentIndex = 0;
+        pendingSpeakOnSettingsClose = true;
         updateReadingDataset();
         document.getElementById('headerSubtitle').textContent = lvl === 1 ? "Level 1: Syllables" : lvl === 2 ? "Level 2: Easy Words" : "Level 3: Short Sentences";
-        updateDisplay(autoPlayAudio);
+        updateDisplay(false);
       }
     }
 
@@ -632,32 +683,32 @@
     ];
 
     const alphabetDataset = [
-      { french: "A", english: "Ah", phonetic: "/ah/", hex: "#EF4444" },
-      { french: "B", english: "Baw", phonetic: "/bay/", hex: "#3B82F6" },
-      { french: "C", english: "Say", phonetic: "/say/", hex: "#10B981" },
-      { french: "D", english: "Day", phonetic: "/day/", hex: "#F59E0B" },
-      { french: "E", english: "Euh", phonetic: "/uh/", hex: "#8B5CF6" },
-      { french: "F", english: "Eff", phonetic: "/eff/", hex: "#EC4899" },
-      { french: "G", english: "Zhey", phonetic: "/zhay/", hex: "#14B8A6" },
-      { french: "H", english: "Ash", phonetic: "/ash/", hex: "#F97316" },
-      { french: "I", english: "Eee", phonetic: "/ee/", hex: "#6366F1" },
-      { french: "J", english: "Zhee", phonetic: "/zhee/", hex: "#84CC16" },
-      { french: "K", english: "Kah", phonetic: "/kah/", hex: "#06B6D4" },
-      { french: "L", english: "Ell", phonetic: "/ell/", hex: "#A855F7" },
-      { french: "M", english: "Emm", phonetic: "/emm/", hex: "#EAB308" },
-      { french: "N", english: "Enn", phonetic: "/enn/", hex: "#F43F5E" },
-      { french: "O", english: "Oh", phonetic: "/oh/", hex: "#059669" },
-      { french: "P", english: "Pay", phonetic: "/pay/", hex: "#D97706" },
-      { french: "Q", english: "Koo", phonetic: "/koo/", hex: "#3B82F6" },
-      { french: "R", english: "Air", phonetic: "/air/", hex: "#EF4444" },
-      { french: "S", english: "Ess", phonetic: "/ess/", hex: "#10B981" },
-      { french: "T", english: "Tay", phonetic: "/tay/", hex: "#8B5CF6" },
-      { french: "U", english: "Eew", phonetic: "/oo/", hex: "#EC4899" },
-      { french: "V", english: "Vey", phonetic: "/vay/", hex: "#14B8A6" },
-      { french: "W", english: "Double Vey", phonetic: "/doo-bluh-vay/", hex: "#F97316" },
-      { french: "X", english: "Eeks", phonetic: "/eeks/", hex: "#6366F1" },
-      { french: "Y", english: "Eegrek", phonetic: "/ee-grek/", hex: "#84CC16" },
-      { french: "Z", english: "Zed", phonetic: "/zed/", hex: "#06B6D4" }
+      { french: "A", english: "Ah", phonetic: "/ah/", soundSpeak: "a", soundLabel: "Sound: /ah/", soundPhonetic: "like in papa", hex: "#EF4444" },
+      { french: "B", english: "Baw", phonetic: "/bay/", soundSpeak: "beu", soundLabel: "Sound: /buh/", soundPhonetic: "like in ballon", hex: "#3B82F6" },
+      { french: "C", english: "Say", phonetic: "/say/", soundSpeak: "keu", soundLabel: "Sound: /kuh/ or /sss/", soundPhonetic: "like in citron / canard", hex: "#10B981" },
+      { french: "D", english: "Day", phonetic: "/day/", soundSpeak: "deu", soundLabel: "Sound: /duh/", soundPhonetic: "like in dinosaure", hex: "#F59E0B" },
+      { french: "E", english: "Euh", phonetic: "/uh/", soundSpeak: "euh", soundLabel: "Sound: /uh/", soundPhonetic: "like in le", hex: "#8B5CF6" },
+      { french: "F", english: "Eff", phonetic: "/eff/", soundSpeak: "fff", soundLabel: "Sound: /fff/", soundPhonetic: "like in fantôme", hex: "#EC4899" },
+      { french: "G", english: "Zhey", phonetic: "/zhay/", soundSpeak: "gueu", soundLabel: "Sound: /guh/ or /zh/", soundPhonetic: "like in gâteau", hex: "#14B8A6" },
+      { french: "H", english: "Ash", phonetic: "/ash/", soundSpeak: "h", soundLabel: "Silent in French!", soundPhonetic: "like in hibou", hex: "#F97316" },
+      { french: "I", english: "Eee", phonetic: "/ee/", soundSpeak: "i", soundLabel: "Sound: /eee/", soundPhonetic: "like in igloo", hex: "#6366F1" },
+      { french: "J", english: "Zhee", phonetic: "/zhee/", soundSpeak: "jeu", soundLabel: "Sound: /zhuh/", soundPhonetic: "like in jupe", hex: "#84CC16" },
+      { french: "K", english: "Kah", phonetic: "/kah/", soundSpeak: "keu", soundLabel: "Sound: /kuh/", soundPhonetic: "like in kangourou", hex: "#06B6D4" },
+      { french: "L", english: "Ell", phonetic: "/ell/", soundSpeak: "lll", soundLabel: "Sound: /lll/", soundPhonetic: "like in lune", hex: "#A855F7" },
+      { french: "M", english: "Emm", phonetic: "/emm/", soundSpeak: "mmm", soundLabel: "Sound: /mmm/", soundPhonetic: "like in maman", hex: "#EAB308" },
+      { french: "N", english: "Enn", phonetic: "/enn/", soundSpeak: "nnn", soundLabel: "Sound: /nnn/", soundPhonetic: "like in neige", hex: "#F43F5E" },
+      { french: "O", english: "Oh", phonetic: "/oh/", soundSpeak: "o", soundLabel: "Sound: /oh/", soundPhonetic: "like in orange", hex: "#059669" },
+      { french: "P", english: "Pay", phonetic: "/pay/", soundSpeak: "peu", soundLabel: "Sound: /puh/", soundPhonetic: "like in papa", hex: "#D97706" },
+      { french: "Q", english: "Koo", phonetic: "/koo/", soundSpeak: "keu", soundLabel: "Sound: /kuh/", soundPhonetic: "like in quatre", hex: "#3B82F6" },
+      { french: "R", english: "Air", phonetic: "/air/", soundSpeak: "rrr", soundLabel: "Sound: /rrr/", soundPhonetic: "like in robot", hex: "#EF4444" },
+      { french: "S", english: "Ess", phonetic: "/ess/", soundSpeak: "sss", soundLabel: "Sound: /sss/", soundPhonetic: "like in soleil", hex: "#10B981" },
+      { french: "T", english: "Tay", phonetic: "/tay/", soundSpeak: "teu", soundLabel: "Sound: /tuh/", soundPhonetic: "like in tortue", hex: "#8B5CF6" },
+      { french: "U", english: "Eew", phonetic: "/oo/", soundSpeak: "u", soundLabel: "Sound: /ew/", soundPhonetic: "like in lune", hex: "#EC4899" },
+      { french: "V", english: "Vey", phonetic: "/vay/", soundSpeak: "vvv", soundLabel: "Sound: /vvv/", soundPhonetic: "like in vélo", hex: "#14B8A6" },
+      { french: "W", english: "Double Vey", phonetic: "/doo-bluh-vay/", soundSpeak: "vvv", soundLabel: "Sound: /vvv/ or /w/", soundPhonetic: "like in wagon", hex: "#F97316" },
+      { french: "X", english: "Eeks", phonetic: "/eeks/", soundSpeak: "ks", soundLabel: "Sound: /ks/", soundPhonetic: "like in xylophone", hex: "#6366F1" },
+      { french: "Y", english: "Eegrek", phonetic: "/ee-grek/", soundSpeak: "i", soundLabel: "Sound: /eee/", soundPhonetic: "like in pyjama", hex: "#84CC16" },
+      { french: "Z", english: "Zed", phonetic: "/zed/", soundSpeak: "zzz", soundLabel: "Sound: /zzz/", soundPhonetic: "like in zoo", hex: "#06B6D4" }
     ];
 
     // Reading Module Datasets (Levels 1, 2, 3)
@@ -725,6 +776,8 @@
     let currentModule = 'colors';
     let numberRangeMode = '1-10'; // Options: '1-10', '11-20', '1-20'
     let readingLevel = 1; // Options: 1, 2, 3
+    let alphabetAudioMode = 'letter'; // Options: 'letter' or 'sound'
+    let pendingSpeakOnSettingsClose = false;
     let activeDataset = colorsDataset;
     
     let currentIndex = 0;
@@ -734,6 +787,14 @@
     let speechRate = 0.85;
     let synth = window.speechSynthesis;
     let frenchVoice = null;
+
+    function getSpeakableText(item) {
+      if (!item) return '';
+      if (currentModule === 'alphabet' && alphabetAudioMode === 'sound') {
+        return item.soundSpeak || item.french.toLowerCase();
+      }
+      return item.speakText || item.french;
+    }
 
     function formatDisplayCase(text) {
       if (!text) return '';
@@ -791,9 +852,10 @@
 
       if (currentView === 'module' && currentModule === 'numbers') {
         currentIndex = 0;
+        pendingSpeakOnSettingsClose = true;
         updateNumberDataset();
         document.getElementById('headerSubtitle').textContent = `French Numbers (${numberRangeMode})`;
-        updateDisplay(autoPlayAudio);
+        updateDisplay(false);
       }
     }
 
@@ -971,11 +1033,19 @@
       }
 
       // Helper Box Text: For Numbers, show the French word (formatted in selected case) + phonetic ("/uhn/")
-      englishText.textContent = isNumberModule ? formatDisplayCase(item.french) : item.english;
-      phoneticText.textContent = item.phonetic;
+      if (isNumberModule) {
+        englishText.textContent = formatDisplayCase(item.french);
+        phoneticText.textContent = item.phonetic;
+      } else if (isAlphabetModule && alphabetAudioMode === 'sound') {
+        englishText.textContent = item.soundLabel;
+        phoneticText.textContent = item.soundPhonetic;
+      } else {
+        englishText.textContent = item.english;
+        phoneticText.textContent = item.phonetic;
+      }
 
       if (shouldSpeak) {
-        speakWord(item.speakText || item.french);
+        speakWord(getSpeakableText(item));
       }
     }
 
@@ -1005,7 +1075,7 @@
 
     function handleCardClick(e) {
       const item = activeDataset[currentIndex];
-      speakWord(item.speakText || item.french);
+      speakWord(getSpeakableText(item));
       
       const rect = e.currentTarget.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
@@ -1059,8 +1129,7 @@
       }
 
       if (currentView === 'module' && activeDataset[currentIndex]) {
-        const item = activeDataset[currentIndex];
-        speakWord(item.speakText || item.french);
+        pendingSpeakOnSettingsClose = true;
       }
     }
 
