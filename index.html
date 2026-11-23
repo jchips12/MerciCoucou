@@ -4,205 +4,82 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>French Learning for Kids</title>
-  
-  <!-- PWA Settings for Mobile/Android -->
-  <meta name="theme-color" content="#fef3c7">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="French Kids">
-  
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Canvas Confetti Library -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
     body {
       font-family: 'Fredoka', cursive, sans-serif;
-      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
     .custom-shadow {
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+    }
+    .storybook-shadow {
+      box-shadow: 0 14px 30px -6px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+    }
+    @keyframes popBounce {
+      0% { transform: scale(0.95); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .animate-pop {
+      animation: popBounce 0.25s ease-out;
     }
   </style>
 </head>
-<body class="bg-amber-50 min-h-screen flex flex-col justify-between text-slate-800 select-none relative overflow-x-hidden">
+<body class="bg-amber-50 text-slate-800 min-h-screen flex flex-col justify-between p-4 sm:p-6">
 
-  <!-- SETTINGS MODAL OVERLAY -->
-  <div id="settingsOverlay" onclick="closeSettings()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-200 opacity-0 pointer-events-none flex items-center justify-center p-4">
-    <!-- SETTINGS MODAL CARD -->
-    <div id="settingsModal" onclick="event.stopPropagation()" class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 border-4 border-amber-200 transform scale-95 transition-transform duration-200">
-      <div class="flex items-center justify-between pb-3 border-b border-amber-100 mb-5">
-        <div class="flex items-center space-x-2">
-          <i class="fas fa-cog text-2xl text-amber-500"></i>
-          <h2 class="text-xl font-black text-slate-800">Settings</h2>
-        </div>
-        <button onclick="closeSettings()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 font-bold flex items-center justify-center transition">
-          ✕
-        </button>
-      </div>
+  <!-- TOP HEADER -->
+  <header class="w-full max-w-2xl mx-auto flex items-center justify-between gap-3 pt-1 pb-2">
+    <!-- Home Button -->
+    <button id="homeBtn" onclick="goHome()" aria-label="Home"
+            class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white border-4 border-amber-200 hover:border-amber-400 shadow-md flex items-center justify-center text-2xl sm:text-3xl transition transform active:scale-90 shrink-0">
+      🇫🇷
+    </button>
 
-      <!-- MODULE-SPECIFIC SETTINGS (DYNAMICALLY SHOWN) -->
-      <div id="moduleSpecificSettings" class="hidden mb-5 pb-5 border-b border-amber-100">
-        <!-- NUMBER RANGE SELECTOR -->
-        <div id="numberRangeSettingGroup" class="hidden">
-          <p class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-            <span>🔢</span>
-            <span>Number Range</span>
-          </p>
-          <div class="grid grid-cols-3 gap-2 bg-amber-50 p-1.5 rounded-2xl border border-amber-200">
-            <button id="range1-10Btn" onclick="setNumberRange('1-10')" class="py-2 px-2 rounded-xl text-sm font-bold bg-amber-500 text-white transition text-center shadow-sm">
-              1 – 10
-            </button>
-            <button id="range11-20Btn" onclick="setNumberRange('11-20')" class="py-2 px-2 rounded-xl text-sm font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center">
-              11 – 20
-            </button>
-            <button id="range1-20Btn" onclick="setNumberRange('1-20')" class="py-2 px-2 rounded-xl text-sm font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center">
-              1 – 20
-            </button>
-          </div>
-        </div>
-
-        <!-- READING LEVEL SELECTOR -->
-        <div id="readingLevelSettingGroup" class="hidden">
-          <p class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-            <span>📖</span>
-            <span>Reading Level</span>
-          </p>
-          <div class="grid grid-cols-3 gap-2 bg-amber-50 p-1.5 rounded-2xl border border-amber-200">
-            <button id="readLevel1Btn" onclick="setReadingLevel(1)" class="py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight">
-              Level 1<br><span class="text-[10px] opacity-90">Syllabes</span>
-            </button>
-            <button id="readLevel2Btn" onclick="setReadingLevel(2)" class="py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight">
-              Level 2<br><span class="text-[10px] opacity-90">Mots</span>
-            </button>
-            <button id="readLevel3Btn" onclick="setReadingLevel(3)" class="py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight">
-              Level 3<br><span class="text-[10px] opacity-90">Phrases</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- ALPHABET AUDIO MODE SELECTOR -->
-        <div id="alphabetAudioSettingGroup" class="hidden">
-          <p class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-            <span>🔤</span>
-            <span>Alphabet Pronunciation</span>
-          </p>
-          <div class="grid grid-cols-2 gap-2 bg-amber-50 p-1.5 rounded-2xl border border-amber-200">
-            <button id="alphaModeLetterBtn" onclick="setAlphabetAudioMode('letter')" class="py-2 px-2 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight">
-              Letter Name<br><span class="text-[10px] opacity-90">(Ah, Bay, Say)</span>
-            </button>
-            <button id="alphaModeSoundBtn" onclick="setAlphabetAudioMode('sound')" class="py-2 px-2 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight">
-              Phonic Sound<br><span class="text-[10px] opacity-90">(/a/, /b/, /s/)</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- COMMON SETTINGS (ALWAYS VISIBLE) -->
-      <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">General Options</p>
-      <div class="space-y-3">
-        <!-- ENGLISH HELPER TOGGLE -->
-        <button id="toggleEnglishBtn" onclick="toggleEnglish()" 
-                class="w-full flex items-center justify-between px-4 py-3.5 bg-blue-50 text-blue-900 hover:bg-blue-100 rounded-2xl font-bold text-sm transition">
-          <span class="flex items-center space-x-2.5">
-            <i class="fas fa-language text-xl text-blue-600"></i>
-            <span>English Helper</span>
-          </span>
-          <span id="englishStatusBadge" class="text-xs bg-blue-200 text-blue-900 font-black px-2.5 py-1 rounded-full">ON</span>
-        </button>
-
-        <!-- SPEAK ON NAVIGATE TOGGLE -->
-        <button id="toggleAutoAudioBtn" onclick="toggleAutoAudio()" 
-                class="w-full flex items-center justify-between px-4 py-3.5 bg-amber-100/80 text-amber-950 hover:bg-amber-200/80 rounded-2xl font-bold text-sm transition">
-          <span class="flex items-center space-x-2.5">
-            <i id="audioMenuIcon" class="fas fa-volume-up text-xl text-amber-600"></i>
-            <span>Speak on Navigate</span>
-          </span>
-          <span id="audioStatusBadge" class="text-xs bg-amber-300 text-amber-950 font-black px-2.5 py-1 rounded-full">ON</span>
-        </button>
-
-        <!-- VOICE SPEED SELECTOR -->
-        <div class="p-3.5 bg-slate-100 rounded-2xl flex items-center justify-between text-sm text-slate-700">
-          <span class="font-bold flex items-center space-x-2">
-            <i class="fas fa-tachometer-alt text-amber-500 text-lg"></i>
-            <span>Voice Speed</span>
-          </span>
-          <div class="flex bg-slate-200 p-1 rounded-xl space-x-1">
-            <button id="speedSlowBtn" onclick="setSpeechRate(0.7)" class="px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-600">🐢 Slow</button>
-            <button id="speedNormalBtn" onclick="setSpeechRate(0.85)" class="px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs">🧒 Normal</button>
-          </div>
-        </div>
-
-        <!-- LETTER CASE SELECTOR (LOWERCASE / UPPERCASE / COMBINED) -->
-        <div class="p-3.5 bg-slate-100 rounded-2xl flex items-center justify-between text-sm text-slate-700">
-          <span class="font-bold flex items-center space-x-2">
-            <i class="fas fa-font text-amber-500 text-lg"></i>
-            <span>Letter Case</span>
-          </span>
-          <div class="flex bg-slate-200 p-1 rounded-xl space-x-1">
-            <button id="caseLowerBtn" onclick="setLetterCase('lower')" class="px-2.5 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs">abc</button>
-            <button id="caseUpperBtn" onclick="setLetterCase('upper')" class="px-2.5 py-1.5 rounded-lg font-black transition text-xs text-slate-600">ABC</button>
-            <button id="caseBothBtn" onclick="setLetterCase('both')" class="px-2.5 py-1.5 rounded-lg font-black transition text-xs text-slate-600">Aa</button>
-          </div>
-        </div>
-      </div>
+    <!-- Dynamic Title -->
+    <div class="text-center flex-1 min-w-0">
+      <h1 id="headerTitle" class="text-2xl sm:text-3xl font-black text-slate-800 tracking-wide truncate">
+        Apprendre le Français
+      </h1>
+      <p id="headerSubtitle" class="text-xs sm:text-sm font-bold text-amber-700 truncate">
+        Tap a module to start learning!
+      </p>
     </div>
-  </div>
 
-  <!-- HEADER -->
-  <header class="bg-white/85 backdrop-blur-md border-b-4 border-amber-200 sticky top-0 z-40 p-3 sm:p-4">
-    <div class="max-w-4xl mx-auto flex items-center justify-between gap-2">
-      <!-- LEFT: HOME BUTTON -->
-      <button id="homeHeaderBtn" onclick="goHome()" title="Home Menu" 
-              class="px-3 py-2 sm:px-3.5 sm:py-2.5 bg-amber-100 hover:bg-amber-200 active:scale-95 text-amber-950 rounded-2xl flex items-center justify-center border-2 border-amber-300 transition shadow-sm cursor-pointer shrink-0">
-        <span class="text-2xl leading-none">🇫🇷</span>
-      </button>
-
-      <!-- CENTER: TITLE -->
-      <div class="text-center flex-1 min-w-0 px-1">
-        <h1 id="headerTitle" class="text-lg sm:text-2xl font-black text-amber-600 tracking-wide leading-tight truncate">Apprendre le Français</h1>
-        <p id="headerSubtitle" class="text-xs text-amber-800 font-bold truncate">Choose a Learning Module</p>
-      </div>
-
-      <!-- RIGHT: SETTINGS BUTTON -->
-      <button onclick="openSettings()" title="Settings" 
-              class="px-3 py-2 sm:px-3.5 sm:py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 rounded-2xl flex items-center justify-center border-2 border-slate-300 transition shadow-sm cursor-pointer shrink-0">
-        <i class="fas fa-cog text-xl text-amber-600"></i>
-      </button>
-    </div>
+    <!-- Settings Button -->
+    <button id="settingsBtn" onclick="openSettings()" aria-label="Settings"
+            class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white border-4 border-amber-200 hover:border-amber-400 shadow-md flex items-center justify-center text-2xl sm:text-3xl text-slate-700 transition transform active:scale-90 shrink-0">
+      ⚙️
+    </button>
   </header>
 
-  <main class="flex-grow flex flex-col items-center justify-center p-4 max-w-4xl mx-auto w-full">
+  <!-- HOME MODULE GRID -->
+  <main class="w-full max-w-2xl mx-auto flex-1 flex flex-col justify-center my-2">
+    <section id="homeSection" class="w-full">
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
 
-    <!-- HOME TILE DASHBOARD SECTION -->
-    <section id="homeSection" class="w-full max-w-3xl mx-auto py-2">
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-5">
-        
         <!-- TILE 1: COULEURS -->
         <button onclick="selectModule('colors')" 
-                class="bg-gradient-to-br from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
+                class="bg-gradient-to-br from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
           <span class="text-5xl sm:text-6xl mb-3 filter drop-shadow">🎨</span>
           <h2 class="text-xl sm:text-2xl font-black tracking-wide leading-tight">Couleurs</h2>
           <p class="text-xs sm:text-sm font-bold text-white/90 mt-1">Colors</p>
         </button>
 
-        <!-- TILE 2: VOCABULAIRE (A-Z) -->
+        <!-- TILE 2: VOCABULAIRE -->
         <button onclick="selectModule('vocab')" 
-                class="bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
-          <span class="text-5xl sm:text-6xl mb-3 filter drop-shadow">📚</span>
+                class="bg-gradient-to-br from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
+          <span class="text-5xl sm:text-6xl mb-3 filter drop-shadow">🦁</span>
           <h2 class="text-xl sm:text-2xl font-black tracking-wide leading-tight">Vocabulaire</h2>
-          <p class="text-xs sm:text-sm font-bold text-white/90 mt-1">Words (A–Z)</p>
+          <p class="text-xs sm:text-sm font-bold text-white/90 mt-1">Words A–Z</p>
         </button>
 
         <!-- TILE 3: JOURS DE LA SEMAINE -->
         <button onclick="selectModule('days')" 
-                class="bg-gradient-to-br from-sky-400 to-blue-600 hover:from-sky-500 hover:to-blue-700 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
+                class="bg-gradient-to-br from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
           <span class="text-5xl sm:text-6xl mb-3 filter drop-shadow">📅</span>
           <h2 class="text-xl sm:text-2xl font-black tracking-wide leading-tight">Jours</h2>
           <p class="text-xs sm:text-sm font-bold text-white/90 mt-1">Days of Week</p>
@@ -210,10 +87,10 @@
 
         <!-- TILE 4: NOMBRES -->
         <button onclick="selectModule('numbers')" 
-                class="bg-gradient-to-br from-emerald-400 to-teal-600 hover:from-emerald-500 hover:to-teal-700 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
+                class="bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
           <span class="text-5xl sm:text-6xl mb-3 filter drop-shadow">🔢</span>
           <h2 class="text-xl sm:text-2xl font-black tracking-wide leading-tight">Nombres</h2>
-          <p id="homeNumbersSub" class="text-xs sm:text-sm font-bold text-white/90 mt-1">Numbers (1–10)</p>
+          <p id="homeNumbersSub" class="text-xs sm:text-sm font-bold text-white/90 mt-1">Numbers 1–10</p>
         </button>
 
         <!-- TILE 5: ALPHABET -->
@@ -221,7 +98,7 @@
                 class="bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
           <span class="text-5xl sm:text-6xl mb-3 filter drop-shadow">🔤</span>
           <h2 class="text-xl sm:text-2xl font-black tracking-wide leading-tight">Alphabet</h2>
-          <p class="text-xs sm:text-sm font-bold text-white/90 mt-1">A to Z</p>
+          <p class="text-xs sm:text-sm font-bold text-white/90 mt-1">Letters A–Z</p>
         </button>
 
         <!-- TILE 6: LES QUATRE SAISONS -->
@@ -232,77 +109,71 @@
           <p class="text-xs sm:text-sm font-bold text-white/90 mt-1">4 Seasons</p>
         </button>
 
-        <!-- TILE 7: LECTURE (READING FOR KIDS) -->
+        <!-- TILE 7: SALUTATIONS (GREETINGS) -->
+        <button onclick="selectModule('greetings')" 
+                class="bg-gradient-to-br from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col items-center justify-center text-center transition transform hover:-translate-y-1 active:scale-95 aspect-square">
+          <span class="text-5xl sm:text-6xl mb-3 filter drop-shadow">👋</span>
+          <h2 class="text-xl sm:text-2xl font-black tracking-wide leading-tight">Salutations</h2>
+          <p class="text-xs sm:text-sm font-bold text-white/90 mt-1">Greetings</p>
+        </button>
+
+        <!-- TILE 8: LECTURE (READING FOR KIDS) -->
         <button onclick="selectModule('reading')" 
-                class="col-span-2 sm:col-span-3 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-600 hover:via-teal-600 hover:to-emerald-600 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex items-center justify-center gap-4 sm:gap-6 text-left transition transform hover:-translate-y-1 active:scale-95">
+                class="col-span-2 sm:col-span-2 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-600 hover:via-teal-600 hover:to-emerald-600 text-white rounded-3xl p-5 sm:p-6 border-4 border-white custom-shadow flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 text-center sm:text-left transition transform hover:-translate-y-1 active:scale-95">
           <span class="text-5xl sm:text-6xl filter drop-shadow shrink-0">📖</span>
           <div>
-            <h2 class="text-2xl sm:text-3xl font-black tracking-wide leading-tight">Je Lis (Reading)</h2>
-            <p id="homeReadingSub" class="text-xs sm:text-sm font-bold text-white/95 mt-1">Level 1: Syllables • Level 2: Words • Level 3: Sentences</p>
+            <h2 class="text-xl sm:text-2xl font-black tracking-wide leading-tight">Je Lis (Reading)</h2>
+            <p id="homeReadingSub" class="text-xs sm:text-sm font-bold text-white/95 mt-1">Syllables • Words • Sentences</p>
           </div>
         </button>
 
       </div>
     </section>
 
-    <!-- LEARN MODE SECTION (HIDDEN ON HOME) -->
-    <section id="learnSection" class="w-full flex flex-col items-center hidden">
+    <!-- LEARNING FLASHCARD SECTION -->
+    <section id="learnSection" class="hidden w-full flex flex-col items-center justify-center">
       
-      <!-- MAIN DISPLAY CARD -->
-      <div id="displayCard" 
-           onclick="handleCardClick(event)" 
-           class="w-full max-w-md min-h-[22rem] sm:min-h-[27rem] rounded-3xl border-8 border-white custom-shadow transition-all duration-300 transform active:scale-95 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden group">
+      <!-- FLASHCARD CONTAINER -->
+      <div id="flashcard" onclick="speakCurrentItem()"
+           class="w-full max-w-md min-h-[23rem] sm:min-h-[26rem] rounded-3xl border-8 storybook-shadow transition-all duration-200 transform active:scale-98 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden">
         
-        <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+        <!-- Visual / Icon / SVG / Big Digit Container -->
+        <div id="cardVisualContainer" class="mb-3 flex items-center justify-center"></div>
 
-        <div class="flex-grow flex flex-col items-center justify-center w-full">
-          <!-- Level 1 Equation Pill (e.g., M + A) -->
-          <div id="readingEquation" class="hidden items-center justify-center gap-2 mb-3 z-10"></div>
+        <!-- Primary French Word / Letter / Number -->
+        <h2 id="cardPrimaryText" class="font-black tracking-wide leading-tight mb-3"></h2>
 
-          <!-- Custom SVG Illustration Container -->
-          <div id="cardIllustration" class="w-28 h-28 sm:w-36 sm:h-36 mb-2 hidden items-center justify-center filter drop-shadow-md"></div>
+        <!-- Interactive Syllables / Word Breakdown for Reading Module -->
+        <div id="readingBreakdown" class="hidden flex flex-wrap items-center justify-center gap-2 mb-3"></div>
 
-          <!-- Emoji Icon Display for Vocab / Words -->
-          <div id="cardIcon" class="text-6xl sm:text-7xl mb-2 hidden filter drop-shadow-md">✈️</div>
-
-          <!-- French Primary Text Display -->
-          <h2 id="frenchName" class="text-5xl sm:text-7xl font-black tracking-wide drop-shadow-md text-white mb-3 transition-all">
-            Rouge
-          </h2>
-
-          <!-- Interactive Syllables / Word Chunks Container (Reading Mode) -->
-          <div id="readingChunksContainer" class="hidden flex-wrap items-center justify-center gap-2 mb-3 z-10"></div>
-
-          <!-- English Translation & Phonetics -->
-          <div id="englishContainer" class="bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl text-white mt-1 transition-all">
-            <p id="englishName" class="text-2xl sm:text-4xl font-bold">Red</p>
-            <p id="phoneticText" class="text-sm sm:text-lg font-semibold opacity-85 italic mt-1">/roozh/</p>
-          </div>
+        <!-- Helper Box (English Translation + Phonetics) -->
+        <div id="cardHelperBox" class="px-5 py-3 rounded-2xl border-2 mt-1 max-w-full">
+          <p id="cardEnglishText" class="text-xl sm:text-3xl font-bold"></p>
+          <p id="cardPhoneticText" class="text-sm sm:text-base font-semibold italic mt-0.5"></p>
         </div>
       </div>
 
-      <!-- MAIN NAVIGATION CONTROLS (ICON-ONLY WITH MATCHING BOLD WEIGHT) -->
-      <div class="w-full max-w-md mt-5 grid grid-cols-3 gap-3 sm:gap-4">
-        
-        <!-- PREVIOUS BUTTON -->
-        <button onclick="prevItem()" aria-label="Previous"
-                class="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-sky-700 flex items-center justify-center shadow-lg transition transform active:translate-y-1 cursor-pointer">
-          <svg viewBox="0 0 24 24" class="w-8 h-8 sm:w-9 sm:h-9" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <!-- ICON-ONLY NAVIGATION CONTROLS (Android-Safe, No Text Labels) -->
+      <div class="w-full max-w-md grid grid-cols-3 gap-3 sm:gap-4 mt-5">
+        <!-- Previous Button -->
+        <button onclick="prevCard()" aria-label="Previous"
+                class="h-16 sm:h-20 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white border-b-4 border-sky-700 active:border-b-0 active:translate-y-1 shadow-lg flex items-center justify-center transition">
+          <svg class="w-8 h-8 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </button>
 
-        <!-- RANDOM BUTTON -->
-        <button onclick="randomItem()" aria-label="Random"
-                class="bg-purple-500 hover:bg-purple-600 active:bg-purple-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-purple-800 flex items-center justify-center shadow-lg transition transform active:translate-y-1 cursor-pointer">
-          <i class="fas fa-dice text-3xl sm:text-4xl leading-none"></i>
+        <!-- Random / Shuffle Button -->
+        <button onclick="randomCard()" aria-label="Random"
+                class="h-16 sm:h-20 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white border-b-4 border-purple-700 active:border-b-0 active:translate-y-1 shadow-lg flex items-center justify-center transition">
+          <span class="text-3xl sm:text-4xl leading-none">🎲</span>
         </button>
 
-        <!-- NEXT BUTTON -->
-        <button onclick="nextItem()" aria-label="Next"
-                class="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-black py-4 sm:py-5 px-3 rounded-2xl border-b-4 border-emerald-700 flex items-center justify-center shadow-lg transition transform active:translate-y-1 cursor-pointer">
-          <svg viewBox="0 0 24 24" class="w-8 h-8 sm:w-9 sm:h-9" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Next Button -->
+        <button onclick="nextCard()" aria-label="Next"
+                class="h-16 sm:h-20 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white border-b-4 border-emerald-700 active:border-b-0 active:translate-y-1 shadow-lg flex items-center justify-center transition">
+          <svg class="w-8 h-8 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
@@ -310,34 +181,482 @@
       </div>
 
     </section>
-
   </main>
 
-    <script>
-    // Register Service Worker for offline capability
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        const swContent = `
-          self.addEventListener('install', (e) => self.skipWaiting());
-          self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
-          self.addEventListener('fetch', (e) => {
-            e.respondWith(fetch(e.request).catch(() => new Response("Offline")));
-          });
-        `;
-        const blob = new Blob([swContent], { type: 'text/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl).catch(err => console.log('SW note:', err));
-      });
+  <!-- FOOTER -->
+  <footer class="w-full max-w-2xl mx-auto text-center text-xs font-bold text-amber-800/60 py-1">
+    Tap any card to hear French pronunciation 🔊
+  </footer>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-md p-6 border-4 border-amber-300 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b-2 border-slate-100 pb-3">
+        <h3 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+          <span>⚙️</span> Settings
+        </h3>
+        <button onclick="closeSettings()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xl flex items-center justify-center">
+          ✕
+        </button>
+      </div>
+
+      <!-- MODULE-SPECIFIC OPTIONS -->
+      <!-- 1. Numbers Range -->
+      <div id="settingNumbersGroup" class="hidden space-y-2 bg-emerald-50 p-4 rounded-2xl border-2 border-emerald-200">
+        <label class="block text-sm font-black text-emerald-900 uppercase tracking-wide">
+          🔢 Numbers Range
+        </label>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btnRange10" onclick="setNumberRange('1-10')"
+                  class="py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition">
+            1 – 10
+          </button>
+          <button id="btnRange20" onclick="setNumberRange('1-20')"
+                  class="py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition">
+            1 – 20
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Alphabet Pronunciation Mode -->
+      <div id="settingAlphabetGroup" class="hidden space-y-2 bg-purple-50 p-4 rounded-2xl border-2 border-purple-200">
+        <label class="block text-sm font-black text-purple-900 uppercase tracking-wide">
+          🔤 Alphabet Pronunciation
+        </label>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btnAlphaPhonic" onclick="setAlphabetMode('phonic')"
+                  class="py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition">
+            Phonic Sound
+          </button>
+          <button id="btnAlphaName" onclick="setAlphabetMode('name')"
+                  class="py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition">
+            Letter Name
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Reading Level -->
+      <div id="settingReadingGroup" class="hidden space-y-2 bg-cyan-50 p-4 rounded-2xl border-2 border-cyan-200">
+        <label class="block text-sm font-black text-cyan-900 uppercase tracking-wide">
+          📖 Reading Level
+        </label>
+        <div class="grid grid-cols-3 gap-2">
+          <button id="btnRead1" onclick="setReadingLevel(1)"
+                  class="py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition">
+            Lvl 1: Syllables
+          </button>
+          <button id="btnRead2" onclick="setReadingLevel(2)"
+                  class="py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition">
+            Lvl 2: Words
+          </button>
+          <button id="btnRead3" onclick="setReadingLevel(3)"
+                  class="py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition">
+            Lvl 3: Sentences
+          </button>
+        </div>
+      </div>
+
+      <!-- GENERAL OPTIONS -->
+      <div class="space-y-4">
+        <!-- Letter Case Mode (Default: Lowercase 'abc') -->
+        <div class="space-y-2">
+          <label class="block text-sm font-black text-slate-700 uppercase tracking-wide">
+            🔡 Letter Case
+          </label>
+          <div class="grid grid-cols-3 gap-2">
+            <button id="btnCaseLower" onclick="setLetterCase('lower')"
+                    class="py-2.5 px-3 rounded-xl font-black text-base border-2 transition">
+              abc
+            </button>
+            <button id="btnCaseUpper" onclick="setLetterCase('upper')"
+                    class="py-2.5 px-3 rounded-xl font-black text-base border-2 transition">
+              ABC
+            </button>
+            <button id="btnCaseBoth" onclick="setLetterCase('both')"
+                    class="py-2.5 px-3 rounded-xl font-black text-base border-2 transition">
+              Aa
+            </button>
+          </div>
+        </div>
+
+        <!-- Voice Speed -->
+        <div class="space-y-2">
+          <label class="block text-sm font-black text-slate-700 uppercase tracking-wide">
+            🐢 Voice Speed
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btnSpeedSlow" onclick="setVoiceSpeed(0.65)"
+                    class="py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition">
+              🐢 Slow
+            </button>
+            <button id="btnSpeedNormal" onclick="setVoiceSpeed(0.85)"
+                    class="py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition">
+              🐇 Normal
+            </button>
+          </div>
+        </div>
+
+        <!-- Auto-Play Audio Toggle -->
+        <div class="flex items-center justify-between bg-slate-50 p-3.5 rounded-2xl border-2 border-slate-200">
+          <div>
+            <p class="font-bold text-slate-800 text-sm">Auto-Speak on Next Card</p>
+            <p class="text-xs text-slate-500">Read automatically when changing cards</p>
+          </div>
+          <button id="btnAutoPlay" onclick="toggleAutoPlay()"
+                  class="w-14 h-8 rounded-full transition-colors p-1 flex items-center">
+            <span id="autoPlayKnob" class="w-6 h-6 rounded-full bg-white shadow transform transition-transform"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Done Button -->
+      <button onclick="closeSettings()"
+              class="w-full py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-lg border-b-4 border-amber-600 active:border-b-0 active:translate-y-0.5 transition">
+        Done
+      </button>
+
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. STATE & DEFAULTS
+    // ==========================================
+    let currentView = 'home';
+    let currentModule = null;
+    let currentIndex = 0;
+    let activeDataset = [];
+
+    // User Preferences (Defaults: lowercase 'abc', phonic alphabet, 1-10 numbers)
+    let letterCaseMode = 'lower';     // 'lower' | 'upper' | 'both'
+    let alphabetSoundMode = 'phonic'; // 'phonic' | 'name'
+    let numberRangeMode = '1-10';     // '1-10' | '1-20'
+    let readingLevel = 1;             // 1 | 2 | 3
+    let speechRate = 0.85;
+    let autoPlayAudio = true;
+    let pendingSpeakOnClose = false;
+    let frenchVoice = null;
+
+    // ==========================================
+    // 2. SVG ARTWORK FOR SEASONS
+    // ==========================================
+    const svgArtwork = {
+      spring: `<svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="14" fill="#FACC15"/>
+        <circle cx="50" cy="24" r="14" fill="#F472B6"/>
+        <circle cx="74" cy="40" r="14" fill="#F472B6"/>
+        <circle cx="65" cy="70" r="14" fill="#F472B6"/>
+        <circle cx="35" cy="70" r="14" fill="#F472B6"/>
+        <circle cx="26" cy="40" r="14" fill="#F472B6"/>
+        <circle cx="50" cy="50" r="11" fill="#FDE047"/>
+      </svg>`,
+      summer: `<svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="24" fill="#FDE047" stroke="#FEF08A" stroke-width="4"/>
+        <g stroke="#FEF08A" stroke-width="6" stroke-linecap="round">
+          <line x1="50" y1="10" x2="50" y2="20"/>
+          <line x1="50" y1="80" x2="50" y2="90"/>
+          <line x1="10" y1="50" x2="20" y2="50"/>
+          <line x1="80" y1="50" x2="90" y2="50"/>
+          <line x1="22" y1="22" x2="29" y2="29"/>
+          <line x1="71" y1="71" x2="78" y2="78"/>
+          <line x1="78" y1="22" x2="71" y2="29"/>
+          <line x1="29" y1="71" x2="22" y2="78"/>
+        </g>
+      </svg>`,
+      autumn: `<svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow" viewBox="0 0 100 100">
+        <path d="M50 15 C75 35, 80 65, 50 80 C20 65, 25 35, 50 15 Z" fill="#FDBA74" stroke="#FFF7ED" stroke-width="3"/>
+        <line x1="50" y1="25" x2="50" y2="90" stroke="#7C2D12" stroke-width="5" stroke-linecap="round"/>
+        <line x1="50" y1="45" x2="36" y2="35" stroke="#7C2D12" stroke-width="3" stroke-linecap="round"/>
+        <line x1="50" y1="55" x2="64" y2="45" stroke="#7C2D12" stroke-width="3" stroke-linecap="round"/>
+      </svg>`,
+      winter: `<svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow" viewBox="0 0 100 100">
+        <g stroke="#FFFFFF" stroke-width="6" stroke-linecap="round">
+          <line x1="50" y1="14" x2="50" y2="86"/>
+          <line x1="14" y1="50" x2="86" y2="50"/>
+          <line x1="25" y1="25" x2="75" y2="75"/>
+          <line x1="75" y1="25" x2="25" y2="75"/>
+        </g>
+        <circle cx="50" cy="50" r="10" fill="#BAE6FD"/>
+      </svg>`
+    };
+
+    // ==========================================
+    // 3. DATASETS
+    // ==========================================
+    const colorsDataset = [
+      { french: "Rouge", english: "Red", phonetic: "/roozh/", hex: "#EF4444", textDark: false },
+      { french: "Bleu", english: "Blue", phonetic: "/bluh/", hex: "#3B82F6", textDark: false },
+      { french: "Jaune", english: "Yellow", phonetic: "/zhohn/", hex: "#FACC15", textDark: true },
+      { french: "Vert", english: "Green", phonetic: "/vair/", hex: "#22C55E", textDark: false },
+      { french: "Orange", english: "Orange", phonetic: "/oh-rahnzh/", hex: "#F97316", textDark: false },
+      { french: "Violet", english: "Purple", phonetic: "/vyoh-lay/", hex: "#8B5CF6", textDark: false },
+      { french: "Rose", english: "Pink", phonetic: "/rohz/", hex: "#F472B6", textDark: false },
+      { french: "Marron", english: "Brown", phonetic: "/mah-rohn/", hex: "#92400E", textDark: false },
+      { french: "Noir", english: "Black", phonetic: "/nwahr/", hex: "#1E293B", textDark: false },
+      { french: "Blanc", english: "White", phonetic: "/blahn/", hex: "#FFFFFF", textDark: true },
+      { french: "Gris", english: "Gray", phonetic: "/gree/", hex: "#64748B", textDark: false }
+    ];
+
+    const seasonsDataset = [
+      { french: "Le Printemps", english: "Spring", phonetic: "/luh pran-tahn/", hex: "#16A34A", svg: svgArtwork.spring },
+      { french: "L'Été", english: "Summer", phonetic: "/lay-tay/", hex: "#F59E0B", svg: svgArtwork.summer },
+      { french: "L'Automne", english: "Autumn / Fall", phonetic: "/loh-tohn/", hex: "#EA580C", svg: svgArtwork.autumn },
+      { french: "L'Hiver", english: "Winter", phonetic: "/lee-vair/", hex: "#0284C7", svg: svgArtwork.winter }
+    ];
+
+    const greetingsDataset = [
+      { french: "Bonjour", english: "Hello / Good morning", phonetic: "/bohn-zhoor/", hex: "#0EA5E9", icon: "👋" },
+      { french: "Salut", english: "Hi / Bye (friendly)", phonetic: "/sah-loo/", hex: "#F43F5E", icon: "😊" },
+      { french: "Bonsoir", english: "Good evening", phonetic: "/bohn-swahr/", hex: "#8B5CF6", icon: "🌆" },
+      { french: "Bonne nuit", english: "Good night", phonetic: "/bon nwee/", hex: "#3B82F6", icon: "🌙" },
+      { french: "Au revoir", english: "Goodbye", phonetic: "/oh ruh-vwahr/", hex: "#10B981", icon: "👋" },
+      { french: "À bientôt", english: "See you soon", phonetic: "/ah byan-toh/", hex: "#F59E0B", icon: "🤗" },
+      { french: "S'il vous plaît", english: "Please", phonetic: "/seel voo play/", hex: "#6366F1", icon: "🙏" },
+      { french: "Merci", english: "Thank you", phonetic: "/mair-see/", hex: "#14B8A6", icon: "💖" },
+      { french: "De rien", english: "You're welcome", phonetic: "/duh ryan/", hex: "#84CC16", icon: "🌟" },
+      { french: "Pardon", english: "Excuse me / Sorry", phonetic: "/par-dohn/", hex: "#F97316", icon: "🙈" },
+      { french: "Comment ça va ?", english: "How are you?", phonetic: "/koh-mahn sah vah/", hex: "#06B6D4", icon: "💬" },
+      { french: "Ça va bien !", english: "I'm doing good!", phonetic: "/sah vah byan/", hex: "#D97706", icon: "👍" }
+    ];
+
+    const vocabDataset = [
+      { french: "Avion", english: "Airplane", phonetic: "/ah-vyohn/", hex: "#0EA5E9", icon: "✈️" },
+      { french: "Ballon", english: "Ball", phonetic: "/bah-lohn/", hex: "#F43F5E", icon: "⚽" },
+      { french: "Chat", english: "Cat", phonetic: "/shah/", hex: "#F59E0B", icon: "🐱" },
+      { french: "Chien", english: "Dog", phonetic: "/shyan/", hex: "#D97706", icon: "🐶" },
+      { french: "Éléphant", english: "Elephant", phonetic: "/ay-lay-fahn/", hex: "#6366F1", icon: "🐘" },
+      { french: "Fleur", english: "Flower", phonetic: "/fluhr/", hex: "#EC4899", icon: "🌸" },
+      { french: "Gâteau", english: "Cake", phonetic: "/gah-toh/", hex: "#F97316", icon: "🎂" },
+      { french: "Hibou", english: "Owl", phonetic: "/ee-boo/", hex: "#8B5CF6", icon: "🦉" },
+      { french: "Île", english: "Island", phonetic: "/eel/", hex: "#14B8A6", icon: "🏝️" },
+      { french: "Jus", english: "Juice", phonetic: "/zhoo/", hex: "#EAB308", icon: "🧃" },
+      { french: "Koala", english: "Koala", phonetic: "/koh-ah-lah/", hex: "#64748B", icon: "🐨" },
+      { french: "Lion", english: "Lion", phonetic: "/lyohn/", hex: "#EA580C", icon: "🦁" },
+      { french: "Maison", english: "House", phonetic: "/may-zohn/", hex: "#EF4444", icon: "🏠" },
+      { french: "Nuage", english: "Cloud", phonetic: "/noo-ahzh/", hex: "#38BDF8", icon: "☁️" },
+      { french: "Oiseau", english: "Bird", phonetic: "/wah-zoh/", hex: "#3B82F6", icon: "🐦" },
+      { french: "Pomme", english: "Apple", phonetic: "/pom/", hex: "#DC2626", icon: "🍎" },
+      { french: "Soleil", english: "Sun", phonetic: "/soh-lay/", hex: "#FACC15", icon: "☀️" },
+      { french: "Tortue", english: "Turtle", phonetic: "/tor-too/", hex: "#16A34A", icon: "🐢" },
+      { french: "Vélo", english: "Bicycle", phonetic: "/vay-loh/", hex: "#10B981", icon: "🚲" },
+      { french: "Zèbre", english: "Zebra", phonetic: "/zebr/", hex: "#475569", icon: "🦓" }
+    ];
+
+    const daysDataset = [
+      { french: "Lundi", english: "Monday", phonetic: "/luhn-dee/", hex: "#EF4444", icon: "1️⃣" },
+      { french: "Mardi", english: "Tuesday", phonetic: "/mar-dee/", hex: "#F97316", icon: "2️⃣" },
+      { french: "Mercredi", english: "Wednesday", phonetic: "/mair-kruh-dee/", hex: "#EAB308", icon: "3️⃣" },
+      { french: "Jeudi", english: "Thursday", phonetic: "/zhuh-dee/", hex: "#22C55E", icon: "4️⃣" },
+      { french: "Vendredi", english: "Friday", phonetic: "/vahn-druh-dee/", hex: "#0EA5E9", icon: "5️⃣" },
+      { french: "Samedi", english: "Saturday", phonetic: "/sam-dee/", hex: "#8B5CF6", icon: "🎉" },
+      { french: "Dimanche", english: "Sunday", phonetic: "/dee-mahnsh/", hex: "#EC4899", icon: "☀️" }
+    ];
+
+    const allNumbersDataset = [
+      { digit: "1", french: "Un", english: "One", phonetic: "/uhn/", hex: "#EF4444" },
+      { digit: "2", french: "Deux", english: "Two", phonetic: "/duh/", hex: "#F97316" },
+      { digit: "3", french: "Trois", english: "Three", phonetic: "/trwah/", hex: "#EAB308" },
+      { digit: "4", french: "Quatre", english: "Four", phonetic: "/katr/", hex: "#22C55E" },
+      { digit: "5", french: "Cinq", english: "Five", phonetic: "/sank/", hex: "#14B8A6" },
+      { digit: "6", french: "Six", english: "Six", phonetic: "/sees/", hex: "#0EA5E9" },
+      { digit: "7", french: "Sept", english: "Seven", phonetic: "/set/", hex: "#3B82F6" },
+      { digit: "8", french: "Huit", english: "Eight", phonetic: "/weet/", hex: "#6366F1" },
+      { digit: "9", french: "Neuf", english: "Nine", phonetic: "/nuhf/", hex: "#8B5CF6" },
+      { digit: "10", french: "Dix", english: "Ten", phonetic: "/dees/", hex: "#EC4899" },
+      { digit: "11", french: "Onze", english: "Eleven", phonetic: "/ohnz/", hex: "#F43F5E" },
+      { digit: "12", french: "Douze", english: "Twelve", phonetic: "/dooz/", hex: "#EA580C" },
+      { digit: "13", french: "Treize", english: "Thirteen", phonetic: "/trez/", hex: "#D97706" },
+      { digit: "14", french: "Quatorze", english: "Fourteen", phonetic: "/kah-torz/", hex: "#16A34A" },
+      { digit: "15", french: "Quinze", english: "Fifteen", phonetic: "/kanz/", hex: "#0D9488" },
+      { digit: "16", french: "Seize", english: "Sixteen", phonetic: "/sez/", hex: "#0284C7" },
+      { digit: "17", french: "Dix-sept", english: "Seventeen", phonetic: "/dee-set/", hex: "#2563EB" },
+      { digit: "18", french: "Dix-huit", english: "Eighteen", phonetic: "/deez-weet/", hex: "#4F46E5" },
+      { digit: "19", french: "Dix-neuf", english: "Nineteen", phonetic: "/deez-nuhf/", hex: "#7C3AED" },
+      { digit: "20", french: "Vingt", english: "Twenty", phonetic: "/van/", hex: "#DB2777" }
+    ];
+
+    const alphabetDataset = [
+      { letter: "A", nameSpeak: "A", namePhonetic: "/ah/", soundSpeak: "ah", soundDisplay: '"ah"', soundHint: "abeille (bee)", hex: "#EF4444" },
+      { letter: "B", nameSpeak: "B", namePhonetic: "/bay/", soundSpeak: "beu", soundDisplay: '"buh"', soundHint: "ballon (ball)", hex: "#F97316" },
+      { letter: "C", nameSpeak: "C", namePhonetic: "/say/", soundSpeak: "keu", soundDisplay: '"kuh"', soundHint: "carotte (carrot)", hex: "#EAB308" },
+      { letter: "D", nameSpeak: "D", namePhonetic: "/day/", soundSpeak: "de", soundDisplay: '"duh"', soundHint: "dinosaure (dinosaur)", hex: "#22C55E" },
+      { letter: "E", nameSpeak: "E", namePhonetic: "/uh/", soundSpeak: "euh", soundDisplay: '"uh"', soundHint: "cheval (horse)", hex: "#10B981" },
+      { letter: "F", nameSpeak: "F", namePhonetic: "/ef/", soundSpeak: "feuh", soundDisplay: '"fff"', soundHint: "fleur (flower)", hex: "#14B8A6" },
+      { letter: "G", nameSpeak: "G", namePhonetic: "/zhay/", soundSpeak: "gueu", soundDisplay: '"guh"', soundHint: "guitare (guitar)", hex: "#06B6D4" },
+      { letter: "H", nameSpeak: "H", namePhonetic: "/ash/", soundSpeak: "", soundDisplay: "Silent (no sound!)", soundHint: "hibou (owl)", hex: "#0EA5E9", silent: true },
+      { letter: "I", nameSpeak: "I", namePhonetic: "/ee/", soundSpeak: "ee", soundDisplay: '"ee"', soundHint: "igloo (igloo)", hex: "#3B82F6" },
+      { letter: "J", nameSpeak: "J", namePhonetic: "/zhee/", soundSpeak: "jeu", soundDisplay: '"zhuh"', soundHint: "jardin (garden)", hex: "#6366F1" },
+      { letter: "K", nameSpeak: "K", namePhonetic: "/kah/", soundSpeak: "keu", soundDisplay: '"kuh"', soundHint: "kangourou (kangaroo)", hex: "#8B5CF6" },
+      { letter: "L", nameSpeak: "L", namePhonetic: "/el/", soundSpeak: "leuh", soundDisplay: '"lll"', soundHint: "lapin (rabbit)", hex: "#A855F7" },
+      { letter: "M", nameSpeak: "M", namePhonetic: "/em/", soundSpeak: "meuh", soundDisplay: '"mmm"', soundHint: "maman (mom)", hex: "#D946EF" },
+      { letter: "N", nameSpeak: "N", namePhonetic: "/en/", soundSpeak: "neuh", soundDisplay: '"nnn"', soundHint: "nuage (cloud)", hex: "#EC4899" },
+      { letter: "O", nameSpeak: "O", namePhonetic: "/oh/", soundSpeak: "oh", soundDisplay: '"oh"', soundHint: "orange (orange)", hex: "#F43F5E" },
+      { letter: "P", nameSpeak: "P", namePhonetic: "/pay/", soundSpeak: "peu", soundDisplay: '"puh"', soundHint: "panda (panda)", hex: "#EF4444" },
+      { letter: "Q", nameSpeak: "Q", namePhonetic: "/koo/", soundSpeak: "keu", soundDisplay: '"kuh"', soundHint: "quiche (quiche)", hex: "#F97316" },
+      { letter: "R", nameSpeak: "R", namePhonetic: "/air/", soundSpeak: "reuh", soundDisplay: '"rrr"', soundHint: "robot (robot)", hex: "#EAB308" },
+      { letter: "S", nameSpeak: "S", namePhonetic: "/ess/", soundSpeak: "seuh", soundDisplay: '"sss"', soundHint: "serpent (snake)", hex: "#22C55E" },
+      { letter: "T", nameSpeak: "T", namePhonetic: "/tay/", soundSpeak: "te", soundDisplay: '"tuh"', soundHint: "tortue (turtle)", hex: "#14B8A6" },
+      { letter: "U", nameSpeak: "U", namePhonetic: "/oo/", soundSpeak: "u", soundDisplay: '"ew"', soundHint: "usine (factory)", hex: "#0EA5E9" },
+      { letter: "V", nameSpeak: "V", namePhonetic: "/vay/", soundSpeak: "veuh", soundDisplay: '"vvv"', soundHint: "vélo (bike)", hex: "#3B82F6" },
+      { letter: "W", nameSpeak: "W", namePhonetic: "/doo-bluh-vay/", soundSpeak: "wouah", soundDisplay: '"wuh"', soundHint: "wapiti (elk)", hex: "#6366F1" },
+      { letter: "X", nameSpeak: "X", namePhonetic: "/eeks/", soundSpeak: "kseuh", soundDisplay: '"ks"', soundHint: "xylophone (xylophone)", hex: "#8B5CF6" },
+      { letter: "Y", nameSpeak: "Y", namePhonetic: "/ee-grek/", soundSpeak: "yeuh", soundDisplay: '"yuh"', soundHint: "yaourt (yogurt)", hex: "#EC4899" },
+      { letter: "Z", nameSpeak: "Z", namePhonetic: "/zed/", soundSpeak: "zeuh", soundDisplay: '"zzz"', soundHint: "zèbre (zebra)", hex: "#F43F5E" }
+    ];
+
+    const readingDatasets = {
+      1: [
+        { french: "ma", parts: ["m", "a"], english: "Syllable: m + a", phonetic: "/mah/", hex: "#EC4899" },
+        { french: "pa", parts: ["p", "a"], english: "Syllable: p + a", phonetic: "/pah/", hex: "#3B82F6" },
+        { french: "bé", parts: ["b", "é"], english: "Syllable: b + é", phonetic: "/bay/", hex: "#10B981" },
+        { french: "vé", parts: ["v", "é"], english: "Syllable: v + é", phonetic: "/vay/", hex: "#F59E0B" },
+        { french: "lo", parts: ["l", "o"], english: "Syllable: l + o", phonetic: "/loh/", hex: "#8B5CF6" },
+        { french: "ri", parts: ["r", "i"], english: "Syllable: r + i", phonetic: "/ree/", hex: "#F43F5E" },
+        { french: "so", parts: ["s", "o"], english: "Syllable: s + o", phonetic: "/soh/", hex: "#0EA5E9" },
+        { french: "fu", parts: ["f", "u"], english: "Syllable: f + u", phonetic: "/foo/", hex: "#14B8A6" }
+      ],
+      2: [
+        { french: "papa", parts: ["pa", "pa"], english: "Dad", phonetic: "/pah-pah/", hex: "#3B82F6", icon: "👨" },
+        { french: "maman", parts: ["ma", "man"], english: "Mom", phonetic: "/mah-mahn/", hex: "#EC4899", icon: "👩" },
+        { french: "vélo", parts: ["vé", "lo"], english: "Bicycle", phonetic: "/vay-loh/", hex: "#10B981", icon: "🚲" },
+        { french: "bébé", parts: ["bé", "bé"], english: "Baby", phonetic: "/bay-bay/", hex: "#F59E0B", icon: "👶" },
+        { french: "lune", parts: ["lu", "ne"], english: "Moon", phonetic: "/loon/", hex: "#6366F1", icon: "🌙" },
+        { french: "banane", parts: ["ba", "na", "ne"], english: "Banana", phonetic: "/bah-nan/", hex: "#EAB308", icon: "🍌" },
+        { french: "tomate", parts: ["to", "ma", "te"], english: "Tomato", phonetic: "/toh-mat/", hex: "#EF4444", icon: "🍅" }
+      ],
+      3: [
+        { french: "Le chat dort.", english: "The cat is sleeping.", phonetic: "/luh shah dor/", hex: "#F59E0B", icon: "😴" },
+        { french: "J'aime la pomme.", english: "I like the apple.", phonetic: "/zhem lah pom/", hex: "#EF4444", icon: "🍎" },
+        { french: "Le soleil brille.", english: "The sun is shining.", phonetic: "/luh soh-lay bree/", hex: "#EAB308", icon: "☀️" },
+        { french: "Voici mon vélo.", english: "Here is my bicycle.", phonetic: "/vwah-see mohn vay-loh/", hex: "#10B981", icon: "🚲" },
+        { french: "Bonjour maman !", english: "Hello mom!", phonetic: "/bohn-zhoor mah-mahn/", hex: "#EC4899", icon: "💖" }
+      ]
+    };
+
+    // ==========================================
+    // 4. SPEECH SYNTHESIS & PHONETIC HELPERS
+    // ==========================================
+    function initVoices() {
+      if (!('speechSynthesis' in window)) return;
+      const load = () => {
+        const voices = window.speechSynthesis.getVoices();
+        frenchVoice = voices.find(v => v.lang === 'fr-CA') ||
+                      voices.find(v => v.lang.startsWith('fr')) ||
+                      null;
+      };
+      load();
+      window.speechSynthesis.onvoiceschanged = load;
     }
 
-    // ==================== NAVIGATION & MODAL CONTROLLERS ====================
+    // Phonetic map for single letters/syllables in Level 1 Reading so 'é' doesn't say "e accent aigu"
+    const readingChunkPhonics = {
+      'a': 'ah',
+      'é': 'hé',
+      'e': 'euh',
+      'i': 'ee',
+      'o': 'oh',
+      'u': 'u',
+      'b': 'beu',
+      'f': 'feuh',
+      'l': 'leuh',
+      'm': 'meuh',
+      'p': 'peu',
+      'r': 'reuh',
+      's': 'seuh',
+      'v': 'veuh'
+    };
+
+    function speakText(textToSpeak) {
+      if (!('speechSynthesis' in window) || !textToSpeak) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.lang = 'fr-FR';
+        if (frenchVoice) utterance.voice = frenchVoice;
+        utterance.rate = speechRate;
+        utterance.pitch = 1.05;
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn("Speech synthesis unavailable:", err);
+      }
+    }
+
+    function speakCurrentItem() {
+      const item = activeDataset[currentIndex];
+      if (!item) return;
+
+      if (currentModule === 'alphabet') {
+        if (alphabetSoundMode === 'phonic') {
+          if (item.silent) return; // Silent 'H' makes no sound in phonic mode
+          speakText(item.soundSpeak);
+        } else {
+          speakText(item.nameSpeak);
+        }
+        return;
+      }
+
+      speakText(item.french);
+    }
+
+    // ==========================================
+    // 5. CASE FORMATTING HELPER
+    // ==========================================
+    function formatTextByCase(text, isSingleAlphabetLetter = false) {
+      if (!text) return "";
+      if (isSingleAlphabetLetter) {
+        const up = text.toUpperCase();
+        const low = text.toLowerCase();
+        if (letterCaseMode === 'upper') return up;
+        if (letterCaseMode === 'both') return `${up} ${low}`;
+        return low;
+      }
+
+      if (letterCaseMode === 'upper') {
+        return text.toUpperCase();
+      } else if (letterCaseMode === 'both') {
+        // Title Case (capitalize first letter, lowercase rest)
+        return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+      } else {
+        return text.toLowerCase();
+      }
+    }
+
+    // ==========================================
+    // 6. NAVIGATION & RENDERING
+    // ==========================================
     function goHome() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
       currentView = 'home';
-      document.getElementById('homeSection').classList.remove('hidden');
+      currentModule = null;
       document.getElementById('learnSection').classList.add('hidden');
+      document.getElementById('homeSection').classList.remove('hidden');
       document.getElementById('headerTitle').textContent = "Apprendre le Français";
-      document.getElementById('headerSubtitle').textContent = "Choose a Learning Module";
-      closeSettings();
+      document.getElementById('headerSubtitle').textContent = "Tap a module to start learning!";
+    }
+
+    function updateNumberDataset() {
+      activeDataset = numberRangeMode === '1-10'
+        ? allNumbersDataset.slice(0, 10)
+        : allNumbersDataset.slice(0, 20);
+      document.getElementById('homeNumbersSub').textContent = `Numbers ${numberRangeMode}`;
+      if (currentModule === 'numbers') {
+        document.getElementById('headerSubtitle').textContent = `French Numbers (${numberRangeMode})`;
+      }
+    }
+
+    function updateReadingDataset() {
+      activeDataset = readingDatasets[readingLevel] || readingDatasets[1];
+      if (currentModule === 'reading') {
+        const subMap = {
+          1: "Level 1: Syllables",
+          2: "Level 2: Easy Words",
+          3: "Level 3: Short Sentences"
+        };
+        document.getElementById('headerSubtitle').textContent = subMap[readingLevel];
+      }
     }
 
     function selectModule(moduleKey) {
@@ -355,6 +674,7 @@
         numbers: { title: "Nombres", sub: `French Numbers (${numberRangeMode})` },
         alphabet: { title: "Alphabet", sub: "French Alphabet (A–Z)" },
         seasons: { title: "Les Quatre Saisons", sub: "The Four Seasons" },
+        greetings: { title: "Salutations", sub: "French Greetings & Polite Words" },
         reading: { title: "Je Lis (Reading)", sub: readingLevel === 1 ? "Level 1: Syllables" : readingLevel === 2 ? "Level 2: Easy Words" : "Level 3: Short Sentences" }
       };
 
@@ -367,868 +687,306 @@
       else if (moduleKey === 'numbers') updateNumberDataset();
       else if (moduleKey === 'alphabet') activeDataset = alphabetDataset;
       else if (moduleKey === 'seasons') activeDataset = seasonsDataset;
+      else if (moduleKey === 'greetings') activeDataset = greetingsDataset;
       else if (moduleKey === 'reading') updateReadingDataset();
 
       updateDisplay(autoPlayAudio);
     }
 
-    function openSettings() {
-      const overlay = document.getElementById('settingsOverlay');
-      const modal = document.getElementById('settingsModal');
-      const numGroup = document.getElementById('numberRangeSettingGroup');
-      const readGroup = document.getElementById('readingLevelSettingGroup');
-      const alphaGroup = document.getElementById('alphabetAudioSettingGroup');
-      const modSpecific = document.getElementById('moduleSpecificSettings');
+    function updateDisplay(shouldSpeak = false) {
+      const item = activeDataset[currentIndex];
+      if (!item) return;
 
-      numGroup.classList.add('hidden');
-      readGroup.classList.add('hidden');
-      alphaGroup.classList.add('hidden');
-      modSpecific.classList.add('hidden');
+      const card = document.getElementById('flashcard');
+      const visualContainer = document.getElementById('cardVisualContainer');
+      const primaryText = document.getElementById('cardPrimaryText');
+      const readingBreakdown = document.getElementById('readingBreakdown');
+      const helperBox = document.getElementById('cardHelperBox');
+      const englishText = document.getElementById('cardEnglishText');
+      const phoneticText = document.getElementById('cardPhoneticText');
 
-      if (currentView === 'module') {
+      // Re-trigger pop animation
+      card.classList.remove('animate-pop');
+      void card.offsetWidth;
+      card.classList.add('animate-pop');
+
+      // Reset containers
+      visualContainer.innerHTML = '';
+      visualContainer.classList.add('hidden');
+      readingBreakdown.innerHTML = '';
+      readingBreakdown.classList.add('hidden');
+
+      const isFullColorCard = (currentModule === 'colors' || currentModule === 'seasons');
+
+      if (isFullColorCard) {
+        // FULL-SCREEN COLORFUL BACKGROUND FOR COLORS & SEASONS
+        card.style.backgroundColor = item.hex;
+        card.style.borderColor = item.hex === '#FFFFFF' ? '#CBD5E1' : '#FFFFFF';
+
+        const useDarkText = item.textDark === true;
+        primaryText.className = `text-5xl sm:text-6xl font-black tracking-wide leading-tight mb-4 ${useDarkText ? 'text-slate-800' : 'text-white drop-shadow'}`;
+        primaryText.textContent = formatTextByCase(item.french);
+
+        if (item.svg) {
+          visualContainer.innerHTML = item.svg;
+          visualContainer.classList.remove('hidden');
+        }
+
+        helperBox.style.backgroundColor = useDarkText ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255, 255, 255, 0.22)';
+        helperBox.style.borderColor = useDarkText ? 'rgba(15, 23, 42, 0.15)' : 'rgba(255, 255, 255, 0.45)';
+        englishText.className = `text-xl sm:text-3xl font-bold ${useDarkText ? 'text-slate-800' : 'text-white'}`;
+        phoneticText.className = `text-sm sm:text-base font-semibold italic mt-0.5 ${useDarkText ? 'text-slate-600' : 'text-white/90'}`;
+        englishText.textContent = item.english;
+        phoneticText.textContent = item.phonetic;
+
+      } else {
+        // STORYBOOK CARD STYLE (Warm Ivory Background + Dynamic Colored Border)
+        const borderHex = item.hex || '#38BDF8';
+        card.style.backgroundColor = '#FFFDF9';
+        card.style.borderColor = borderHex;
+
+        helperBox.style.backgroundColor = `${borderHex}14`;
+        helperBox.style.borderColor = `${borderHex}45`;
+        englishText.className = 'text-xl sm:text-3xl font-bold text-slate-800';
+        phoneticText.className = 'text-sm sm:text-base font-semibold italic mt-0.5 text-slate-600';
+
         if (currentModule === 'numbers') {
-          numGroup.classList.remove('hidden');
-          modSpecific.classList.remove('hidden');
-        } else if (currentModule === 'reading') {
-          readGroup.classList.remove('hidden');
-          modSpecific.classList.remove('hidden');
+          // Big Digit + French Word in Helper Box
+          primaryText.className = 'text-7xl sm:text-8xl font-black tracking-wide leading-none mb-4 text-slate-800';
+          primaryText.textContent = item.digit;
+
+          englishText.textContent = `${formatTextByCase(item.french)} (${item.english})`;
+          phoneticText.textContent = item.phonetic;
+
         } else if (currentModule === 'alphabet') {
-          alphaGroup.classList.remove('hidden');
-          modSpecific.classList.remove('hidden');
+          // Matching Giant Letter Size (text-7xl sm:text-8xl)
+          primaryText.className = 'text-7xl sm:text-8xl font-black tracking-wide leading-none mb-4 text-slate-800';
+          primaryText.textContent = formatTextByCase(item.letter, true);
+
+          if (alphabetSoundMode === 'phonic') {
+            englishText.textContent = item.silent ? `🤫 ${item.soundDisplay}` : `Sound: ${item.soundDisplay}`;
+            phoneticText.textContent = `${formatTextByCase(item.soundHint.split(' (')[0])} (${item.soundHint.split(' (')[1]}`;
+          } else {
+            englishText.textContent = `Letter ${item.letter}`;
+            phoneticText.textContent = item.namePhonetic;
+          }
+
+        } else if (currentModule === 'reading') {
+          if (item.icon) {
+            visualContainer.innerHTML = `<span class="text-6xl sm:text-7xl filter drop-shadow-sm">${item.icon}</span>`;
+            visualContainer.classList.remove('hidden');
+          }
+
+          primaryText.className = readingLevel === 3
+            ? 'text-3xl sm:text-4xl font-black tracking-wide leading-snug mb-3 text-slate-800'
+            : 'text-5xl sm:text-6xl font-black tracking-wide leading-tight mb-3 text-slate-800';
+          primaryText.textContent = formatTextByCase(item.french);
+
+          // Interactive Syllable/Letter Pills for Level 1 & Level 2
+          if (item.parts && item.parts.length > 0) {
+            readingBreakdown.classList.remove('hidden');
+            item.parts.forEach((part, idx) => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'px-4 py-2 rounded-2xl bg-white border-2 border-slate-300 hover:border-cyan-500 shadow-sm text-2xl sm:text-3xl font-black text-slate-800 active:scale-90 transition';
+              btn.textContent = formatTextByCase(part);
+              btn.onclick = (e) => {
+                e.stopPropagation();
+                const lowerPart = part.toLowerCase();
+                const speakChunk = (readingLevel === 1 && readingChunkPhonics[lowerPart])
+                  ? readingChunkPhonics[lowerPart]
+                  : part;
+                speakText(speakChunk);
+              };
+              readingBreakdown.appendChild(btn);
+
+              if (readingLevel === 1 && idx < item.parts.length - 1) {
+                const plus = document.createElement('span');
+                plus.className = 'text-xl sm:text-2xl font-black text-slate-400';
+                plus.textContent = '+';
+                readingBreakdown.appendChild(plus);
+              }
+            });
+          }
+
+          englishText.textContent = item.english;
+          phoneticText.textContent = item.phonetic;
+
+        } else {
+          // Vocabulaire, Jours, Salutations
+          if (item.icon) {
+            visualContainer.innerHTML = `<span class="text-7xl sm:text-8xl filter drop-shadow-sm">${item.icon}</span>`;
+            visualContainer.classList.remove('hidden');
+          }
+
+          const isLongPhrase = item.french.length > 12;
+          primaryText.className = isLongPhrase
+            ? 'text-3xl sm:text-5xl font-black tracking-wide leading-tight mb-4 text-slate-800'
+            : 'text-5xl sm:text-6xl font-black tracking-wide leading-tight mb-4 text-slate-800';
+          primaryText.textContent = formatTextByCase(item.french);
+
+          englishText.textContent = item.english;
+          phoneticText.textContent = item.phonetic;
         }
       }
 
-      overlay.classList.remove('opacity-0', 'pointer-events-none');
-      modal.classList.remove('scale-95');
-      modal.classList.add('scale-100');
+      if (shouldSpeak) {
+        speakCurrentItem();
+      }
+    }
+
+    function nextCard() {
+      if (!activeDataset.length) return;
+      currentIndex = (currentIndex + 1) % activeDataset.length;
+      updateDisplay(autoPlayAudio);
+    }
+
+    function prevCard() {
+      if (!activeDataset.length) return;
+      currentIndex = (currentIndex - 1 + activeDataset.length) % activeDataset.length;
+      updateDisplay(autoPlayAudio);
+    }
+
+    function randomCard() {
+      if (activeDataset.length <= 1) {
+        updateDisplay(autoPlayAudio);
+        return;
+      }
+      let nextIdx = currentIndex;
+      while (nextIdx === currentIndex) {
+        nextIdx = Math.floor(Math.random() * activeDataset.length);
+      }
+      currentIndex = nextIdx;
+      updateDisplay(autoPlayAudio);
+    }
+
+    // ==========================================
+    // 7. SETTINGS MODAL CONTROLS
+    // ==========================================
+    function openSettings() {
+      pendingSpeakOnClose = false;
+
+      // Show module-specific groups only when inside that module
+      document.getElementById('settingNumbersGroup').classList.toggle('hidden', currentModule !== 'numbers');
+      document.getElementById('settingAlphabetGroup').classList.toggle('hidden', currentModule !== 'alphabet');
+      document.getElementById('settingReadingGroup').classList.toggle('hidden', currentModule !== 'reading');
+
+      syncSettingsUI();
+      document.getElementById('settingsModal').classList.remove('hidden');
     }
 
     function closeSettings() {
-      const overlay = document.getElementById('settingsOverlay');
-      const modal = document.getElementById('settingsModal');
+      document.getElementById('settingsModal').classList.add('hidden');
+      if (pendingSpeakOnClose && currentView === 'module') {
+        pendingSpeakOnClose = false;
+        speakCurrentItem();
+      }
+    }
 
-      overlay.classList.add('opacity-0', 'pointer-events-none');
-      modal.classList.remove('scale-100');
-      modal.classList.add('scale-95');
+    function syncSettingsUI() {
+      const activeClasses = ['bg-amber-400', 'border-amber-600', 'text-slate-900'];
+      const inactiveClasses = ['bg-white', 'border-slate-200', 'text-slate-600'];
 
-      if (pendingSpeakOnSettingsClose && currentView === 'module' && activeDataset[currentIndex]) {
-        pendingSpeakOnSettingsClose = false;
-        if (autoPlayAudio) {
-          const item = activeDataset[currentIndex];
-          const speakText = getSpeakableText(item);
-          if (speakText) speakWord(speakText);
-        }
+      const applyToggleStyle = (elId, isActive) => {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.classList.remove(...activeClasses, ...inactiveClasses);
+        el.classList.add(...(isActive ? activeClasses : inactiveClasses));
+      };
+
+      // Letter Case
+      applyToggleStyle('btnCaseLower', letterCaseMode === 'lower');
+      applyToggleStyle('btnCaseUpper', letterCaseMode === 'upper');
+      applyToggleStyle('btnCaseBoth', letterCaseMode === 'both');
+
+      // Voice Speed
+      applyToggleStyle('btnSpeedSlow', speechRate === 0.65);
+      applyToggleStyle('btnSpeedNormal', speechRate === 0.85);
+
+      // Numbers Range
+      applyToggleStyle('btnRange10', numberRangeMode === '1-10');
+      applyToggleStyle('btnRange20', numberRangeMode === '1-20');
+
+      // Alphabet Sound Mode
+      applyToggleStyle('btnAlphaPhonic', alphabetSoundMode === 'phonic');
+      applyToggleStyle('btnAlphaName', alphabetSoundMode === 'name');
+
+      // Reading Level
+      applyToggleStyle('btnRead1', readingLevel === 1);
+      applyToggleStyle('btnRead2', readingLevel === 2);
+      applyToggleStyle('btnRead3', readingLevel === 3);
+
+      // Auto-Play Toggle
+      const autoBtn = document.getElementById('btnAutoPlay');
+      const autoKnob = document.getElementById('autoPlayKnob');
+      if (autoPlayAudio) {
+        autoBtn.classList.remove('bg-slate-300');
+        autoBtn.classList.add('bg-emerald-500');
+        autoKnob.classList.add('translate-x-6');
       } else {
-        pendingSpeakOnSettingsClose = false;
+        autoBtn.classList.remove('bg-emerald-500');
+        autoBtn.classList.add('bg-slate-300');
+        autoKnob.classList.remove('translate-x-6');
       }
-    }
-
-    function setAlphabetAudioMode(mode) {
-      alphabetAudioMode = mode;
-      const letterBtn = document.getElementById('alphaModeLetterBtn');
-      const soundBtn = document.getElementById('alphaModeSoundBtn');
-
-      letterBtn.className = mode === 'letter'
-        ? "py-2 px-2 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight"
-        : "py-2 px-2 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
-
-      soundBtn.className = mode === 'sound'
-        ? "py-2 px-2 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight"
-        : "py-2 px-2 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
-
-      if (currentView === 'module' && currentModule === 'alphabet') {
-        pendingSpeakOnSettingsClose = true;
-        updateDisplay(false);
-      }
-    }
-
-    function setReadingLevel(lvl) {
-      readingLevel = lvl;
-      const b1 = document.getElementById('readLevel1Btn');
-      const b2 = document.getElementById('readLevel2Btn');
-      const b3 = document.getElementById('readLevel3Btn');
-
-      b1.className = lvl === 1 ? "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight" : "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
-      b2.className = lvl === 2 ? "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight" : "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
-      b3.className = lvl === 3 ? "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-500 text-white transition text-center shadow-sm leading-tight" : "py-2 px-1.5 rounded-xl text-xs font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center leading-tight";
-
-      document.getElementById('homeReadingSub').textContent = lvl === 1 ? "Level 1: Syllables" : lvl === 2 ? "Level 2: Words" : "Level 3: Sentences";
-
-      if (currentView === 'module' && currentModule === 'reading') {
-        currentIndex = 0;
-        pendingSpeakOnSettingsClose = true;
-        updateReadingDataset();
-        document.getElementById('headerSubtitle').textContent = lvl === 1 ? "Level 1: Syllables" : lvl === 2 ? "Level 2: Easy Words" : "Level 3: Short Sentences";
-        updateDisplay(false);
-      }
-    }
-
-    // ==================== CUSTOM SVG ILLUSTRATIONS ====================
-    const svgArtwork = {
-      igloo: `
-        <svg viewBox="0 0 140 110" class="w-full h-full">
-          <!-- Snow Base -->
-          <ellipse cx="70" cy="96" rx="64" ry="10" fill="#E0F2FE" />
-          <!-- Main Dome -->
-          <path d="M 18 95 A 52 50 0 0 1 122 95 Z" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="3"/>
-          <!-- Ice Block Lines -->
-          <path d="M 32 62 Q 70 54 108 62" fill="none" stroke="#7DD3FC" stroke-width="2.5"/>
-          <path d="M 22 78 Q 70 70 118 78" fill="none" stroke="#7DD3FC" stroke-width="2.5"/>
-          <line x1="70" y1="45" x2="70" y2="58" stroke="#7DD3FC" stroke-width="2.5"/>
-          <line x1="50" y1="59" x2="50" y2="74" stroke="#7DD3FC" stroke-width="2.5"/>
-          <line x1="90" y1="59" x2="90" y2="74" stroke="#7DD3FC" stroke-width="2.5"/>
-          <line x1="36" y1="75" x2="36" y2="94" stroke="#7DD3FC" stroke-width="2.5"/>
-          <line x1="104" y1="75" x2="104" y2="94" stroke="#7DD3FC" stroke-width="2.5"/>
-          <!-- Entrance Tunnel -->
-          <path d="M 52 95 L 52 74 A 18 18 0 0 1 88 74 L 88 95 Z" fill="#F0F9FF" stroke="#7DD3FC" stroke-width="3"/>
-          <path d="M 58 95 L 58 77 A 12 12 0 0 1 82 77 L 82 95 Z" fill="#0369A1"/>
-        </svg>
-      `,
-      rake: `
-        <svg viewBox="0 0 140 120" class="w-full h-full">
-          <!-- Wooden Handle -->
-          <line x1="98" y1="14" x2="54" y2="66" stroke="#D97706" stroke-width="8" stroke-linecap="round"/>
-          <line x1="98" y1="14" x2="54" y2="66" stroke="#FBBF24" stroke-width="3" stroke-linecap="round"/>
-          <!-- Rake Crossbar / Head -->
-          <path d="M 34 56 L 72 88" stroke="#DC2626" stroke-width="7" stroke-linecap="round"/>
-          <!-- Rake Tines -->
-          <line x1="36" y1="58" x2="16" y2="86" stroke="#E2E8F0" stroke-width="3.5" stroke-linecap="round"/>
-          <line x1="45" y1="66" x2="26" y2="94" stroke="#E2E8F0" stroke-width="3.5" stroke-linecap="round"/>
-          <line x1="54" y1="73" x2="37" y2="101" stroke="#E2E8F0" stroke-width="3.5" stroke-linecap="round"/>
-          <line x1="63" y1="81" x2="48" y2="107" stroke="#E2E8F0" stroke-width="3.5" stroke-linecap="round"/>
-          <line x1="71" y1="88" x2="59" y2="112" stroke="#E2E8F0" stroke-width="3.5" stroke-linecap="round"/>
-          <!-- Little Autumn Leaves -->
-          <ellipse cx="95" cy="98" rx="9" ry="5" transform="rotate(-25 95 98)" fill="#F97316"/>
-          <ellipse cx="112" cy="84" rx="8" ry="4.5" transform="rotate(20 112 84)" fill="#FACC15"/>
-        </svg>
-      `,
-      spring: `
-        <svg viewBox="0 0 140 120" class="w-full h-full">
-          <!-- Green Stem & Leaves -->
-          <path d="M 65 110 Q 62 80 68 58" fill="none" stroke="#15803D" stroke-width="6" stroke-linecap="round"/>
-          <path d="M 64 90 Q 40 82 36 68 Q 54 68 64 85" fill="#4ADE80"/>
-          <path d="M 66 82 Q 90 74 94 60 Q 76 60 66 77" fill="#22C55E"/>
-          <!-- Pink Cherry Blossom Petals -->
-          <circle cx="68" cy="36" r="13" fill="#FBCFE8"/>
-          <circle cx="85" cy="48" r="13" fill="#F9A8D4"/>
-          <circle cx="79" cy="66" r="13" fill="#FBCFE8"/>
-          <circle cx="57" cy="66" r="13" fill="#F9A8D4"/>
-          <circle cx="51" cy="48" r="13" fill="#FBCFE8"/>
-          <!-- Flower Center -->
-          <circle cx="68" cy="52" r="9" fill="#FACC15"/>
-          <!-- Little Butterfly -->
-          <ellipse cx="108" cy="28" rx="8" ry="6" transform="rotate(-20 108 28)" fill="#38BDF8"/>
-          <ellipse cx="118" cy="33" rx="7" ry="5" transform="rotate(25 118 33)" fill="#7DD3FC"/>
-        </svg>
-      `,
-      summer: `
-        <svg viewBox="0 0 140 120" class="w-full h-full">
-          <!-- Sun Rays -->
-          <g stroke="#FEF08A" stroke-width="5" stroke-linecap="round">
-            <line x1="70" y1="8" x2="70" y2="20"/>
-            <line x1="70" y1="76" x2="70" y2="88"/>
-            <line x1="30" y1="48" x2="42" y2="48"/>
-            <line x1="98" y1="48" x2="110" y2="48"/>
-            <line x1="42" y1="20" x2="50" y2="28"/>
-            <line x1="90" y1="68" x2="98" y2="76"/>
-            <line x1="98" y1="20" x2="90" y2="28"/>
-            <line x1="50" y1="68" x2="42" y2="76"/>
-          </g>
-          <!-- Bright Sun -->
-          <circle cx="70" cy="48" r="24" fill="#FACC15" stroke="#FEF08A" stroke-width="3"/>
-          <!-- Ocean Waves -->
-          <path d="M 10 92 Q 30 80 50 92 T 90 92 T 130 92 L 130 112 L 10 112 Z" fill="#0284C7"/>
-          <path d="M 10 102 Q 30 92 50 102 T 90 102 T 130 102 L 130 115 L 10 115 Z" fill="#38BDF8"/>
-        </svg>
-      `,
-      autumn: `
-        <svg viewBox="0 0 140 120" class="w-full h-full">
-          <!-- Maple / Autumn Leaf 1 (Red-Orange) -->
-          <path d="M 52 22 L 60 38 L 76 34 L 68 50 L 82 60 L 62 64 L 56 80 L 48 64 L 28 60 L 42 50 L 34 34 L 50 38 Z" fill="#DC2626"/>
-          <line x1="55" y1="56" x2="58" y2="92" stroke="#78350F" stroke-width="4" stroke-linecap="round"/>
-          <!-- Autumn Leaf 2 (Golden Yellow) -->
-          <path d="M 98 48 C 114 48 122 64 112 78 C 102 92 84 86 84 70 C 84 56 90 48 98 48 Z" fill="#FACC15"/>
-          <line x1="100" y1="64" x2="92" y2="98" stroke="#78350F" stroke-width="3.5" stroke-linecap="round"/>
-          <!-- Falling Wind Swirl -->
-          <path d="M 20 96 Q 65 88 120 102" fill="none" stroke="#FED7AA" stroke-width="3" stroke-dasharray="6 6" stroke-linecap="round"/>
-        </svg>
-      `,
-      winter: `
-        <svg viewBox="0 0 140 120" class="w-full h-full">
-          <!-- Geometric Snowflake -->
-          <g stroke="#FFFFFF" stroke-width="5" stroke-linecap="round">
-            <line x1="70" y1="16" x2="70" y2="96"/>
-            <line x1="35" y1="36" x2="105" y2="76"/>
-            <line x1="105" y1="36" x2="35" y2="76"/>
-            <!-- Snowflake Branches -->
-            <polyline points="60,26 70,35 80,26" fill="none"/>
-            <polyline points="60,86 70,77 80,86" fill="none"/>
-            <polyline points="42,48 53,46 50,35" fill="none"/>
-            <polyline points="98,64 87,66 90,77" fill="none"/>
-            <polyline points="90,35 87,46 98,48" fill="none"/>
-            <polyline points="50,77 53,66 42,64" fill="none"/>
-          </g>
-          <circle cx="70" cy="56" r="7" fill="#BAE6FD" stroke="#FFFFFF" stroke-width="3"/>
-          <!-- Falling Snow Dots -->
-          <circle cx="26" cy="24" r="3.5" fill="#E0F2FE"/>
-          <circle cx="114" cy="24" r="3.5" fill="#E0F2FE"/>
-          <circle cx="24" cy="92" r="4" fill="#E0F2FE"/>
-          <circle cx="116" cy="94" r="4" fill="#E0F2FE"/>
-        </svg>
-      `,
-      pajamas: `
-        <svg viewBox="0 0 140 120" class="w-full h-full">
-          <!-- Pajama Pants (Bottom Layer) -->
-          <path d="M 46 62 L 94 62 L 100 112 L 76 112 L 70 82 L 64 112 L 40 112 Z" fill="#38BDF8" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- Cute Yellow Stars on Pants -->
-          <circle cx="54" cy="84" r="3" fill="#FEF08A"/>
-          <circle cx="86" cy="88" r="3" fill="#FEF08A"/>
-          <circle cx="52" cy="100" r="2.5" fill="#FEF08A"/>
-          <circle cx="88" cy="102" r="2.5" fill="#FEF08A"/>
-          <!-- Pajama Long-Sleeve Shirt -->
-          <path d="M 46 22 L 94 22 L 118 52 L 106 62 L 92 44 L 92 72 L 48 72 L 48 44 L 34 62 L 22 52 Z" fill="#60A5FA" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- Shirt Collar -->
-          <path d="M 58 22 L 70 34 L 82 22" fill="#BAE6FD" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
-          <!-- Shirt Buttons -->
-          <circle cx="70" cy="42" r="2.5" fill="#FEF08A"/>
-          <circle cx="70" cy="53" r="2.5" fill="#FEF08A"/>
-          <circle cx="70" cy="64" r="2.5" fill="#FEF08A"/>
-          <!-- Little Moon Pocket -->
-          <path d="M 78 44 A 6 6 0 1 0 86 52 A 4.5 4.5 0 1 1 78 44 Z" fill="#FEF08A"/>
-        </svg>
-      `
-    };
-
-    // ==================== DATASETS ====================
-    const colorsDataset = [
-      { french: "Rouge", english: "Red", phonetic: "/roozh/", hex: "#EF4444", textDark: false },
-      { french: "Bleu", english: "Blue", phonetic: "/bluh/", hex: "#3B82F6", textDark: false },
-      { french: "Jaune", english: "Yellow", phonetic: "/zhohn/", hex: "#FACC15", textDark: true },
-      { french: "Vert", english: "Green", phonetic: "/vair/", hex: "#22C55E", textDark: false },
-      { french: "Orange", english: "Orange", phonetic: "/oh-rahnj/", hex: "#F97316", textDark: false },
-      { french: "Rose", english: "Pink", phonetic: "/rohz/", hex: "#EC4899", textDark: false },
-      { french: "Violet", english: "Purple", phonetic: "/vyoh-lay/", hex: "#A855F7", textDark: false },
-      { french: "Noir", english: "Black", phonetic: "/nwahr/", hex: "#1E293B", textDark: false },
-      { french: "Blanc", english: "White", phonetic: "/blahnk/", hex: "#FFFFFF", textDark: true, border: true },
-      { french: "Gris", english: "Gray", phonetic: "/gree/", hex: "#64748B", textDark: false },
-      { french: "Marron", english: "Brown", phonetic: "/mah-rohn/", hex: "#78350F", textDark: false }
-    ];
-
-    const daysDataset = [
-      { french: "Lundi", english: "Monday", phonetic: "/luhn-dee/", hex: "#3B82F6", textDark: false },
-      { french: "Mardi", english: "Tuesday", phonetic: "/mahr-dee/", hex: "#10B981", textDark: false },
-      { french: "Mercredi", english: "Wednesday", phonetic: "/mair-kruh-dee/", hex: "#F59E0B", textDark: true },
-      { french: "Jeudi", english: "Thursday", phonetic: "/zhuh-dee/", hex: "#EC4899", textDark: false },
-      { french: "Vendredi", english: "Friday", phonetic: "/vahn-druh-dee/", hex: "#8B5CF6", textDark: false },
-      { french: "Samedi", english: "Saturday", phonetic: "/sahm-dee/", hex: "#F97316", textDark: false },
-      { french: "Dimanche", english: "Sunday", phonetic: "/dee-mahnsh/", hex: "#EF4444", textDark: false }
-    ];
-
-    const seasonsDataset = [
-      { french: "Le Printemps", english: "Spring", phonetic: "/luh pran-tahn/", hex: "#16A34A", svg: svgArtwork.spring },
-      { french: "L'Été", english: "Summer", phonetic: "/lay-tay/", hex: "#F59E0B", svg: svgArtwork.summer },
-      { french: "L'Automne", english: "Autumn / Fall", phonetic: "/loh-tohn/", hex: "#EA580C", svg: svgArtwork.autumn },
-      { french: "L'Hiver", english: "Winter", phonetic: "/lee-vair/", hex: "#0284C7", svg: svgArtwork.winter }
-    ];
-
-    const vocabDataset = [
-      { french: "Avion", english: "Airplane", phonetic: "/ah-vyohn/", hex: "#0EA5E9", icon: "✈️" },
-      { french: "Ballon", english: "Balloon", phonetic: "/bah-lohn/", hex: "#F43F5E", icon: "🎈" },
-      { french: "Citron", english: "Lemon", phonetic: "/see-trohn/", hex: "#EAB308", icon: "🍋", textDark: true },
-      { french: "Crayon", english: "Pencil", phonetic: "/kray-yohn/", hex: "#F97316", icon: "✏️" },
-      { french: "Dinosaure", english: "Dinosaur", phonetic: "/dee-noh-zohr/", hex: "#10B981", icon: "🦕" },
-      { french: "Éléphant", english: "Elephant", phonetic: "/ay-lay-fahn/", hex: "#64748B", icon: "🐘" },
-      { french: "Fantôme", english: "Ghost", phonetic: "/fahn-tohm/", hex: "#8B5CF6", icon: "👻" },
-      { french: "Gentil", english: "Kind / Nice", phonetic: "/zhahn-tee/", hex: "#EC4899", icon: "😊" },
-      { french: "Halloween", english: "Halloween", phonetic: "/ah-loh-ween/", hex: "#D97706", icon: "🎃" },
-      { french: "Igloo", english: "Igloo", phonetic: "/ee-gloo/", hex: "#0284C7", svg: svgArtwork.igloo },
-      { french: "Jupe", english: "Skirt", phonetic: "/zhoop/", hex: "#A855F7", icon: "👗" },
-      { french: "Kangourou", english: "Kangaroo", phonetic: "/kahn-goo-roo/", hex: "#B45309", icon: "🦘" },
-      { french: "Lumière", english: "Light", phonetic: "/loo-myair/", hex: "#F59E0B", icon: "💡", textDark: true },
-      { french: "Maison", english: "House", phonetic: "/may-zohn/", hex: "#EF4444", icon: "🏠" },
-      { french: "Nettoyer", english: "To clean", phonetic: "/neh-twah-yay/", hex: "#14B8A6", icon: "🧹" },
-      { french: "Orange", english: "Orange", phonetic: "/oh-rahnj/", hex: "#F97316", icon: "🍊" },
-      { french: "Papier", english: "Paper", phonetic: "/pah-pyay/", hex: "#0284C7", icon: "📄" },
-      { french: "Question", english: "Question", phonetic: "/keh-styohn/", hex: "#6366F1", icon: "❓" },
-      { french: "Râteau", english: "Rake", phonetic: "/rah-toh/", hex: "#854D0E", svg: svgArtwork.rake },
-      { french: "Souris", english: "Mouse", phonetic: "/soo-ree/", hex: "#475569", icon: "🐭" },
-      { french: "Tortue", english: "Turtle", phonetic: "/tor-too/", hex: "#15803D", icon: "🐢" },
-      { french: "Uniforme", english: "Uniform", phonetic: "/oo-nee-form/", hex: "#1E40AF", icon: "👔" },
-      { french: "Voiture", english: "Car", phonetic: "/vwah-toor/", hex: "#DC2626", icon: "🚗" },
-      { french: "Wagon", english: "Train car", phonetic: "/vah-gohn/", hex: "#4338CA", icon: "🚃" },
-      { french: "Xylophone", english: "Xylophone", phonetic: "/ksee-loh-fohn/", hex: "#D946EF", icon: "🎼" },
-      { french: "Yaourt", english: "Yogurt", phonetic: "/yah-oort/", hex: "#0284C7", icon: "🥣" },
-      { french: "Zoo", english: "Zoo", phonetic: "/zoh/", hex: "#059669", icon: "🦁" }
-    ];
-
-    const numbersDatasetAll = [
-      { french: "Un", english: "1", phonetic: "/uhn/", hex: "#3B82F6", num: 1 },
-      { french: "Deux", english: "2", phonetic: "/duh/", hex: "#10B981", num: 2 },
-      { french: "Trois", english: "3", phonetic: "/twah/", hex: "#F59E0B", num: 3 },
-      { french: "Quatre", english: "4", phonetic: "/kat-ruh/", hex: "#EC4899", num: 4 },
-      { french: "Cinq", english: "5", phonetic: "/sank/", hex: "#8B5CF6", num: 5 },
-      { french: "Six", english: "6", phonetic: "/sees/", hex: "#EF4444", num: 6 },
-      { french: "Sept", english: "7", phonetic: "/set/", hex: "#14B8A6", num: 7 },
-      { french: "Huit", english: "8", phonetic: "/weet/", hex: "#F97316", num: 8 },
-      { french: "Neuf", english: "9", phonetic: "/nuhf/", hex: "#6366F1", num: 9 },
-      { french: "Dix", english: "10", phonetic: "/dees/", hex: "#84CC16", num: 10 },
-      { french: "Onze", english: "11", phonetic: "/ohnz/", hex: "#06B6D4", num: 11 },
-      { french: "Douze", english: "12", phonetic: "/doo-z/", hex: "#A855F7", num: 12 },
-      { french: "Treize", english: "13", phonetic: "/trehz/", hex: "#EAB308", num: 13 },
-      { french: "Quatorze", english: "14", phonetic: "/kah-torz/", hex: "#F43F5E", num: 14 },
-      { french: "Quinze", english: "15", phonetic: "/kanz/", hex: "#10B981", num: 15 },
-      { french: "Seize", english: "16", phonetic: "/sehz/", hex: "#3B82F6", num: 16 },
-      { french: "Dix-sept", english: "17", phonetic: "/dees-set/", hex: "#D97706", num: 17 },
-      { french: "Dix-huit", english: "18", phonetic: "/dees-weet/", hex: "#8B5CF6", num: 18 },
-      { french: "Dix-neuf", english: "19", phonetic: "/dees-nuhf/", hex: "#EC4899", num: 19 },
-      { french: "Vingt", english: "20", phonetic: "/van/", hex: "#059669", num: 20 }
-    ];
-
-    const alphabetDataset = [
-      { french: "A", english: "Ah", phonetic: "/ah/", soundSpeak: "a", soundLabel: "Sound: /ah/", soundPhonetic: "like in papa", hex: "#EF4444" },
-      { french: "B", english: "Baw", phonetic: "/bay/", soundSpeak: "beu", soundLabel: "Sound: /buh/", soundPhonetic: "like in ballon", hex: "#3B82F6" },
-      { french: "C", english: "Say", phonetic: "/say/", soundSpeak: "keu", soundLabel: "Sound: /kuh/ or /sss/", soundPhonetic: "like in citron / canard", hex: "#10B981" },
-      { french: "D", english: "Day", phonetic: "/day/", soundSpeak: "deu", soundLabel: "Sound: /duh/", soundPhonetic: "like in dinosaure", hex: "#F59E0B" },
-      { french: "E", english: "Euh", phonetic: "/uh/", soundSpeak: "euh", soundLabel: "Sound: /uh/", soundPhonetic: "like in le", hex: "#8B5CF6" },
-      { french: "F", english: "Eff", phonetic: "/eff/", soundSpeak: "feuh", soundLabel: "Sound: /fff/", soundPhonetic: "like in fantôme", hex: "#EC4899" },
-      { french: "G", english: "Zhey", phonetic: "/zhay/", soundSpeak: "gueu", soundLabel: "Sound: /guh/ or /zh/", soundPhonetic: "like in gâteau", hex: "#14B8A6" },
-      { french: "H", english: "Ash", phonetic: "/ash/", soundSpeak: "", silentSound: true, soundLabel: "🤫 Silent in French!", soundPhonetic: "like in hibou", hex: "#F97316" },
-      { french: "I", english: "Eee", phonetic: "/ee/", soundSpeak: "i", soundLabel: "Sound: /eee/", soundPhonetic: "like in igloo", hex: "#6366F1" },
-      { french: "J", english: "Zhee", phonetic: "/zhee/", soundSpeak: "jeu", soundLabel: "Sound: /zhuh/", soundPhonetic: "like in jupe", hex: "#84CC16" },
-      { french: "K", english: "Kah", phonetic: "/kah/", soundSpeak: "keu", soundLabel: "Sound: /kuh/", soundPhonetic: "like in kangourou", hex: "#06B6D4" },
-      { french: "L", english: "Ell", phonetic: "/ell/", soundSpeak: "leuh", soundLabel: "Sound: /lll/", soundPhonetic: "like in lune", hex: "#A855F7" },
-      { french: "M", english: "Emm", phonetic: "/emm/", soundSpeak: "meuh", soundLabel: "Sound: /mmm/", soundPhonetic: "like in maman", hex: "#EAB308" },
-      { french: "N", english: "Enn", phonetic: "/enn/", soundSpeak: "neuh", soundLabel: "Sound: /nnn/", soundPhonetic: "like in neige", hex: "#F43F5E" },
-      { french: "O", english: "Oh", phonetic: "/oh/", soundSpeak: "o", soundLabel: "Sound: /oh/", soundPhonetic: "like in orange", hex: "#059669" },
-      { french: "P", english: "Pay", phonetic: "/pay/", soundSpeak: "peu", soundLabel: "Sound: /puh/", soundPhonetic: "like in papa", hex: "#D97706" },
-      { french: "Q", english: "Koo", phonetic: "/koo/", soundSpeak: "keu", soundLabel: "Sound: /kuh/", soundPhonetic: "like in quatre", hex: "#3B82F6" },
-      { french: "R", english: "Air", phonetic: "/air/", soundSpeak: "reuh", soundLabel: "Sound: /rrr/", soundPhonetic: "like in robot", hex: "#EF4444" },
-      { french: "S", english: "Ess", phonetic: "/ess/", soundSpeak: "seuh", soundLabel: "Sound: /sss/", soundPhonetic: "like in soleil", hex: "#10B981" },
-      { french: "T", english: "Tay", phonetic: "/tay/", soundSpeak: "teu", soundLabel: "Sound: /tuh/", soundPhonetic: "like in tortue", hex: "#8B5CF6" },
-      { french: "U", english: "Eew", phonetic: "/oo/", soundSpeak: "u", soundLabel: "Sound: /ew/", soundPhonetic: "like in lune", hex: "#EC4899" },
-      { french: "V", english: "Vey", phonetic: "/vay/", soundSpeak: "veuh", soundLabel: "Sound: /vvv/", soundPhonetic: "like in vélo", hex: "#14B8A6" },
-      { french: "W", english: "Double Vey", phonetic: "/doo-bluh-vay/", soundSpeak: "veuh", soundLabel: "Sound: /vvv/ or /w/", soundPhonetic: "like in wagon", hex: "#F97316" },
-      { french: "X", english: "Eeks", phonetic: "/eeks/", soundSpeak: "kseuh", soundLabel: "Sound: /ks/", soundPhonetic: "like in xylophone", hex: "#6366F1" },
-      { french: "Y", english: "Eegrek", phonetic: "/ee-grek/", soundSpeak: "i", soundLabel: "Sound: /eee/", soundPhonetic: "like in pyjama", hex: "#84CC16" },
-      { french: "Z", english: "Zed", phonetic: "/zed/", soundSpeak: "zeuh", soundLabel: "Sound: /zzz/", soundPhonetic: "like in zoo", hex: "#06B6D4" }
-    ];
-
-    // Reading Module Datasets (Levels 1, 2, 3)
-    const readingLevel1Dataset = [
-      { french: "MA", speakText: "Ma", parts: ["M", "A"], english: "Maman (Mom)", phonetic: "/mah/", hex: "#EC4899", icon: "👩" },
-      { french: "MI", speakText: "Mi", parts: ["M", "I"], english: "Midi (Noon)", phonetic: "/mee/", hex: "#F59E0B", icon: "☀️" },
-      { french: "MO", speakText: "Mo", parts: ["M", "O"], english: "Moto (Motorcycle)", phonetic: "/moh/", hex: "#EF4444", icon: "🏍️" },
-      { french: "PA", speakText: "Pa", parts: ["P", "A"], english: "Papa (Dad)", phonetic: "/pah/", hex: "#3B82F6", icon: "👨" },
-      { french: "PI", speakText: "Pi", parts: ["P", "I"], english: "Tapis (Rug)", phonetic: "/pee/", hex: "#8B5CF6", icon: "🧶" },
-      { french: "PO", speakText: "Po", parts: ["P", "O"], english: "Pomme (Apple)", phonetic: "/poh/", hex: "#10B981", icon: "🍎" },
-      { french: "LA", speakText: "La", parts: ["L", "A"], english: "Lapin (Rabbit)", phonetic: "/lah/", hex: "#F43F5E", icon: "🐰" },
-      { french: "LI", speakText: "Li", parts: ["L", "I"], english: "Livre (Book)", phonetic: "/lee/", hex: "#0EA5E9", icon: "📖" },
-      { french: "LU", speakText: "Lu", parts: ["L", "U"], english: "Lune (Moon)", phonetic: "/loo/", hex: "#6366F1", icon: "🌙" },
-      { french: "SA", speakText: "Sa", parts: ["S", "A"], english: "Sac (Bag)", phonetic: "/sah/", hex: "#F97316", icon: "🎒" },
-      { french: "SI", speakText: "Si", parts: ["S", "I"], english: "Sirop (Syrup)", phonetic: "/see/", hex: "#B45309", icon: "🍁" },
-      { french: "SO", speakText: "So", parts: ["S", "O"], english: "Soleil (Sun)", phonetic: "/soh/", hex: "#EAB308", icon: "🌞", textDark: true },
-      { french: "BA", speakText: "Ba", parts: ["B", "A"], english: "Banane (Banana)", phonetic: "/bah/", hex: "#84CC16", icon: "🍌" },
-      { french: "BÉ", speakText: "Bé", parts: ["B", "É"], english: "Bébé (Baby)", phonetic: "/bay/", hex: "#06B6D4", icon: "👶" },
-      { french: "BO", speakText: "Bo", parts: ["B", "O"], english: "Bol (Bowl)", phonetic: "/boh/", hex: "#14B8A6", icon: "🥣" },
-      { french: "TA", speakText: "Ta", parts: ["T", "A"], english: "Table (Table)", phonetic: "/tah/", hex: "#D97706", icon: "🪑" },
-      { french: "TO", speakText: "To", parts: ["T", "O"], english: "Tomate (Tomato)", phonetic: "/toh/", hex: "#DC2626", icon: "🍅" },
-      { french: "VÉ", speakText: "Vé", parts: ["V", "É"], english: "Vélo (Bicycle)", phonetic: "/vay/", hex: "#2563EB", icon: "🚲" },
-      { french: "RI", speakText: "Ri", parts: ["R", "I"], english: "Riz (Rice)", phonetic: "/ree/", hex: "#059669", icon: "🍚" },
-      { french: "FÉ", speakText: "Fé", parts: ["F", "É"], english: "Fée (Fairy)", phonetic: "/fay/", hex: "#A855F7", icon: "🧚" }
-    ];
-
-    const readingLevel2Dataset = [
-      { french: "PAPA", speakText: "Papa", syllables: ["PA", "PA"], english: "Dad", phonetic: "/pah-pah/", hex: "#3B82F6", icon: "👨" },
-      { french: "MAMAN", speakText: "Maman", syllables: ["MA", "MAN"], english: "Mom", phonetic: "/mah-mahn/", hex: "#EC4899", icon: "👩" },
-      { french: "BÉBÉ", speakText: "Bébé", syllables: ["BÉ", "BÉ"], english: "Baby", phonetic: "/bay-bay/", hex: "#06B6D4", icon: "👶" },
-      { french: "VÉLO", speakText: "Vélo", syllables: ["VÉ", "LO"], english: "Bicycle", phonetic: "/vay-loh/", hex: "#10B981", icon: "🚲" },
-      { french: "LUNE", speakText: "Lune", syllables: ["LU", "NE"], english: "Moon", phonetic: "/loon/", hex: "#6366F1", icon: "🌙" },
-      { french: "POMME", speakText: "Pomme", syllables: ["PO", "MME"], english: "Apple", phonetic: "/pom/", hex: "#EF4444", icon: "🍎" },
-      { french: "MOTO", speakText: "Moto", syllables: ["MO", "TO"], english: "Motorcycle", phonetic: "/moh-toh/", hex: "#F97316", icon: "🏍️" },
-      { french: "ROBOT", speakText: "Robot", syllables: ["RO", "BOT"], english: "Robot", phonetic: "/roh-boh/", hex: "#64748B", icon: "🤖" },
-      { french: "LAPIN", speakText: "Lapin", syllables: ["LA", "PIN"], english: "Rabbit", phonetic: "/lah-pan/", hex: "#F43F5E", icon: "🐰" },
-      { french: "CANARD", speakText: "Canard", syllables: ["CA", "NARD"], english: "Duck", phonetic: "/kah-nahr/", hex: "#EAB308", icon: "🦆", textDark: true },
-      { french: "POISSON", speakText: "Poisson", syllables: ["POI", "SSON"], english: "Fish", phonetic: "/pwah-sohn/", hex: "#0284C7", icon: "🐟" },
-      { french: "BATEAU", speakText: "Bateau", syllables: ["BA", "TEAU"], english: "Boat", phonetic: "/bah-toh/", hex: "#0EA5E9", icon: "⛵" },
-      { french: "GÂTEAU", speakText: "Gâteau", syllables: ["GÂ", "TEAU"], english: "Cake", phonetic: "/gah-toh/", hex: "#D946EF", icon: "🎂" },
-      { french: "CHAPEAU", speakText: "Chapeau", syllables: ["CHA", "PEAU"], english: "Hat", phonetic: "/shah-poh/", hex: "#2563EB", icon: "🧢" },
-      { french: "BANANE", speakText: "Banane", syllables: ["BA", "NA", "NE"], english: "Banana", phonetic: "/bah-nahn/", hex: "#84CC16", icon: "🍌" },
-      { french: "TOMATE", speakText: "Tomate", syllables: ["TO", "MA", "TE"], english: "Tomato", phonetic: "/toh-maht/", hex: "#DC2626", icon: "🍅" },
-      { french: "PYJAMA", speakText: "Pyjama", syllables: ["PY", "JA", "MA"], english: "Pajamas", phonetic: "/pee-zhah-mah/", hex: "#4F46E5", svg: svgArtwork.pajamas },
-      { french: "ANIMAL", speakText: "Animal", syllables: ["A", "NI", "MAL"], english: "Animal", phonetic: "/ah-nee-mahl/", hex: "#059669", icon: "🐾" }
-    ];
-
-    const readingLevel3Dataset = [
-      { french: "Le chat dort.", words: ["Le", "chat", "dort."], english: "The cat sleeps.", phonetic: "/luh shah dor/", hex: "#6366F1", icon: "🐱" },
-      { french: "Papa a un vélo.", words: ["Papa", "a", "un", "vélo."], english: "Dad has a bicycle.", phonetic: "/pah-pah ah uhn vay-loh/", hex: "#3B82F6", icon: "🚲" },
-      { french: "La lune est jaune.", words: ["La", "lune", "est", "jaune."], english: "The moon is yellow.", phonetic: "/lah loon ay zhohn/", hex: "#4F46E5", icon: "🌙" },
-      { french: "Maman aime la pomme.", words: ["Maman", "aime", "la", "pomme."], english: "Mom likes the apple.", phonetic: "/mah-mahn em lah pom/", hex: "#EC4899", icon: "🍎" },
-      { french: "Le bébé rit.", words: ["Le", "bébé", "rit."], english: "The baby laughs.", phonetic: "/luh bay-bay ree/", hex: "#06B6D4", icon: "👶" },
-      { french: "Le lapin saute.", words: ["Le", "lapin", "saute."], english: "The rabbit jumps.", phonetic: "/luh lah-pan soht/", hex: "#F43F5E", icon: "🐰" },
-      { french: "Voici un petit robot.", words: ["Voici", "un", "petit", "robot."], english: "Here is a little robot.", phonetic: "/vwah-see uhn puh-tee roh-boh/", hex: "#475569", icon: "🤖" },
-      { french: "Le canard nage.", words: ["Le", "canard", "nage."], english: "The duck swims.", phonetic: "/luh kah-nahr nahzh/", hex: "#0284C7", icon: "🦆" },
-      { french: "J'aime le gâteau.", words: ["J'aime", "le", "gâteau."], english: "I like the cake.", phonetic: "/zhem luh gah-toh/", hex: "#D946EF", icon: "🎂" },
-      { french: "Le soleil brille.", words: ["Le", "soleil", "brille."], english: "The sun shines.", phonetic: "/luh soh-lay bree/", hex: "#F59E0B", icon: "☀️" },
-      { french: "Le bateau est bleu.", words: ["Le", "bateau", "est", "bleu."], english: "The boat is blue.", phonetic: "/luh bah-toh ay bluh/", hex: "#0EA5E9", icon: "⛵" },
-      { french: "La banane est bonne.", words: ["La", "banane", "est", "bonne."], english: "The banana is good.", phonetic: "/lah bah-nahn ay bon/", hex: "#16A34A", icon: "🍌" }
-    ];
-
-    // App State Variables
-    let currentView = 'home'; // 'home' or 'module'
-    let currentModule = 'colors';
-    let numberRangeMode = '1-10'; // Options: '1-10', '11-20', '1-20'
-    let readingLevel = 1; // Options: 1, 2, 3
-    let alphabetAudioMode = 'sound'; // Defaults to 'sound' (Phonic Sound)
-    let pendingSpeakOnSettingsClose = false;
-    let activeDataset = colorsDataset;
-    
-    let currentIndex = 0;
-    let autoPlayAudio = true;
-    let showEnglish = true;
-    let letterCaseMode = 'lower'; // Defaults to 'lower' ('lower', 'upper', 'both')
-    let speechRate = 0.85;
-    let synth = window.speechSynthesis;
-    let frenchVoice = null;
-
-    // Phonetic map so standalone letters/syllables (like "é" or consonants) speak natural French sounds instead of accent/letter names
-    const phoneticChunkMap = {
-      'é': 'hé',
-      'b': 'beu',
-      'c': 'keu',
-      'd': 'deu',
-      'f': 'feuh',
-      'g': 'gueu',
-      'j': 'jeu',
-      'k': 'keu',
-      'l': 'leuh',
-      'm': 'meuh',
-      'n': 'neuh',
-      'p': 'peu',
-      'q': 'keu',
-      'r': 'reuh',
-      's': 'seuh',
-      't': 'teu',
-      'v': 'veuh',
-      'w': 'veuh',
-      'x': 'kseuh',
-      'z': 'zeuh',
-      'bé': 'bay',
-      'vé': 'vay',
-      'fé': 'fay'
-    };
-
-    function getSpeakableText(item) {
-      if (!item) return '';
-      if (currentModule === 'alphabet' && alphabetAudioMode === 'sound') {
-        if (item.silentSound) return '';
-        return item.soundSpeak || item.french.toLowerCase();
-      }
-      return item.speakText || item.french;
-    }
-
-    function formatDisplayCase(text, isSingleLetter = false) {
-      if (!text) return '';
-      if (letterCaseMode === 'upper') {
-        return text.toLocaleUpperCase('fr-FR');
-      }
-      if (letterCaseMode === 'lower') {
-        return text.toLocaleLowerCase('fr-FR');
-      }
-      // 'both' (Aa): Show "A a" for single alphabet letters, and Title Case ("Avion", "Vélo") for words/syllables
-      if (isSingleLetter && text.length === 1) {
-        return `${text.toLocaleUpperCase('fr-FR')} ${text.toLocaleLowerCase('fr-FR')}`;
-      }
-      const lower = text.toLocaleLowerCase('fr-FR');
-      return lower.charAt(0).toLocaleUpperCase('fr-FR') + lower.slice(1);
     }
 
     function setLetterCase(mode) {
       letterCaseMode = mode;
-      const lowerBtn = document.getElementById('caseLowerBtn');
-      const upperBtn = document.getElementById('caseUpperBtn');
-      const bothBtn = document.getElementById('caseBothBtn');
-
-      const activeClass = "px-2.5 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-black transition text-xs";
-      const inactiveClass = "px-2.5 py-1.5 rounded-lg font-black transition text-xs text-slate-600";
-
-      lowerBtn.className = mode === 'lower' ? activeClass : inactiveClass;
-      upperBtn.className = mode === 'upper' ? activeClass : inactiveClass;
-      bothBtn.className = mode === 'both' ? activeClass : inactiveClass;
-
+      syncSettingsUI();
       if (currentView === 'module') {
         updateDisplay(false);
       }
     }
 
-    function updateReadingDataset() {
-      if (readingLevel === 1) {
-        activeDataset = readingLevel1Dataset;
-      } else if (readingLevel === 2) {
-        activeDataset = readingLevel2Dataset;
-      } else {
-        activeDataset = readingLevel3Dataset;
+    function setVoiceSpeed(rate) {
+      speechRate = rate;
+      syncSettingsUI();
+      if (currentView === 'module') {
+        pendingSpeakOnClose = true;
       }
     }
 
-    function setNumberRange(rangeKey) {
-      numberRangeMode = rangeKey;
-      
-      const b1 = document.getElementById('range1-10Btn');
-      const b2 = document.getElementById('range11-20Btn');
-      const b3 = document.getElementById('range1-20Btn');
-
-      b1.className = rangeKey === '1-10' 
-        ? "py-2 px-2 rounded-xl text-sm font-bold bg-amber-500 text-white transition text-center shadow-sm"
-        : "py-2 px-2 rounded-xl text-sm font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center";
-
-      b2.className = rangeKey === '11-20' 
-        ? "py-2 px-2 rounded-xl text-sm font-bold bg-amber-500 text-white transition text-center shadow-sm"
-        : "py-2 px-2 rounded-xl text-sm font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center";
-
-      b3.className = rangeKey === '1-20' 
-        ? "py-2 px-2 rounded-xl text-sm font-bold bg-amber-500 text-white transition text-center shadow-sm"
-        : "py-2 px-2 rounded-xl text-sm font-bold bg-amber-100 text-slate-700 hover:bg-amber-200 transition text-center";
-
-      document.getElementById('homeNumbersSub').textContent = `Numbers (${rangeKey})`;
-
-      if (currentView === 'module' && currentModule === 'numbers') {
-        currentIndex = 0;
-        pendingSpeakOnSettingsClose = true;
-        updateNumberDataset();
-        document.getElementById('headerSubtitle').textContent = `French Numbers (${numberRangeMode})`;
+    function setNumberRange(range) {
+      numberRangeMode = range;
+      currentIndex = 0;
+      updateNumberDataset();
+      syncSettingsUI();
+      if (currentModule === 'numbers') {
         updateDisplay(false);
+        pendingSpeakOnClose = true;
       }
     }
 
-    function updateNumberDataset() {
-      if (numberRangeMode === '1-10') {
-        activeDataset = numbersDatasetAll.slice(0, 10);
-      } else if (numberRangeMode === '11-20') {
-        activeDataset = numbersDatasetAll.slice(10, 20);
-      } else {
-        activeDataset = numbersDatasetAll.slice(0, 20);
+    function setAlphabetMode(mode) {
+      alphabetSoundMode = mode;
+      syncSettingsUI();
+      if (currentModule === 'alphabet') {
+        updateDisplay(false);
+        pendingSpeakOnClose = true;
       }
     }
 
+    function setReadingLevel(level) {
+      readingLevel = level;
+      currentIndex = 0;
+      updateReadingDataset();
+      syncSettingsUI();
+      if (currentModule === 'reading') {
+        updateDisplay(false);
+        pendingSpeakOnClose = true;
+      }
+    }
+
+    function toggleAutoPlay() {
+      autoPlayAudio = !autoPlayAudio;
+      syncSettingsUI();
+    }
+
+    // Initialize voices on load
     window.addEventListener('DOMContentLoaded', () => {
       initVoices();
-      goHome();
+      syncSettingsUI();
     });
-
-    // ==================== FLASHCARD DISPLAY & NAVIGATION ====================
-    function updateDisplay(shouldSpeak = autoPlayAudio) {
-      if (!activeDataset || activeDataset.length === 0) return;
-
-      const item = activeDataset[currentIndex];
-      const card = document.getElementById('displayCard');
-      const readingEquation = document.getElementById('readingEquation');
-      const readingChunks = document.getElementById('readingChunksContainer');
-      const cardIllustration = document.getElementById('cardIllustration');
-      const cardIcon = document.getElementById('cardIcon');
-      const frenchText = document.getElementById('frenchName');
-      const englishContainer = document.getElementById('englishContainer');
-      const englishText = document.getElementById('englishName');
-      const phoneticText = document.getElementById('phoneticText');
-
-      // Full-color cards for Colors & 4 Seasons; Storybook ivory cards with dynamic colored borders for Reading/Numbers/Alphabet/Vocab/Days
-      const isFullColorModule = (currentModule === 'colors' || currentModule === 'seasons');
-
-      if (isFullColorModule) {
-        card.style.backgroundColor = item.hex;
-        card.style.borderColor = item.border ? '#CBD5E1' : '#FFFFFF';
-        card.style.boxShadow = '';
-
-        englishContainer.style.backgroundColor = '';
-        englishContainer.style.borderColor = 'transparent';
-        englishContainer.className = "bg-black/30 backdrop-blur-md px-6 py-3 rounded-2xl text-white mt-1 transition-all";
-        englishText.className = "text-2xl sm:text-4xl font-bold text-white";
-        phoneticText.className = "text-sm sm:text-lg font-semibold opacity-90 italic mt-1 text-white";
-      } else {
-        // Storybook Card Style: warm crisp ivory background + dynamic item hex border
-        card.style.backgroundColor = '#FFFDF9';
-        card.style.borderColor = item.hex;
-        card.style.boxShadow = `0 12px 28px -6px ${item.hex}33, 0 4px 12px -2px rgba(15, 23, 42, 0.08)`;
-
-        englishContainer.style.backgroundColor = `${item.hex}14`;
-        englishContainer.style.borderColor = `${item.hex}44`;
-        englishContainer.className = "border-2 px-6 py-3 rounded-2xl text-slate-800 mt-1 transition-all";
-        englishText.className = "text-2xl sm:text-4xl font-black text-slate-800";
-        phoneticText.className = "text-sm sm:text-lg font-bold italic mt-0.5 text-slate-600";
-      }
-
-      // Reset Reading Equation & Chunks
-      readingEquation.innerHTML = '';
-      readingEquation.classList.add('hidden');
-      readingEquation.classList.remove('flex');
-      readingChunks.innerHTML = '';
-      readingChunks.classList.add('hidden');
-      readingChunks.classList.remove('flex');
-
-      // Level 1 Reading Equation (e.g., M + A or m + a)
-      if (currentModule === 'reading' && item.parts) {
-        readingEquation.classList.remove('hidden');
-        readingEquation.classList.add('flex');
-        item.parts.forEach((part, idx) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.textContent = formatDisplayCase(part);
-          btn.style.borderColor = item.hex;
-          btn.className = "px-4 py-1.5 bg-white hover:bg-slate-50 text-slate-900 font-black text-2xl sm:text-3xl rounded-2xl border-2 shadow-sm active:scale-90 transition cursor-pointer";
-          btn.onclick = (e) => {
-            e.stopPropagation();
-            speakWord(part.toLowerCase());
-          };
-          readingEquation.appendChild(btn);
-
-          if (idx < item.parts.length - 1) {
-            const plus = document.createElement('span');
-            plus.textContent = "+";
-            plus.className = "text-slate-400 font-black text-2xl";
-            readingEquation.appendChild(plus);
-          }
-        });
-      }
-
-      // Render custom SVG illustration or emoji icon
-      if (item.svg) {
-        cardIllustration.innerHTML = item.svg;
-        cardIllustration.classList.remove('hidden');
-        cardIllustration.classList.add('flex');
-        cardIcon.classList.add('hidden');
-      } else if (item.icon) {
-        cardIcon.textContent = item.icon;
-        cardIcon.classList.remove('hidden');
-        cardIllustration.classList.add('hidden');
-        cardIllustration.classList.remove('flex');
-      } else {
-        cardIcon.classList.add('hidden');
-        cardIllustration.classList.add('hidden');
-        cardIllustration.classList.remove('flex');
-      }
-
-      // Primary Display Text: For Numbers, show the big digit (1..20) in center and French word below
-      const isNumberModule = (currentModule === 'numbers');
-      const isAlphabetModule = (currentModule === 'alphabet');
-      const primaryDisplayText = isNumberModule ? String(item.num) : formatDisplayCase(item.french, isAlphabetModule);
-
-      // Uniform giant font size for both Numbers (1-20) and Alphabet (A-Z / a-z / A a)
-      let sizeClasses = (isNumberModule || isAlphabetModule) ? "text-7xl sm:text-8xl" : "text-5xl sm:text-7xl";
-      if (!isNumberModule && !isAlphabetModule) {
-        if (item.french.length > 15) {
-          sizeClasses = "text-3xl sm:text-4xl leading-snug";
-        } else if (item.french.length > 10) {
-          sizeClasses = "text-4xl sm:text-6xl";
-        }
-      }
-
-      if (isFullColorModule) {
-        if (item.textDark) {
-          frenchText.className = `${sizeClasses} font-black tracking-wide text-slate-900 mb-3 transition-all drop-shadow-sm`;
-        } else {
-          frenchText.className = `${sizeClasses} font-black tracking-wide text-white mb-3 transition-all drop-shadow-md`;
-        }
-      } else {
-        // Crisp high-contrast dark slate ink on Storybook cards
-        frenchText.className = `${sizeClasses} font-black tracking-wide text-slate-800 mb-3 transition-all`;
-      }
-
-      frenchText.textContent = primaryDisplayText;
-
-      // Level 2 Interactive Color-Coded Syllables (e.g., VÉ · LO or vé · lo)
-      if (currentModule === 'reading' && item.syllables) {
-        readingChunks.classList.remove('hidden');
-        readingChunks.classList.add('flex');
-        const pillColors = [
-          "bg-sky-100 text-sky-950 border-sky-300",
-          "bg-amber-100 text-amber-950 border-amber-300",
-          "bg-emerald-100 text-emerald-950 border-emerald-300"
-        ];
-        item.syllables.forEach((syl, idx) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.textContent = formatDisplayCase(syl);
-          btn.className = `px-4 py-1.5 rounded-2xl font-black text-xl sm:text-2xl border-2 shadow-sm active:scale-90 transition cursor-pointer ${pillColors[idx % pillColors.length]}`;
-          btn.onclick = (e) => {
-            e.stopPropagation();
-            speakWord(syl.toLowerCase());
-          };
-          readingChunks.appendChild(btn);
-        });
-      }
-
-      // Level 3 Interactive Word-by-Word Pills
-      if (currentModule === 'reading' && item.words) {
-        readingChunks.classList.remove('hidden');
-        readingChunks.classList.add('flex');
-        item.words.forEach((w) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.textContent = formatDisplayCase(w);
-          btn.className = "px-3 py-1 bg-slate-100 hover:bg-amber-100 text-slate-900 border border-slate-300 font-black text-base sm:text-lg rounded-xl shadow-sm active:scale-90 transition cursor-pointer";
-          btn.onclick = (e) => {
-            e.stopPropagation();
-            speakWord(w);
-          };
-          readingChunks.appendChild(btn);
-        });
-      }
-
-      // Helper Box Text: For Numbers, show the French word (formatted in selected case) + phonetic ("/uhn/")
-      if (isNumberModule) {
-        englishText.textContent = formatDisplayCase(item.french);
-        phoneticText.textContent = item.phonetic;
-      } else if (isAlphabetModule && alphabetAudioMode === 'sound') {
-        englishText.textContent = item.soundLabel;
-        phoneticText.textContent = item.soundPhonetic;
-      } else {
-        englishText.textContent = item.english;
-        phoneticText.textContent = item.phonetic;
-      }
-
-      if (shouldSpeak) {
-        const speakText = getSpeakableText(item);
-        if (speakText) {
-          speakWord(speakText);
-        }
-      }
-    }
-
-    function nextItem() {
-      currentIndex = (currentIndex + 1) % activeDataset.length;
-      updateDisplay(autoPlayAudio);
-      triggerConfetti(0.8, 0.5);
-    }
-
-    function prevItem() {
-      currentIndex = (currentIndex - 1 + activeDataset.length) % activeDataset.length;
-      updateDisplay(autoPlayAudio);
-      triggerConfetti(0.2, 0.5);
-    }
-
-    function randomItem() {
-      if (!activeDataset || activeDataset.length <= 1) return;
-      let newIndex;
-      do {
-        newIndex = Math.floor(Math.random() * activeDataset.length);
-      } while (newIndex === currentIndex);
-      
-      currentIndex = newIndex;
-      updateDisplay(autoPlayAudio);
-      triggerConfetti(0.5, 0.6);
-    }
-
-    function handleCardClick(e) {
-      const item = activeDataset[currentIndex];
-      const speakText = getSpeakableText(item);
-      if (speakText) {
-        speakWord(speakText);
-      }
-      
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
-      triggerConfetti(x, y);
-    }
-
-    function toggleEnglish() {
-      showEnglish = !showEnglish;
-      const container = document.getElementById('englishContainer');
-      const badge = document.getElementById('englishStatusBadge');
-
-      if (showEnglish) {
-        container.style.display = 'block';
-        badge.textContent = 'ON';
-        badge.className = "text-xs bg-blue-200 text-blue-900 font-black px-2.5 py-1 rounded-full";
-      } else {
-        container.style.display = 'none';
-        badge.textContent = 'OFF';
-        badge.className = "text-xs bg-slate-200 text-slate-600 font-black px-2.5 py-1 rounded-full";
-      }
-    }
-
-    function toggleAutoAudio() {
-      autoPlayAudio = !autoPlayAudio;
-      const badge = document.getElementById('audioStatusBadge');
-      const icon = document.getElementById('audioMenuIcon');
-
-      if (autoPlayAudio) {
-        badge.textContent = 'ON';
-        badge.className = "text-xs bg-amber-300 text-amber-950 font-black px-2.5 py-1 rounded-full";
-        icon.className = "fas fa-volume-up text-xl text-amber-600";
-      } else {
-        badge.textContent = 'OFF';
-        badge.className = "text-xs bg-slate-200 text-slate-600 font-black px-2.5 py-1 rounded-full";
-        icon.className = "fas fa-volume-mute text-xl text-slate-500";
-      }
-    }
-
-    function setSpeechRate(rate) {
-      speechRate = rate;
-      const slowBtn = document.getElementById('speedSlowBtn');
-      const normBtn = document.getElementById('speedNormalBtn');
-
-      if (rate === 0.7) {
-        slowBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs";
-        normBtn.className = "px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-600";
-      } else {
-        normBtn.className = "px-3 py-1.5 rounded-lg bg-white text-amber-700 shadow-sm font-bold transition text-xs";
-        slowBtn.className = "px-3 py-1.5 rounded-lg font-bold transition text-xs text-slate-600";
-      }
-
-      if (currentView === 'module' && activeDataset[currentIndex]) {
-        pendingSpeakOnSettingsClose = true;
-      }
-    }
-
-    // ==================== SPEECH ENGINE ====================
-    function initVoices() {
-      if (!synth) return;
-      const voices = synth.getVoices();
-      if (voices && voices.length > 0) {
-        // Try to find a French voice
-        frenchVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('fr')) || voices[0];
-      }
-    }
-
-    if (typeof synth !== 'undefined' && synth.onvoiceschanged !== undefined) {
-      synth.onvoiceschanged = initVoices;
-    }
-
-    function speakWord(text) {
-      if (!synth || !text) return;
-      try {
-        synth.cancel();
-        const normalized = text.trim().toLowerCase();
-        const spokenString = phoneticChunkMap[normalized] || text;
-
-        const utterance = new SpeechSynthesisUtterance(spokenString);
-        utterance.lang = 'fr-FR';
-        utterance.rate = speechRate;
-        utterance.pitch = 1.1;
-
-        if (!frenchVoice) {
-          initVoices();
-        }
-        if (frenchVoice) {
-          utterance.voice = frenchVoice;
-        }
-
-        synth.speak(utterance);
-      } catch (err) {
-        console.log("Speech synthesis note:", err);
-      }
-    }
-
-    function triggerConfetti(originX = 0.5, originY = 0.5) {
-      if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 25,
-          spread: 60,
-          origin: { x: originX, y: originY },
-          colors: ['#EF4444', '#3B82F6', '#FACC15', '#22C55E', '#EC4899']
-        });
-      }
-    }
   </script>
 </body>
 </html>
