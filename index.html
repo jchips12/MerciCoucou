@@ -153,7 +153,7 @@
         </div>
       </div>
 
-      <!-- ICON-ONLY NAVIGATION CONTROLS (Android-Safe, No Text Labels) -->
+      <!-- ICON-ONLY NAVIGATION CONTROLS -->
       <div class="w-full max-w-md grid grid-cols-3 gap-3 sm:gap-4 mt-5">
         <!-- Previous Button -->
         <button onclick="prevCard()" aria-label="Previous"
@@ -308,6 +308,18 @@
             <span id="autoPlayKnob" class="w-6 h-6 rounded-full bg-white shadow transform transition-transform"></span>
           </button>
         </div>
+
+        <!-- Show English & Phonetic Helper Toggle -->
+        <div class="flex items-center justify-between bg-slate-50 p-3.5 rounded-2xl border-2 border-slate-200">
+          <div>
+            <p class="font-bold text-slate-800 text-sm">Show English & Phonetic Helper</p>
+            <p class="text-xs text-slate-500">Display English hints below the French word</p>
+          </div>
+          <button id="btnShowHelper" onclick="toggleShowHelper()"
+                  class="w-14 h-8 rounded-full transition-colors p-1 flex items-center">
+            <span id="showHelperKnob" class="w-6 h-6 rounded-full bg-white shadow transform transition-transform"></span>
+          </button>
+        </div>
       </div>
 
       <!-- Done Button -->
@@ -335,263 +347,231 @@
     let readingLevel = 1;             // 1 | 2 | 3
     let speechRate = 0.85;
     let autoPlayAudio = true;
+    let showHelper = true;
     let pendingSpeakOnClose = false;
     let frenchVoice = null;
 
     // ==========================================
-    // 2. SVG ARTWORK FOR SEASONS
-    // ==========================================
-    const svgArtwork = {
-      spring: `<svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="14" fill="#FACC15"/>
-        <circle cx="50" cy="24" r="14" fill="#F472B6"/>
-        <circle cx="74" cy="40" r="14" fill="#F472B6"/>
-        <circle cx="65" cy="70" r="14" fill="#F472B6"/>
-        <circle cx="35" cy="70" r="14" fill="#F472B6"/>
-        <circle cx="26" cy="40" r="14" fill="#F472B6"/>
-        <circle cx="50" cy="50" r="11" fill="#FDE047"/>
-      </svg>`,
-      summer: `<svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="24" fill="#FDE047" stroke="#FEF08A" stroke-width="4"/>
-        <g stroke="#FEF08A" stroke-width="6" stroke-linecap="round">
-          <line x1="50" y1="10" x2="50" y2="20"/>
-          <line x1="50" y1="80" x2="50" y2="90"/>
-          <line x1="10" y1="50" x2="20" y2="50"/>
-          <line x1="80" y1="50" x2="90" y2="50"/>
-          <line x1="22" y1="22" x2="29" y2="29"/>
-          <line x1="71" y1="71" x2="78" y2="78"/>
-          <line x1="78" y1="22" x2="71" y2="29"/>
-          <line x1="29" y1="71" x2="22" y2="78"/>
-        </g>
-      </svg>`,
-      autumn: `<svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow" viewBox="0 0 100 100">
-        <path d="M50 15 C75 35, 80 65, 50 80 C20 65, 25 35, 50 15 Z" fill="#FDBA74" stroke="#FFF7ED" stroke-width="3"/>
-        <line x1="50" y1="25" x2="50" y2="90" stroke="#7C2D12" stroke-width="5" stroke-linecap="round"/>
-        <line x1="50" y1="45" x2="36" y2="35" stroke="#7C2D12" stroke-width="3" stroke-linecap="round"/>
-        <line x1="50" y1="55" x2="64" y2="45" stroke="#7C2D12" stroke-width="3" stroke-linecap="round"/>
-      </svg>`,
-      winter: `<svg class="w-24 h-24 sm:w-28 sm:h-28 drop-shadow" viewBox="0 0 100 100">
-        <g stroke="#FFFFFF" stroke-width="6" stroke-linecap="round">
-          <line x1="50" y1="14" x2="50" y2="86"/>
-          <line x1="14" y1="50" x2="86" y2="50"/>
-          <line x1="25" y1="25" x2="75" y2="75"/>
-          <line x1="75" y1="25" x2="25" y2="75"/>
-        </g>
-        <circle cx="50" cy="50" r="10" fill="#BAE6FD"/>
-      </svg>`
-    };
-
-    // ==========================================
-    // 3. DATASETS
+    // 2. DATASETS
     // ==========================================
     const colorsDataset = [
-      { french: "Rouge", english: "Red", phonetic: "/roozh/", hex: "#EF4444", textDark: false },
-      { french: "Bleu", english: "Blue", phonetic: "/bluh/", hex: "#3B82F6", textDark: false },
-      { french: "Jaune", english: "Yellow", phonetic: "/zhohn/", hex: "#FACC15", textDark: true },
-      { french: "Vert", english: "Green", phonetic: "/vair/", hex: "#22C55E", textDark: false },
-      { french: "Orange", english: "Orange", phonetic: "/oh-rahnzh/", hex: "#F97316", textDark: false },
-      { french: "Violet", english: "Purple", phonetic: "/vyoh-lay/", hex: "#8B5CF6", textDark: false },
-      { french: "Rose", english: "Pink", phonetic: "/rohz/", hex: "#F472B6", textDark: false },
-      { french: "Marron", english: "Brown", phonetic: "/mah-rohn/", hex: "#92400E", textDark: false },
-      { french: "Noir", english: "Black", phonetic: "/nwahr/", hex: "#1E293B", textDark: false },
-      { french: "Blanc", english: "White", phonetic: "/blahn/", hex: "#FFFFFF", textDark: true },
-      { french: "Gris", english: "Gray", phonetic: "/gree/", hex: "#64748B", textDark: false }
-    ];
-
-    const seasonsDataset = [
-      { french: "Le Printemps", english: "Spring", phonetic: "/luh pran-tahn/", hex: "#16A34A", svg: svgArtwork.spring },
-      { french: "L'Été", english: "Summer", phonetic: "/lay-tay/", hex: "#F59E0B", svg: svgArtwork.summer },
-      { french: "L'Automne", english: "Autumn / Fall", phonetic: "/loh-tohn/", hex: "#EA580C", svg: svgArtwork.autumn },
-      { french: "L'Hiver", english: "Winter", phonetic: "/lee-vair/", hex: "#0284C7", svg: svgArtwork.winter }
-    ];
-
-    const greetingsDataset = [
-      { french: "Bonjour", english: "Hello / Good morning", phonetic: "/bohn-zhoor/", hex: "#0EA5E9", icon: "👋" },
-      { french: "Salut", english: "Hi / Bye (friendly)", phonetic: "/sah-loo/", hex: "#F43F5E", icon: "😊" },
-      { french: "Bonsoir", english: "Good evening", phonetic: "/bohn-swahr/", hex: "#8B5CF6", icon: "🌆" },
-      { french: "Bonne nuit", english: "Good night", phonetic: "/bon nwee/", hex: "#3B82F6", icon: "🌙" },
-      { french: "Au revoir", english: "Goodbye", phonetic: "/oh ruh-vwahr/", hex: "#10B981", icon: "👋" },
-      { french: "À bientôt", english: "See you soon", phonetic: "/ah byan-toh/", hex: "#F59E0B", icon: "🤗" },
-      { french: "S'il vous plaît", english: "Please", phonetic: "/seel voo play/", hex: "#6366F1", icon: "🙏" },
-      { french: "Merci", english: "Thank you", phonetic: "/mair-see/", hex: "#14B8A6", icon: "💖" },
-      { french: "De rien", english: "You're welcome", phonetic: "/duh ryan/", hex: "#84CC16", icon: "🌟" },
-      { french: "Pardon", english: "Excuse me / Sorry", phonetic: "/par-dohn/", hex: "#F97316", icon: "🙈" },
-      { french: "Comment ça va ?", english: "How are you?", phonetic: "/koh-mahn sah vah/", hex: "#06B6D4", icon: "💬" },
-      { french: "Ça va bien !", english: "I'm doing good!", phonetic: "/sah vah byan/", hex: "#D97706", icon: "👍" }
+      { french: "Rouge", english: "Red", phonetic: "/roozh/", bg: "bg-red-500", border: "border-red-200", text: "text-white", helperBg: "bg-red-600/40 border-red-300/40 text-white" },
+      { french: "Bleu", english: "Blue", phonetic: "/bluh/", bg: "bg-blue-500", border: "border-blue-200", text: "text-white", helperBg: "bg-blue-600/40 border-blue-300/40 text-white" },
+      { french: "Jaune", english: "Yellow", phonetic: "/zhohn/", bg: "bg-yellow-300", border: "border-yellow-500", text: "text-slate-900", helperBg: "bg-yellow-400/50 border-yellow-600/30 text-slate-900" },
+      { french: "Vert", english: "Green", phonetic: "/vair/", bg: "bg-emerald-500", border: "border-emerald-200", text: "text-white", helperBg: "bg-emerald-600/40 border-emerald-300/40 text-white" },
+      { french: "Orange", english: "Orange", phonetic: "/oh-rahnzh/", bg: "bg-orange-500", border: "border-orange-200", text: "text-white", helperBg: "bg-orange-600/40 border-orange-300/40 text-white" },
+      { french: "Violet", english: "Purple", phonetic: "/vyoh-lay/", bg: "bg-purple-600", border: "border-purple-200", text: "text-white", helperBg: "bg-purple-700/40 border-purple-300/40 text-white" },
+      { french: "Rose", english: "Pink", phonetic: "/rohz/", bg: "bg-pink-400", border: "border-pink-200", text: "text-white", helperBg: "bg-pink-500/40 border-pink-200/40 text-white" },
+      { french: "Marron", english: "Brown", phonetic: "/mah-rohn/", bg: "bg-amber-800", border: "border-amber-300", text: "text-white", helperBg: "bg-amber-900/50 border-amber-400/30 text-white" },
+      { french: "Noir", english: "Black", phonetic: "/nwahr/", bg: "bg-slate-900", border: "border-slate-500", text: "text-white", helperBg: "bg-slate-800 border-slate-600 text-white" },
+      { french: "Blanc", english: "White", phonetic: "/blahn/", bg: "bg-white", border: "border-slate-300", text: "text-slate-800", helperBg: "bg-slate-100 border-slate-200 text-slate-800" },
+      { french: "Gris", english: "Gray", phonetic: "/gree/", bg: "bg-slate-500", border: "border-slate-300", text: "text-white", helperBg: "bg-slate-600/50 border-slate-300/40 text-white" }
     ];
 
     const vocabDataset = [
-      { french: "Avion", english: "Airplane", phonetic: "/ah-vyohn/", hex: "#0EA5E9", icon: "✈️" },
-      { french: "Ballon", english: "Ball", phonetic: "/bah-lohn/", hex: "#F43F5E", icon: "⚽" },
-      { french: "Chat", english: "Cat", phonetic: "/shah/", hex: "#F59E0B", icon: "🐱" },
-      { french: "Chien", english: "Dog", phonetic: "/shyan/", hex: "#D97706", icon: "🐶" },
-      { french: "Éléphant", english: "Elephant", phonetic: "/ay-lay-fahn/", hex: "#6366F1", icon: "🐘" },
-      { french: "Fleur", english: "Flower", phonetic: "/fluhr/", hex: "#EC4899", icon: "🌸" },
-      { french: "Gâteau", english: "Cake", phonetic: "/gah-toh/", hex: "#F97316", icon: "🎂" },
-      { french: "Hibou", english: "Owl", phonetic: "/ee-boo/", hex: "#8B5CF6", icon: "🦉" },
-      { french: "Île", english: "Island", phonetic: "/eel/", hex: "#14B8A6", icon: "🏝️" },
-      { french: "Jus", english: "Juice", phonetic: "/zhoo/", hex: "#EAB308", icon: "🧃" },
-      { french: "Koala", english: "Koala", phonetic: "/koh-ah-lah/", hex: "#64748B", icon: "🐨" },
-      { french: "Lion", english: "Lion", phonetic: "/lyohn/", hex: "#EA580C", icon: "🦁" },
-      { french: "Maison", english: "House", phonetic: "/may-zohn/", hex: "#EF4444", icon: "🏠" },
-      { french: "Nuage", english: "Cloud", phonetic: "/noo-ahzh/", hex: "#38BDF8", icon: "☁️" },
-      { french: "Oiseau", english: "Bird", phonetic: "/wah-zoh/", hex: "#3B82F6", icon: "🐦" },
-      { french: "Pomme", english: "Apple", phonetic: "/pom/", hex: "#DC2626", icon: "🍎" },
-      { french: "Soleil", english: "Sun", phonetic: "/soh-lay/", hex: "#FACC15", icon: "☀️" },
-      { french: "Tortue", english: "Turtle", phonetic: "/tor-too/", hex: "#16A34A", icon: "🐢" },
-      { french: "Vélo", english: "Bicycle", phonetic: "/vay-loh/", hex: "#10B981", icon: "🚲" },
-      { french: "Zèbre", english: "Zebra", phonetic: "/zebr/", hex: "#475569", icon: "🦓" }
+      { french: "Avion", english: "Airplane", phonetic: "/ah-vyohn/", icon: "✈️" },
+      { french: "Banane", english: "Banana", phonetic: "/bah-nahn/", icon: "🍌" },
+      { french: "Chat", english: "Cat", phonetic: "/shah/", icon: "🐱" },
+      { french: "Dauphin", english: "Dolphin", phonetic: "/doh-fan/", icon: "🐬" },
+      { french: "Éléphant", english: "Elephant", phonetic: "/ay-lay-fahn/", icon: "🐘" },
+      { french: "Fleur", english: "Flower", phonetic: "/flur/", icon: "🌸" },
+      { french: "Girafe", english: "Giraffe", phonetic: "/zhee-rahf/", icon: "🦒" },
+      { french: "Hibou", english: "Owl", phonetic: "/ee-boo/", icon: "🦉" },
+      { french: "Igloo", english: "Igloo", phonetic: "/ee-gloo/", icon: "🧊" },
+      { french: "Jardin", english: "Garden", phonetic: "/zhar-dan/", icon: "🌻" },
+      { french: "Kangourou", english: "Kangaroo", phonetic: "/kahn-goo-roo/", icon: "🦘" },
+      { french: "Lion", english: "Lion", phonetic: "/lyohn/", icon: "🦁" },
+      { french: "Maison", english: "House", phonetic: "/may-zohn/", icon: "🏠" },
+      { french: "Nuage", english: "Cloud", phonetic: "/noo-ahzh/", icon: "☁️" },
+      { french: "Orange", english: "Orange", phonetic: "/oh-rahnzh/", icon: "🍊" },
+      { french: "Pomme", english: "Apple", phonetic: "/pom/", icon: "🍎" },
+      { french: "Quatre", english: "Four", phonetic: "/kah-truh/", icon: "4️⃣" },
+      { french: "Robot", english: "Robot", phonetic: "/roh-boh/", icon: "🤖" },
+      { french: "Soleil", english: "Sun", phonetic: "/soh-lay/", icon: "☀️" },
+      { french: "Tortue", english: "Turtle", phonetic: "/tor-too/", icon: "🐢" },
+      { french: "Univers", english: "Space / Universe", phonetic: "/oo-nee-vair/", icon: "🚀" },
+      { french: "Vélo", english: "Bicycle", phonetic: "/vay-loh/", icon: "🚲" },
+      { french: "Wagon", english: "Train Car", phonetic: "/vah-gohn/", icon: "🚃" },
+      { french: "Xylophone", english: "Xylophone", phonetic: "/gzee-loh-fon/", icon: "🎶" },
+      { french: "Yaourt", english: "Yogurt", phonetic: "/yah-oort/", icon: "🥣" },
+      { french: "Zèbre", english: "Zebra", phonetic: "/zeh-bruh/", icon: "🦓" }
     ];
 
     const daysDataset = [
-      { french: "Lundi", english: "Monday", phonetic: "/luhn-dee/", hex: "#EF4444", icon: "1️⃣" },
-      { french: "Mardi", english: "Tuesday", phonetic: "/mar-dee/", hex: "#F97316", icon: "2️⃣" },
-      { french: "Mercredi", english: "Wednesday", phonetic: "/mair-kruh-dee/", hex: "#EAB308", icon: "3️⃣" },
-      { french: "Jeudi", english: "Thursday", phonetic: "/zhuh-dee/", hex: "#22C55E", icon: "4️⃣" },
-      { french: "Vendredi", english: "Friday", phonetic: "/vahn-druh-dee/", hex: "#0EA5E9", icon: "5️⃣" },
-      { french: "Samedi", english: "Saturday", phonetic: "/sam-dee/", hex: "#8B5CF6", icon: "🎉" },
-      { french: "Dimanche", english: "Sunday", phonetic: "/dee-mahnsh/", hex: "#EC4899", icon: "☀️" }
+      { french: "Lundi", english: "Monday", phonetic: "/luhn-dee/", icon: "🌙" },
+      { french: "Mardi", english: "Tuesday", phonetic: "/mar-dee/", icon: "🚀" },
+      { french: "Mercredi", english: "Wednesday", phonetic: "/mair-kruh-dee/", icon: "🎨" },
+      { french: "Jeudi", english: "Thursday", phonetic: "/zhuh-dee/", icon: "⚡" },
+      { french: "Vendredi", english: "Friday", phonetic: "/vahn-druh-dee/", icon: "🎉" },
+      { french: "Samedi", english: "Saturday", phonetic: "/sahm-dee/", icon: "🧸" },
+      { french: "Dimanche", english: "Sunday", phonetic: "/dee-mahnsh/", icon: "☀️" }
     ];
 
-    const allNumbersDataset = [
-      { digit: "1", french: "Un", english: "One", phonetic: "/uhn/", hex: "#EF4444" },
-      { digit: "2", french: "Deux", english: "Two", phonetic: "/duh/", hex: "#F97316" },
-      { digit: "3", french: "Trois", english: "Three", phonetic: "/trwah/", hex: "#EAB308" },
-      { digit: "4", french: "Quatre", english: "Four", phonetic: "/katr/", hex: "#22C55E" },
-      { digit: "5", french: "Cinq", english: "Five", phonetic: "/sank/", hex: "#14B8A6" },
-      { digit: "6", french: "Six", english: "Six", phonetic: "/sees/", hex: "#0EA5E9" },
-      { digit: "7", french: "Sept", english: "Seven", phonetic: "/set/", hex: "#3B82F6" },
-      { digit: "8", french: "Huit", english: "Eight", phonetic: "/weet/", hex: "#6366F1" },
-      { digit: "9", french: "Neuf", english: "Nine", phonetic: "/nuhf/", hex: "#8B5CF6" },
-      { digit: "10", french: "Dix", english: "Ten", phonetic: "/dees/", hex: "#EC4899" },
-      { digit: "11", french: "Onze", english: "Eleven", phonetic: "/ohnz/", hex: "#F43F5E" },
-      { digit: "12", french: "Douze", english: "Twelve", phonetic: "/dooz/", hex: "#EA580C" },
-      { digit: "13", french: "Treize", english: "Thirteen", phonetic: "/trez/", hex: "#D97706" },
-      { digit: "14", french: "Quatorze", english: "Fourteen", phonetic: "/kah-torz/", hex: "#16A34A" },
-      { digit: "15", french: "Quinze", english: "Fifteen", phonetic: "/kanz/", hex: "#0D9488" },
-      { digit: "16", french: "Seize", english: "Sixteen", phonetic: "/sez/", hex: "#0284C7" },
-      { digit: "17", french: "Dix-sept", english: "Seventeen", phonetic: "/dee-set/", hex: "#2563EB" },
-      { digit: "18", french: "Dix-huit", english: "Eighteen", phonetic: "/deez-weet/", hex: "#4F46E5" },
-      { digit: "19", french: "Dix-neuf", english: "Nineteen", phonetic: "/deez-nuhf/", hex: "#7C3AED" },
-      { digit: "20", french: "Vingt", english: "Twenty", phonetic: "/van/", hex: "#DB2777" }
+    const numbersDataset = [
+      { num: 1, french: "Un", english: "One", phonetic: "/uhn/" },
+      { num: 2, french: "Deux", english: "Two", phonetic: "/duh/" },
+      { num: 3, french: "Trois", english: "Three", phonetic: "/trwah/" },
+      { num: 4, french: "Quatre", english: "Four", phonetic: "/kah-truh/" },
+      { num: 5, french: "Cinq", english: "Five", phonetic: "/sank/" },
+      { num: 6, french: "Six", english: "Six", phonetic: "/sees/" },
+      { num: 7, french: "Sept", english: "Seven", phonetic: "/set/" },
+      { num: 8, french: "Huit", english: "Eight", phonetic: "/weet/" },
+      { num: 9, french: "Neuf", english: "Nine", phonetic: "/nuhf/" },
+      { num: 10, french: "Dix", english: "Ten", phonetic: "/dees/" },
+      { num: 11, french: "Onze", english: "Eleven", phonetic: "/ohnz/" },
+      { num: 12, french: "Douze", english: "Twelve", phonetic: "/dooz/" },
+      { num: 13, french: "Treize", english: "Thirteen", phonetic: "/trez/" },
+      { num: 14, french: "Quatorze", english: "Fourteen", phonetic: "/kah-torz/" },
+      { num: 15, french: "Quinze", english: "Fifteen", phonetic: "/kanz/" },
+      { num: 16, french: "Seize", english: "Sixteen", phonetic: "/sez/" },
+      { num: 17, french: "Dix-sept", english: "Seventeen", phonetic: "/dees-set/" },
+      { num: 18, french: "Dix-huit", english: "Eighteen", phonetic: "/deez-weet/" },
+      { num: 19, french: "Dix-neuf", english: "Nineteen", phonetic: "/deez-nuhf/" },
+      { num: 20, french: "Vingt", english: "Twenty", phonetic: "/van/" }
     ];
 
     const alphabetDataset = [
-      { letter: "A", nameSpeak: "A", namePhonetic: "/ah/", soundSpeak: "ah", soundDisplay: '"ah"', soundHint: "abeille (bee)", hex: "#EF4444" },
-      { letter: "B", nameSpeak: "B", namePhonetic: "/bay/", soundSpeak: "beu", soundDisplay: '"buh"', soundHint: "ballon (ball)", hex: "#F97316" },
-      { letter: "C", nameSpeak: "C", namePhonetic: "/say/", soundSpeak: "keu", soundDisplay: '"kuh"', soundHint: "carotte (carrot)", hex: "#EAB308" },
-      { letter: "D", nameSpeak: "D", namePhonetic: "/day/", soundSpeak: "de", soundDisplay: '"duh"', soundHint: "dinosaure (dinosaur)", hex: "#22C55E" },
-      { letter: "E", nameSpeak: "E", namePhonetic: "/uh/", soundSpeak: "euh", soundDisplay: '"uh"', soundHint: "cheval (horse)", hex: "#10B981" },
-      { letter: "F", nameSpeak: "F", namePhonetic: "/ef/", soundSpeak: "feuh", soundDisplay: '"fff"', soundHint: "fleur (flower)", hex: "#14B8A6" },
-      { letter: "G", nameSpeak: "G", namePhonetic: "/zhay/", soundSpeak: "gueu", soundDisplay: '"guh"', soundHint: "guitare (guitar)", hex: "#06B6D4" },
-      { letter: "H", nameSpeak: "H", namePhonetic: "/ash/", soundSpeak: "", soundDisplay: "Silent (no sound!)", soundHint: "hibou (owl)", hex: "#0EA5E9", silent: true },
-      { letter: "I", nameSpeak: "I", namePhonetic: "/ee/", soundSpeak: "ee", soundDisplay: '"ee"', soundHint: "igloo (igloo)", hex: "#3B82F6" },
-      { letter: "J", nameSpeak: "J", namePhonetic: "/zhee/", soundSpeak: "jeu", soundDisplay: '"zhuh"', soundHint: "jardin (garden)", hex: "#6366F1" },
-      { letter: "K", nameSpeak: "K", namePhonetic: "/kah/", soundSpeak: "keu", soundDisplay: '"kuh"', soundHint: "kangourou (kangaroo)", hex: "#8B5CF6" },
-      { letter: "L", nameSpeak: "L", namePhonetic: "/el/", soundSpeak: "leuh", soundDisplay: '"lll"', soundHint: "lapin (rabbit)", hex: "#A855F7" },
-      { letter: "M", nameSpeak: "M", namePhonetic: "/em/", soundSpeak: "meuh", soundDisplay: '"mmm"', soundHint: "maman (mom)", hex: "#D946EF" },
-      { letter: "N", nameSpeak: "N", namePhonetic: "/en/", soundSpeak: "neuh", soundDisplay: '"nnn"', soundHint: "nuage (cloud)", hex: "#EC4899" },
-      { letter: "O", nameSpeak: "O", namePhonetic: "/oh/", soundSpeak: "oh", soundDisplay: '"oh"', soundHint: "orange (orange)", hex: "#F43F5E" },
-      { letter: "P", nameSpeak: "P", namePhonetic: "/pay/", soundSpeak: "peu", soundDisplay: '"puh"', soundHint: "panda (panda)", hex: "#EF4444" },
-      { letter: "Q", nameSpeak: "Q", namePhonetic: "/koo/", soundSpeak: "keu", soundDisplay: '"kuh"', soundHint: "quiche (quiche)", hex: "#F97316" },
-      { letter: "R", nameSpeak: "R", namePhonetic: "/air/", soundSpeak: "reuh", soundDisplay: '"rrr"', soundHint: "robot (robot)", hex: "#EAB308" },
-      { letter: "S", nameSpeak: "S", namePhonetic: "/ess/", soundSpeak: "seuh", soundDisplay: '"sss"', soundHint: "serpent (snake)", hex: "#22C55E" },
-      { letter: "T", nameSpeak: "T", namePhonetic: "/tay/", soundSpeak: "te", soundDisplay: '"tuh"', soundHint: "tortue (turtle)", hex: "#14B8A6" },
-      { letter: "U", nameSpeak: "U", namePhonetic: "/oo/", soundSpeak: "u", soundDisplay: '"ew"', soundHint: "usine (factory)", hex: "#0EA5E9" },
-      { letter: "V", nameSpeak: "V", namePhonetic: "/vay/", soundSpeak: "veuh", soundDisplay: '"vvv"', soundHint: "vélo (bike)", hex: "#3B82F6" },
-      { letter: "W", nameSpeak: "W", namePhonetic: "/doo-bluh-vay/", soundSpeak: "wouah", soundDisplay: '"wuh"', soundHint: "wapiti (elk)", hex: "#6366F1" },
-      { letter: "X", nameSpeak: "X", namePhonetic: "/eeks/", soundSpeak: "kseuh", soundDisplay: '"ks"', soundHint: "xylophone (xylophone)", hex: "#8B5CF6" },
-      { letter: "Y", nameSpeak: "Y", namePhonetic: "/ee-grek/", soundSpeak: "yeuh", soundDisplay: '"yuh"', soundHint: "yaourt (yogurt)", hex: "#EC4899" },
-      { letter: "Z", nameSpeak: "Z", namePhonetic: "/zed/", soundSpeak: "zeuh", soundDisplay: '"zzz"', soundHint: "zèbre (zebra)", hex: "#F43F5E" }
+      { letter: "A", namePhonetic: "ah", soundPhonetic: '"ah"', soundSpeak: "ah", exampleFr: "abeille", exampleEn: "bee" },
+      { letter: "B", namePhonetic: "bay", soundPhonetic: '"buh"', soundSpeak: "beu", exampleFr: "ballon", exampleEn: "ball" },
+      { letter: "C", namePhonetic: "say", soundPhonetic: '"kuh"', soundSpeak: "keu", exampleFr: "carotte", exampleEn: "carrot" },
+      { letter: "D", namePhonetic: "day", soundPhonetic: '"duh"', soundSpeak: "de", exampleFr: "dinosaure", exampleEn: "dinosaur" },
+      { letter: "E", namePhonetic: "uh", soundPhonetic: '"uh"', soundSpeak: "euh", exampleFr: "cheval", exampleEn: "horse" },
+      { letter: "F", namePhonetic: "ef", soundPhonetic: '"fff"', soundSpeak: "feuh", exampleFr: "fleur", exampleEn: "flower" },
+      { letter: "G", namePhonetic: "zhay", soundPhonetic: '"guh"', soundSpeak: "gueu", exampleFr: "guitare", exampleEn: "guitar" },
+      { letter: "H", namePhonetic: "ash", soundPhonetic: "Silent (no sound!)", soundSpeak: "", silent: true, exampleFr: "hibou", exampleEn: "owl" },
+      { letter: "I", namePhonetic: "ee", soundPhonetic: '"ee"', soundSpeak: "i", exampleFr: "igloo", exampleEn: "igloo" },
+      { letter: "J", namePhonetic: "zhee", soundPhonetic: '"zhuh"', soundSpeak: "jeu", exampleFr: "jardin", exampleEn: "garden" },
+      { letter: "K", namePhonetic: "kah", soundPhonetic: '"kuh"', soundSpeak: "keu", exampleFr: "kangourou", exampleEn: "kangaroo" },
+      { letter: "L", namePhonetic: "el", soundPhonetic: '"lll"', soundSpeak: "leuh", exampleFr: "lapin", exampleEn: "rabbit" },
+      { letter: "M", namePhonetic: "em", soundPhonetic: '"mmm"', soundSpeak: "meuh", exampleFr: "maman", exampleEn: "mom" },
+      { letter: "N", namePhonetic: "en", soundPhonetic: '"nnn"', soundSpeak: "neuh", exampleFr: "nuage", exampleEn: "cloud" },
+      { letter: "O", namePhonetic: "oh", soundPhonetic: '"oh"', soundSpeak: "o", exampleFr: "orange", exampleEn: "orange" },
+      { letter: "P", namePhonetic: "pay", soundPhonetic: '"puh"', soundSpeak: "peu", exampleFr: "panda", exampleEn: "panda" },
+      { letter: "Q", namePhonetic: "koo", soundPhonetic: '"kuh"', soundSpeak: "keu", exampleFr: "quiche", exampleEn: "quiche" },
+      { letter: "R", namePhonetic: "air", soundPhonetic: '"rrr"', soundSpeak: "reuh", exampleFr: "robot", exampleEn: "robot" },
+      { letter: "S", namePhonetic: "ess", soundPhonetic: '"sss"', soundSpeak: "seuh", exampleFr: "serpent", exampleEn: "snake" },
+      { letter: "T", namePhonetic: "tay", soundPhonetic: '"tuh"', soundSpeak: "te", exampleFr: "tortue", exampleEn: "turtle" },
+      { letter: "U", namePhonetic: "oo", soundPhonetic: '"ew"', soundSpeak: "u", exampleFr: "usine", exampleEn: "factory" },
+      { letter: "V", namePhonetic: "vay", soundPhonetic: '"vvv"', soundSpeak: "veuh", exampleFr: "vélo", exampleEn: "bike" },
+      { letter: "W", namePhonetic: "doo-bluh-vay", soundPhonetic: '"wuh"', soundSpeak: "wouah", exampleFr: "wapiti", exampleEn: "elk" },
+      { letter: "X", namePhonetic: "eeks", soundPhonetic: '"ks"', soundSpeak: "kseuh", exampleFr: "xylophone", exampleEn: "xylophone" },
+      { letter: "Y", namePhonetic: "ee-grek", soundPhonetic: '"yuh"', soundSpeak: "yeuh", exampleFr: "yaourt", exampleEn: "yogurt" },
+      { letter: "Z", namePhonetic: "zed", soundPhonetic: '"zzz"', soundSpeak: "zeuh", exampleFr: "zèbre", exampleEn: "zebra" }
     ];
 
-    const readingDatasets = {
+    const seasonsDataset = [
+      { french: "Le Printemps", english: "Spring", phonetic: "/luh pran-tahn/", icon: "🌷" },
+      { french: "L'Été", english: "Summer", phonetic: "/lay-tay/", icon: "☀️" },
+      { french: "L'Automne", english: "Autumn / Fall", phonetic: "/loh-ton/", icon: "🍂" },
+      { french: "L'Hiver", english: "Winter", phonetic: "/lee-vair/", icon: "⛄" }
+    ];
+
+    const greetingsDataset = [
+      { french: "Bonjour", english: "Hello / Good morning", phonetic: "/bohn-zhoor/", icon: "👋" },
+      { french: "Salut", english: "Hi / Bye (friendly)", phonetic: "/sah-loo/", icon: "😊" },
+      { french: "Bonsoir", english: "Good evening", phonetic: "/bohn-swahr/", icon: "🌆" },
+      { french: "Bonne nuit", english: "Good night", phonetic: "/bon nwee/", icon: "🌙" },
+      { french: "Au revoir", english: "Goodbye", phonetic: "/oh ruh-vwahr/", icon: "👋" },
+      { french: "À bientôt", english: "See you soon", phonetic: "/ah byan-toh/", icon: "🤗" },
+      { french: "S'il vous plaît", english: "Please (polite / formal)", phonetic: "/seel voo play/", icon: "🙏" },
+      { french: "Merci", english: "Thank you", phonetic: "/mair-see/", icon: "💖" },
+      { french: "De rien", english: "You're welcome", phonetic: "/duh ryan/", icon: "🌟" },
+      { french: "Pardon", english: "Excuse me / Sorry", phonetic: "/par-dohn/", icon: "🙈" },
+      { french: "Comment ça va ?", english: "How are you?", phonetic: "/koh-mahn sah vah/", icon: "💬" },
+      { french: "Ça va bien !", english: "I'm doing good!", phonetic: "/sah vah byan/", icon: "👍" }
+    ];
+
+    const readingDataset = {
       1: [
-        { french: "ma", parts: ["m", "a"], english: "Syllable: m + a", phonetic: "/mah/", hex: "#EC4899" },
-        { french: "pa", parts: ["p", "a"], english: "Syllable: p + a", phonetic: "/pah/", hex: "#3B82F6" },
-        { french: "bé", parts: ["b", "é"], english: "Syllable: b + é", phonetic: "/bay/", hex: "#10B981" },
-        { french: "vé", parts: ["v", "é"], english: "Syllable: v + é", phonetic: "/vay/", hex: "#F59E0B" },
-        { french: "lo", parts: ["l", "o"], english: "Syllable: l + o", phonetic: "/loh/", hex: "#8B5CF6" },
-        { french: "ri", parts: ["r", "i"], english: "Syllable: r + i", phonetic: "/ree/", hex: "#F43F5E" },
-        { french: "so", parts: ["s", "o"], english: "Syllable: s + o", phonetic: "/soh/", hex: "#0EA5E9" },
-        { french: "fu", parts: ["f", "u"], english: "Syllable: f + u", phonetic: "/foo/", hex: "#14B8A6" }
+        { french: "ma", chunks: ["m", "a"], english: "Syllable: m + a", phonetic: "/mah/", icon: "🔤" },
+        { french: "pa", chunks: ["p", "a"], english: "Syllable: p + a", phonetic: "/pah/", icon: "🔤" },
+        { french: "ba", chunks: ["b", "a"], english: "Syllable: b + a", phonetic: "/bah/", icon: "🔤" },
+        { french: "la", chunks: ["l", "a"], english: "Syllable: l + a", phonetic: "/lah/", icon: "🔤" },
+        { french: "bé", chunks: ["b", "é"], english: "Syllable: b + é", phonetic: "/bay/", icon: "🔤" },
+        { french: "vé", chunks: ["v", "é"], english: "Syllable: v + é", phonetic: "/vay/", icon: "🔤" },
+        { french: "mi", chunks: ["m", "i"], english: "Syllable: m + i", phonetic: "/mee/", icon: "🔤" },
+        { french: "ri", chunks: ["r", "i"], english: "Syllable: r + i", phonetic: "/ree/", icon: "🔤" },
+        { french: "mo", chunks: ["m", "o"], english: "Syllable: m + o", phonetic: "/moh/", icon: "🔤" },
+        { french: "lu", chunks: ["l", "u"], english: "Syllable: l + u", phonetic: "/loo/", icon: "🔤" }
       ],
       2: [
-        { french: "papa", parts: ["pa", "pa"], english: "Dad", phonetic: "/pah-pah/", hex: "#3B82F6", icon: "👨" },
-        { french: "maman", parts: ["ma", "man"], english: "Mom", phonetic: "/mah-mahn/", hex: "#EC4899", icon: "👩" },
-        { french: "vélo", parts: ["vé", "lo"], english: "Bicycle", phonetic: "/vay-loh/", hex: "#10B981", icon: "🚲" },
-        { french: "bébé", parts: ["bé", "bé"], english: "Baby", phonetic: "/bay-bay/", hex: "#F59E0B", icon: "👶" },
-        { french: "lune", parts: ["lu", "ne"], english: "Moon", phonetic: "/loon/", hex: "#6366F1", icon: "🌙" },
-        { french: "banane", parts: ["ba", "na", "ne"], english: "Banana", phonetic: "/bah-nan/", hex: "#EAB308", icon: "🍌" },
-        { french: "tomate", parts: ["to", "ma", "te"], english: "Tomato", phonetic: "/toh-mat/", hex: "#EF4444", icon: "🍅" }
+        { french: "papa", chunks: ["pa", "pa"], english: "Dad", phonetic: "/pah-pah/", icon: "👨" },
+        { french: "maman", chunks: ["ma", "man"], english: "Mom", phonetic: "/mah-mahn/", icon: "👩" },
+        { french: "bébé", chunks: ["bé", "bé"], english: "Baby", phonetic: "/bay-bay/", icon: "👶" },
+        { french: "vélo", chunks: ["vé", "lo"], english: "Bicycle", phonetic: "/vay-loh/", icon: "🚲" },
+        { french: "lune", chunks: ["lu", "ne"], english: "Moon", phonetic: "/loon/", icon: "🌙" },
+        { french: "moto", chunks: ["mo", "to"], english: "Motorcycle", phonetic: "/moh-toh/", icon: "🏍️" },
+        { french: "ami", chunks: ["a", "mi"], english: "Friend", phonetic: "/ah-mee/", icon: "🤝" },
+        { french: "banane", chunks: ["ba", "na", "ne"], english: "Banana", phonetic: "/bah-nahn/", icon: "🍌" }
       ],
       3: [
-        { french: "Le chat dort.", english: "The cat is sleeping.", phonetic: "/luh shah dor/", hex: "#F59E0B", icon: "😴" },
-        { french: "J'aime la pomme.", english: "I like the apple.", phonetic: "/zhem lah pom/", hex: "#EF4444", icon: "🍎" },
-        { french: "Le soleil brille.", english: "The sun is shining.", phonetic: "/luh soh-lay bree/", hex: "#EAB308", icon: "☀️" },
-        { french: "Voici mon vélo.", english: "Here is my bicycle.", phonetic: "/vwah-see mohn vay-loh/", hex: "#10B981", icon: "🚲" },
-        { french: "Bonjour maman !", english: "Hello mom!", phonetic: "/bohn-zhoor mah-mahn/", hex: "#EC4899", icon: "💖" }
+        { french: "Le chat dort.", chunks: ["Le", "chat", "dort."], english: "The cat sleeps.", phonetic: "/luh shah dor/", icon: "😴" },
+        { french: "Papa a un vélo.", chunks: ["Papa", "a", "un", "vélo."], english: "Dad has a bike.", phonetic: "/pah-pah ah uhn vay-loh/", icon: "🚲" },
+        { french: "Maman aime la pomme.", chunks: ["Maman", "aime", "la", "pomme."], english: "Mom likes the apple.", phonetic: "/mah-mahn em lah pom/", icon: "🍎" },
+        { french: "Le soleil est jaune.", chunks: ["Le", "soleil", "est", "jaune."], english: "The sun is yellow.", phonetic: "/luh soh-lay ay zhohn/", icon: "☀️" },
+        { french: "Je vois la lune.", chunks: ["Je", "vois", "la", "lune."], english: "I see the moon.", phonetic: "/zhuh vwah lah loon/", icon: "🌙" },
+        { french: "Le bébé rit.", chunks: ["Le", "bébé", "rit."], english: "The baby laughs.", phonetic: "/luh bay-bay ree/", icon: "😄" }
       ]
     };
 
+    // Phonetic helper map for standalone Level 1 reading buttons (so "é" doesn't say "e accent aigu")
+    const readingChunkPhonics = {
+      "a": "ah",
+      "é": "hé",
+      "i": "i",
+      "o": "o",
+      "u": "u",
+      "b": "beu",
+      "l": "leuh",
+      "m": "meuh",
+      "p": "peu",
+      "r": "reuh",
+      "v": "veuh"
+    };
+
     // ==========================================
-    // 4. SPEECH SYNTHESIS & PHONETIC HELPERS
+    // 3. SPEECH SYNTHESIS (FRENCH VOICE)
     // ==========================================
     function initVoices() {
-      if (!('speechSynthesis' in window)) return;
+      if (!window.speechSynthesis) return;
       const load = () => {
         const voices = window.speechSynthesis.getVoices();
-        frenchVoice = voices.find(v => v.lang === 'fr-CA') ||
-                      voices.find(v => v.lang.startsWith('fr')) ||
+        frenchVoice = voices.find(v => v.lang === 'fr-FR' || v.lang === 'fr-CA') ||
+                      voices.find(v => v.lang && v.lang.toLowerCase().startsWith('fr')) ||
                       null;
       };
       load();
       window.speechSynthesis.onvoiceschanged = load;
     }
 
-    // Phonetic map for single letters/syllables in Level 1 Reading so 'é' doesn't say "e accent aigu"
-    const readingChunkPhonics = {
-      'a': 'ah',
-      'é': 'hé',
-      'e': 'euh',
-      'i': 'ee',
-      'o': 'oh',
-      'u': 'u',
-      'b': 'beu',
-      'f': 'feuh',
-      'l': 'leuh',
-      'm': 'meuh',
-      'p': 'peu',
-      'r': 'reuh',
-      's': 'seuh',
-      'v': 'veuh'
-    };
-
     function speakText(textToSpeak) {
-      if (!('speechSynthesis' in window) || !textToSpeak) return;
+      if (!window.speechSynthesis || !textToSpeak) return;
       try {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        if (frenchVoice) {
+          utterance.voice = frenchVoice;
+        }
         utterance.lang = 'fr-FR';
-        if (frenchVoice) utterance.voice = frenchVoice;
         utterance.rate = speechRate;
-        utterance.pitch = 1.05;
+        utterance.pitch = 1.08;
         window.speechSynthesis.speak(utterance);
-      } catch (err) {
-        console.warn("Speech synthesis unavailable:", err);
+      } catch (e) {
+        console.warn("Speech synthesis unavailable:", e);
       }
     }
 
     function speakCurrentItem() {
+      if (currentView !== 'module' || !activeDataset.length) return;
       const item = activeDataset[currentIndex];
       if (!item) return;
 
       if (currentModule === 'alphabet') {
         if (alphabetSoundMode === 'phonic') {
-          if (item.silent) return; // Silent 'H' makes no sound in phonic mode
+          if (item.silent || !item.soundSpeak) return; // Silent 'h' makes no sound
           speakText(item.soundSpeak);
         } else {
-          speakText(item.nameSpeak);
+          speakText(item.letter.toLowerCase());
         }
         return;
       }
@@ -600,102 +580,106 @@
     }
 
     // ==========================================
-    // 5. CASE FORMATTING HELPER
+    // 4. CASE FORMATTING HELPER
     // ==========================================
-    function formatTextByCase(text, isSingleAlphabetLetter = false) {
+    function formatTextByCase(text, isSingleLetter = false) {
       if (!text) return "";
-      if (isSingleAlphabetLetter) {
-        const up = text.toUpperCase();
-        const low = text.toLowerCase();
-        if (letterCaseMode === 'upper') return up;
-        if (letterCaseMode === 'both') return `${up} ${low}`;
-        return low;
+      if (isSingleLetter) {
+        if (letterCaseMode === 'lower') return text.toLowerCase();
+        if (letterCaseMode === 'upper') return text.toUpperCase();
+        return `${text.toUpperCase()} ${text.toLowerCase()}`;
       }
-
-      if (letterCaseMode === 'upper') {
-        return text.toUpperCase();
-      } else if (letterCaseMode === 'both') {
-        // Title Case (capitalize first letter, lowercase rest)
-        return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-      } else {
-        return text.toLowerCase();
-      }
+      if (letterCaseMode === 'lower') return text.toLowerCase();
+      if (letterCaseMode === 'upper') return text.toUpperCase();
+      // 'both' -> Title Case (capitalize first character)
+      return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
     }
 
     // ==========================================
-    // 6. NAVIGATION & RENDERING
+    // 5. NAVIGATION & MODULE SELECTION
     // ==========================================
     function goHome() {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
       currentView = 'home';
       currentModule = null;
-      document.getElementById('learnSection').classList.add('hidden');
+
       document.getElementById('homeSection').classList.remove('hidden');
-      document.getElementById('headerTitle').textContent = "Apprendre le Français";
-      document.getElementById('headerSubtitle').textContent = "Tap a module to start learning!";
+      document.getElementById('learnSection').classList.add('hidden');
+      document.getElementById('headerTitle').textContent = 'Apprendre le Français';
+      document.getElementById('headerSubtitle').textContent = 'Tap a module to start learning!';
     }
 
-    function updateNumberDataset() {
-      activeDataset = numberRangeMode === '1-10'
-        ? allNumbersDataset.slice(0, 10)
-        : allNumbersDataset.slice(0, 20);
-      document.getElementById('homeNumbersSub').textContent = `Numbers ${numberRangeMode}`;
-      if (currentModule === 'numbers') {
-        document.getElementById('headerSubtitle').textContent = `French Numbers (${numberRangeMode})`;
-      }
-    }
-
-    function updateReadingDataset() {
-      activeDataset = readingDatasets[readingLevel] || readingDatasets[1];
-      if (currentModule === 'reading') {
-        const subMap = {
-          1: "Level 1: Syllables",
-          2: "Level 2: Easy Words",
-          3: "Level 3: Short Sentences"
-        };
-        document.getElementById('headerSubtitle').textContent = subMap[readingLevel];
-      }
-    }
-
-    function selectModule(moduleKey) {
+    function selectModule(mod) {
+      currentModule = mod;
       currentView = 'module';
-      currentModule = moduleKey;
       currentIndex = 0;
+
+      buildActiveDataset();
 
       document.getElementById('homeSection').classList.add('hidden');
       document.getElementById('learnSection').classList.remove('hidden');
 
-      const titles = {
-        colors: { title: "Couleurs", sub: "French Colors" },
-        vocab: { title: "Vocabulaire", sub: "French Vocabulary (A–Z)" },
-        days: { title: "Jours de la Semaine", sub: "Days of the Week" },
-        numbers: { title: "Nombres", sub: `French Numbers (${numberRangeMode})` },
-        alphabet: { title: "Alphabet", sub: "French Alphabet (A–Z)" },
-        seasons: { title: "Les Quatre Saisons", sub: "The Four Seasons" },
-        greetings: { title: "Salutations", sub: "French Greetings & Polite Words" },
-        reading: { title: "Je Lis (Reading)", sub: readingLevel === 1 ? "Level 1: Syllables" : readingLevel === 2 ? "Level 2: Easy Words" : "Level 3: Short Sentences" }
-      };
-
-      document.getElementById('headerTitle').textContent = titles[moduleKey].title;
-      document.getElementById('headerSubtitle').textContent = titles[moduleKey].sub;
-
-      if (moduleKey === 'colors') activeDataset = colorsDataset;
-      else if (moduleKey === 'vocab') activeDataset = vocabDataset;
-      else if (moduleKey === 'days') activeDataset = daysDataset;
-      else if (moduleKey === 'numbers') updateNumberDataset();
-      else if (moduleKey === 'alphabet') activeDataset = alphabetDataset;
-      else if (moduleKey === 'seasons') activeDataset = seasonsDataset;
-      else if (moduleKey === 'greetings') activeDataset = greetingsDataset;
-      else if (moduleKey === 'reading') updateReadingDataset();
-
+      updateHeaderForModule();
       updateDisplay(autoPlayAudio);
     }
 
+    function buildActiveDataset() {
+      if (currentModule === 'colors') activeDataset = colorsDataset;
+      else if (currentModule === 'vocab') activeDataset = vocabDataset;
+      else if (currentModule === 'days') activeDataset = daysDataset;
+      else if (currentModule === 'numbers') {
+        const limit = numberRangeMode === '1-20' ? 20 : 10;
+        activeDataset = numbersDataset.slice(0, limit);
+      } else if (currentModule === 'alphabet') activeDataset = alphabetDataset;
+      else if (currentModule === 'seasons') activeDataset = seasonsDataset;
+      else if (currentModule === 'greetings') activeDataset = greetingsDataset;
+      else if (currentModule === 'reading') activeDataset = readingDataset[readingLevel] || readingDataset[1];
+    }
+
+    function updateHeaderForModule() {
+      const titles = {
+        colors: ['Les Couleurs', 'Colors in French'],
+        vocab: ['Le Vocabulaire', 'Words A to Z'],
+        days: ['Les Jours', 'Days of the Week'],
+        numbers: ['Les Nombres', `Numbers ${numberRangeMode}`],
+        alphabet: ["L'Alphabet", alphabetSoundMode === 'phonic' ? 'Phonic Sounds' : 'Letter Names'],
+        seasons: ['Les Saisons', 'The 4 Seasons'],
+        greetings: ['Les Salutations', 'Greetings & Polite Words'],
+        reading: ['Je Lis (Reading)', `Level ${readingLevel}: ${readingLevel === 1 ? 'Syllables' : readingLevel === 2 ? 'Words' : 'Sentences'}`]
+      };
+      const pair = titles[currentModule] || ['Apprendre le Français', ''];
+      document.getElementById('headerTitle').textContent = pair[0];
+      document.getElementById('headerSubtitle').textContent = pair[1];
+    }
+
+    function prevCard() {
+      if (!activeDataset.length) return;
+      currentIndex = (currentIndex - 1 + activeDataset.length) % activeDataset.length;
+      updateDisplay(autoPlayAudio);
+    }
+
+    function nextCard() {
+      if (!activeDataset.length) return;
+      currentIndex = (currentIndex + 1) % activeDataset.length;
+      updateDisplay(autoPlayAudio);
+    }
+
+    function randomCard() {
+      if (activeDataset.length <= 1) return;
+      let nextIdx = currentIndex;
+      while (nextIdx === currentIndex) {
+        nextIdx = Math.floor(Math.random() * activeDataset.length);
+      }
+      currentIndex = nextIdx;
+      updateDisplay(autoPlayAudio);
+    }
+
+    // ==========================================
+    // 6. FLASHCARD RENDERING
+    // ==========================================
     function updateDisplay(shouldSpeak = false) {
+      if (!activeDataset.length) return;
       const item = activeDataset[currentIndex];
-      if (!item) return;
 
       const card = document.getElementById('flashcard');
       const visualContainer = document.getElementById('cardVisualContainer');
@@ -710,124 +694,136 @@
       void card.offsetWidth;
       card.classList.add('animate-pop');
 
+      // Show or hide helper box based on user setting
+      helperBox.classList.toggle('hidden', !showHelper);
+
       // Reset containers
       visualContainer.innerHTML = '';
-      visualContainer.classList.add('hidden');
+      visualContainer.className = 'mb-3 flex items-center justify-center';
       readingBreakdown.innerHTML = '';
       readingBreakdown.classList.add('hidden');
 
-      const isFullColorCard = (currentModule === 'colors' || currentModule === 'seasons');
+      // Default Storybook Card Styling (Light Cream Ink)
+      card.className = 'w-full max-w-md min-h-[23rem] sm:min-h-[26rem] rounded-3xl border-8 storybook-shadow transition-all duration-200 transform active:scale-98 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden animate-pop bg-[#FFFDF9] border-amber-300 text-slate-800';
+      helperBox.className = 'px-5 py-3 rounded-2xl border-2 mt-1 max-w-full bg-amber-50 border-amber-200 text-slate-800';
+      englishText.className = 'text-xl sm:text-3xl font-bold text-slate-800';
+      phoneticText.className = 'text-sm sm:text-base font-semibold italic mt-0.5 text-slate-600';
 
-      if (isFullColorCard) {
-        // FULL-SCREEN COLORFUL BACKGROUND FOR COLORS & SEASONS
-        card.style.backgroundColor = item.hex;
-        card.style.borderColor = item.hex === '#FFFFFF' ? '#CBD5E1' : '#FFFFFF';
+      if (currentModule === 'colors') {
+        card.className = `w-full max-w-md min-h-[23rem] sm:min-h-[26rem] rounded-3xl border-8 storybook-shadow transition-all duration-200 transform active:scale-98 cursor-pointer relative flex flex-col items-center justify-center p-6 text-center overflow-hidden animate-pop ${item.bg} ${item.border} ${item.text}`;
+        helperBox.className = `px-5 py-3 rounded-2xl border-2 mt-1 max-w-full ${item.helperBg}`;
+        englishText.className = 'text-xl sm:text-3xl font-bold';
+        phoneticText.className = 'text-sm sm:text-base font-semibold italic mt-0.5 opacity-90';
 
-        const useDarkText = item.textDark === true;
-        primaryText.className = `text-5xl sm:text-6xl font-black tracking-wide leading-tight mb-4 ${useDarkText ? 'text-slate-800' : 'text-white drop-shadow'}`;
+        primaryText.className = 'text-5xl sm:text-7xl font-black tracking-wide leading-tight mb-4';
         primaryText.textContent = formatTextByCase(item.french);
+        englishText.textContent = item.english;
+        phoneticText.textContent = item.phonetic;
 
-        if (item.svg) {
-          visualContainer.innerHTML = item.svg;
-          visualContainer.classList.remove('hidden');
+      } else if (currentModule === 'numbers') {
+        card.classList.replace('border-amber-300', 'border-emerald-400');
+        helperBox.className = 'px-5 py-3 rounded-2xl border-2 mt-1 max-w-full bg-emerald-50 border-emerald-200 text-emerald-950';
+
+        const digitDiv = document.createElement('div');
+        digitDiv.className = 'text-7xl sm:text-8xl font-black text-emerald-600 leading-none mb-1';
+        digitDiv.textContent = item.num;
+        visualContainer.appendChild(digitDiv);
+
+        primaryText.className = 'text-4xl sm:text-6xl font-black tracking-wide text-slate-800 mb-3';
+        primaryText.textContent = formatTextByCase(item.french);
+        englishText.textContent = item.english;
+        phoneticText.textContent = item.phonetic;
+
+      } else if (currentModule === 'alphabet') {
+        card.classList.replace('border-amber-300', 'border-purple-400');
+        helperBox.className = 'px-5 py-3 rounded-2xl border-2 mt-1 max-w-full bg-purple-50 border-purple-200 text-purple-950';
+
+        // Match exact giant font scale (text-7xl sm:text-8xl) of Numbers
+        primaryText.className = 'text-7xl sm:text-8xl font-black tracking-wide text-purple-700 leading-none mb-4';
+        primaryText.textContent = formatTextByCase(item.letter, true);
+
+        const formattedEx = formatTextByCase(item.exampleFr);
+        if (alphabetSoundMode === 'phonic') {
+          englishText.textContent = item.silent ? '🤫 Silent (no sound!)' : `Sound: ${item.soundPhonetic}`;
+          phoneticText.textContent = `${formattedEx} (${item.exampleEn})`;
+        } else {
+          englishText.textContent = `Name: "${item.namePhonetic}"`;
+          phoneticText.textContent = `${formattedEx} (${item.exampleEn})`;
         }
 
-        helperBox.style.backgroundColor = useDarkText ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255, 255, 255, 0.22)';
-        helperBox.style.borderColor = useDarkText ? 'rgba(15, 23, 42, 0.15)' : 'rgba(255, 255, 255, 0.45)';
-        englishText.className = `text-xl sm:text-3xl font-bold ${useDarkText ? 'text-slate-800' : 'text-white'}`;
-        phoneticText.className = `text-sm sm:text-base font-semibold italic mt-0.5 ${useDarkText ? 'text-slate-600' : 'text-white/90'}`;
+      } else if (currentModule === 'reading') {
+        card.classList.replace('border-amber-300', 'border-cyan-400');
+        helperBox.className = 'px-5 py-3 rounded-2xl border-2 mt-1 max-w-full bg-cyan-50 border-cyan-200 text-cyan-950';
+
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'text-5xl sm:text-6xl filter drop-shadow-sm';
+        iconDiv.textContent = item.icon;
+        visualContainer.appendChild(iconDiv);
+
+        primaryText.className = readingLevel === 3
+          ? 'text-3xl sm:text-4xl font-black tracking-wide text-slate-800 mb-3'
+          : 'text-5xl sm:text-6xl font-black tracking-wide text-slate-800 mb-3';
+        primaryText.textContent = formatTextByCase(item.french);
+
+        // Render interactive syllable/word pills
+        if (item.chunks && item.chunks.length > 0) {
+          readingBreakdown.classList.remove('hidden');
+          item.chunks.forEach((chunk, idx) => {
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'px-3.5 py-1.5 rounded-xl bg-cyan-100 hover:bg-cyan-200 active:scale-95 text-cyan-900 font-black text-lg sm:text-xl border-2 border-cyan-300 shadow-sm transition';
+            pill.textContent = letterCaseMode === 'upper' ? chunk.toUpperCase() : chunk.toLowerCase();
+            pill.onclick = (e) => {
+              e.stopPropagation();
+              const cleanKey = chunk.toLowerCase().replace(/[.!?]/g, '');
+              const speakVal = (readingLevel === 1 && readingChunkPhonics[cleanKey])
+                ? readingChunkPhonics[cleanKey]
+                : chunk;
+              speakText(speakVal);
+            };
+            readingBreakdown.appendChild(pill);
+
+            if (readingLevel === 1 && idx < item.chunks.length - 1) {
+              const plus = document.createElement('span');
+              plus.className = 'text-xl font-black text-cyan-500';
+              plus.textContent = '+';
+              readingBreakdown.appendChild(plus);
+            }
+          });
+        }
+
         englishText.textContent = item.english;
         phoneticText.textContent = item.phonetic;
 
       } else {
-        // STORYBOOK CARD STYLE (Warm Ivory Background + Dynamic Colored Border)
-        const borderHex = item.hex || '#38BDF8';
-        card.style.backgroundColor = '#FFFDF9';
-        card.style.borderColor = borderHex;
+        // Vocab, Days, Seasons, Greetings
+        const borderMap = {
+          vocab: 'border-sky-400',
+          days: 'border-amber-400',
+          seasons: 'border-pink-400',
+          greetings: 'border-indigo-400'
+        };
+        const helperMap = {
+          vocab: 'bg-sky-50 border-sky-200 text-sky-950',
+          days: 'bg-amber-50 border-amber-200 text-amber-950',
+          seasons: 'bg-pink-50 border-pink-200 text-pink-950',
+          greetings: 'bg-indigo-50 border-indigo-200 text-indigo-950'
+        };
 
-        helperBox.style.backgroundColor = `${borderHex}14`;
-        helperBox.style.borderColor = `${borderHex}45`;
-        englishText.className = 'text-xl sm:text-3xl font-bold text-slate-800';
-        phoneticText.className = 'text-sm sm:text-base font-semibold italic mt-0.5 text-slate-600';
+        card.classList.replace('border-amber-300', borderMap[currentModule] || 'border-sky-400');
+        helperBox.className = `px-5 py-3 rounded-2xl border-2 mt-1 max-w-full ${helperMap[currentModule] || 'bg-sky-50 border-sky-200 text-sky-950'}`;
 
-        if (currentModule === 'numbers') {
-          // Big Digit + French Word in Helper Box
-          primaryText.className = 'text-7xl sm:text-8xl font-black tracking-wide leading-none mb-4 text-slate-800';
-          primaryText.textContent = item.digit;
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'text-6xl sm:text-7xl filter drop-shadow-sm';
+        iconDiv.textContent = item.icon;
+        visualContainer.appendChild(iconDiv);
 
-          englishText.textContent = `${formatTextByCase(item.french)} (${item.english})`;
-          phoneticText.textContent = item.phonetic;
-
-        } else if (currentModule === 'alphabet') {
-          // Matching Giant Letter Size (text-7xl sm:text-8xl)
-          primaryText.className = 'text-7xl sm:text-8xl font-black tracking-wide leading-none mb-4 text-slate-800';
-          primaryText.textContent = formatTextByCase(item.letter, true);
-
-          if (alphabetSoundMode === 'phonic') {
-            englishText.textContent = item.silent ? `🤫 ${item.soundDisplay}` : `Sound: ${item.soundDisplay}`;
-            phoneticText.textContent = `${formatTextByCase(item.soundHint.split(' (')[0])} (${item.soundHint.split(' (')[1]}`;
-          } else {
-            englishText.textContent = `Letter ${item.letter}`;
-            phoneticText.textContent = item.namePhonetic;
-          }
-
-        } else if (currentModule === 'reading') {
-          if (item.icon) {
-            visualContainer.innerHTML = `<span class="text-6xl sm:text-7xl filter drop-shadow-sm">${item.icon}</span>`;
-            visualContainer.classList.remove('hidden');
-          }
-
-          primaryText.className = readingLevel === 3
-            ? 'text-3xl sm:text-4xl font-black tracking-wide leading-snug mb-3 text-slate-800'
-            : 'text-5xl sm:text-6xl font-black tracking-wide leading-tight mb-3 text-slate-800';
-          primaryText.textContent = formatTextByCase(item.french);
-
-          // Interactive Syllable/Letter Pills for Level 1 & Level 2
-          if (item.parts && item.parts.length > 0) {
-            readingBreakdown.classList.remove('hidden');
-            item.parts.forEach((part, idx) => {
-              const btn = document.createElement('button');
-              btn.type = 'button';
-              btn.className = 'px-4 py-2 rounded-2xl bg-white border-2 border-slate-300 hover:border-cyan-500 shadow-sm text-2xl sm:text-3xl font-black text-slate-800 active:scale-90 transition';
-              btn.textContent = formatTextByCase(part);
-              btn.onclick = (e) => {
-                e.stopPropagation();
-                const lowerPart = part.toLowerCase();
-                const speakChunk = (readingLevel === 1 && readingChunkPhonics[lowerPart])
-                  ? readingChunkPhonics[lowerPart]
-                  : part;
-                speakText(speakChunk);
-              };
-              readingBreakdown.appendChild(btn);
-
-              if (readingLevel === 1 && idx < item.parts.length - 1) {
-                const plus = document.createElement('span');
-                plus.className = 'text-xl sm:text-2xl font-black text-slate-400';
-                plus.textContent = '+';
-                readingBreakdown.appendChild(plus);
-              }
-            });
-          }
-
-          englishText.textContent = item.english;
-          phoneticText.textContent = item.phonetic;
-
-        } else {
-          // Vocabulaire, Jours, Salutations
-          if (item.icon) {
-            visualContainer.innerHTML = `<span class="text-7xl sm:text-8xl filter drop-shadow-sm">${item.icon}</span>`;
-            visualContainer.classList.remove('hidden');
-          }
-
-          const isLongPhrase = item.french.length > 12;
-          primaryText.className = isLongPhrase
-            ? 'text-3xl sm:text-5xl font-black tracking-wide leading-tight mb-4 text-slate-800'
-            : 'text-5xl sm:text-6xl font-black tracking-wide leading-tight mb-4 text-slate-800';
-          primaryText.textContent = formatTextByCase(item.french);
-
-          englishText.textContent = item.english;
-          phoneticText.textContent = item.phonetic;
-        }
+        primaryText.className = item.french.length > 12
+          ? 'text-3xl sm:text-5xl font-black tracking-wide text-slate-800 mb-3'
+          : 'text-4xl sm:text-6xl font-black tracking-wide text-slate-800 mb-3';
+        primaryText.textContent = formatTextByCase(item.french);
+        englishText.textContent = item.english;
+        phoneticText.textContent = item.phonetic;
       }
 
       if (shouldSpeak) {
@@ -835,42 +831,11 @@
       }
     }
 
-    function nextCard() {
-      if (!activeDataset.length) return;
-      currentIndex = (currentIndex + 1) % activeDataset.length;
-      updateDisplay(autoPlayAudio);
-    }
-
-    function prevCard() {
-      if (!activeDataset.length) return;
-      currentIndex = (currentIndex - 1 + activeDataset.length) % activeDataset.length;
-      updateDisplay(autoPlayAudio);
-    }
-
-    function randomCard() {
-      if (activeDataset.length <= 1) {
-        updateDisplay(autoPlayAudio);
-        return;
-      }
-      let nextIdx = currentIndex;
-      while (nextIdx === currentIndex) {
-        nextIdx = Math.floor(Math.random() * activeDataset.length);
-      }
-      currentIndex = nextIdx;
-      updateDisplay(autoPlayAudio);
-    }
-
     // ==========================================
-    // 7. SETTINGS MODAL CONTROLS
+    // 7. SETTINGS MODAL & CONTROLS
     // ==========================================
     function openSettings() {
       pendingSpeakOnClose = false;
-
-      // Show module-specific groups only when inside that module
-      document.getElementById('settingNumbersGroup').classList.toggle('hidden', currentModule !== 'numbers');
-      document.getElementById('settingAlphabetGroup').classList.toggle('hidden', currentModule !== 'alphabet');
-      document.getElementById('settingReadingGroup').classList.toggle('hidden', currentModule !== 'reading');
-
       syncSettingsUI();
       document.getElementById('settingsModal').classList.remove('hidden');
     }
@@ -884,37 +849,38 @@
     }
 
     function syncSettingsUI() {
-      const activeClasses = ['bg-amber-400', 'border-amber-600', 'text-slate-900'];
-      const inactiveClasses = ['bg-white', 'border-slate-200', 'text-slate-600'];
+      // Show/Hide module-specific groups
+      document.getElementById('settingNumbersGroup').classList.toggle('hidden', currentModule !== 'numbers');
+      document.getElementById('settingAlphabetGroup').classList.toggle('hidden', currentModule !== 'alphabet');
+      document.getElementById('settingReadingGroup').classList.toggle('hidden', currentModule !== 'reading');
 
-      const applyToggleStyle = (elId, isActive) => {
-        const el = document.getElementById(elId);
-        if (!el) return;
-        el.classList.remove(...activeClasses, ...inactiveClasses);
-        el.classList.add(...(isActive ? activeClasses : inactiveClasses));
-      };
+      // Update Home Tile Subtitle
+      document.getElementById('homeNumbersSub').textContent = `Numbers ${numberRangeMode}`;
 
-      // Letter Case
-      applyToggleStyle('btnCaseLower', letterCaseMode === 'lower');
-      applyToggleStyle('btnCaseUpper', letterCaseMode === 'upper');
-      applyToggleStyle('btnCaseBoth', letterCaseMode === 'both');
+      const activeClass = 'bg-amber-400 border-amber-500 text-slate-900 shadow-sm';
+      const inactiveClass = 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50';
 
-      // Voice Speed
-      applyToggleStyle('btnSpeedSlow', speechRate === 0.65);
-      applyToggleStyle('btnSpeedNormal', speechRate === 0.85);
+      // Numbers Range Buttons
+      document.getElementById('btnRange10').className = `py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition ${numberRangeMode === '1-10' ? activeClass : inactiveClass}`;
+      document.getElementById('btnRange20').className = `py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition ${numberRangeMode === '1-20' ? activeClass : inactiveClass}`;
 
-      // Numbers Range
-      applyToggleStyle('btnRange10', numberRangeMode === '1-10');
-      applyToggleStyle('btnRange20', numberRangeMode === '1-20');
+      // Alphabet Sound Buttons
+      document.getElementById('btnAlphaPhonic').className = `py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition ${alphabetSoundMode === 'phonic' ? activeClass : inactiveClass}`;
+      document.getElementById('btnAlphaName').className = `py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition ${alphabetSoundMode === 'name' ? activeClass : inactiveClass}`;
 
-      // Alphabet Sound Mode
-      applyToggleStyle('btnAlphaPhonic', alphabetSoundMode === 'phonic');
-      applyToggleStyle('btnAlphaName', alphabetSoundMode === 'name');
+      // Reading Level Buttons
+      document.getElementById('btnRead1').className = `py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition ${readingLevel === 1 ? activeClass : inactiveClass}`;
+      document.getElementById('btnRead2').className = `py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition ${readingLevel === 2 ? activeClass : inactiveClass}`;
+      document.getElementById('btnRead3').className = `py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition ${readingLevel === 3 ? activeClass : inactiveClass}`;
 
-      // Reading Level
-      applyToggleStyle('btnRead1', readingLevel === 1);
-      applyToggleStyle('btnRead2', readingLevel === 2);
-      applyToggleStyle('btnRead3', readingLevel === 3);
+      // Letter Case Buttons
+      document.getElementById('btnCaseLower').className = `py-2.5 px-3 rounded-xl font-black text-base border-2 transition ${letterCaseMode === 'lower' ? activeClass : inactiveClass}`;
+      document.getElementById('btnCaseUpper').className = `py-2.5 px-3 rounded-xl font-black text-base border-2 transition ${letterCaseMode === 'upper' ? activeClass : inactiveClass}`;
+      document.getElementById('btnCaseBoth').className = `py-2.5 px-3 rounded-xl font-black text-base border-2 transition ${letterCaseMode === 'both' ? activeClass : inactiveClass}`;
+
+      // Voice Speed Buttons
+      document.getElementById('btnSpeedSlow').className = `py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition ${speechRate === 0.65 ? activeClass : inactiveClass}`;
+      document.getElementById('btnSpeedNormal').className = `py-2.5 px-3 rounded-xl font-bold text-sm border-2 transition ${speechRate === 0.85 ? activeClass : inactiveClass}`;
 
       // Auto-Play Toggle
       const autoBtn = document.getElementById('btnAutoPlay');
@@ -928,6 +894,21 @@
         autoBtn.classList.add('bg-slate-300');
         autoKnob.classList.remove('translate-x-6');
       }
+
+      // Show English & Phonetic Helper Toggle
+      const helperBtn = document.getElementById('btnShowHelper');
+      const helperKnob = document.getElementById('showHelperKnob');
+      if (helperBtn && helperKnob) {
+        if (showHelper) {
+          helperBtn.classList.remove('bg-slate-300');
+          helperBtn.classList.add('bg-emerald-500');
+          helperKnob.classList.add('translate-x-6');
+        } else {
+          helperBtn.classList.remove('bg-emerald-500');
+          helperBtn.classList.add('bg-slate-300');
+          helperKnob.classList.remove('translate-x-6');
+        }
+      }
     }
 
     function setLetterCase(mode) {
@@ -935,6 +916,40 @@
       syncSettingsUI();
       if (currentView === 'module') {
         updateDisplay(false);
+      }
+    }
+
+    function setNumberRange(range) {
+      numberRangeMode = range;
+      syncSettingsUI();
+      if (currentModule === 'numbers') {
+        buildActiveDataset();
+        if (currentIndex >= activeDataset.length) currentIndex = 0;
+        updateHeaderForModule();
+        updateDisplay(false);
+        pendingSpeakOnClose = true;
+      }
+    }
+
+    function setAlphabetMode(mode) {
+      alphabetSoundMode = mode;
+      syncSettingsUI();
+      if (currentModule === 'alphabet') {
+        updateHeaderForModule();
+        updateDisplay(false);
+        pendingSpeakOnClose = true;
+      }
+    }
+
+    function setReadingLevel(lvl) {
+      readingLevel = lvl;
+      syncSettingsUI();
+      if (currentModule === 'reading') {
+        buildActiveDataset();
+        currentIndex = 0;
+        updateHeaderForModule();
+        updateDisplay(false);
+        pendingSpeakOnClose = true;
       }
     }
 
@@ -946,40 +961,17 @@
       }
     }
 
-    function setNumberRange(range) {
-      numberRangeMode = range;
-      currentIndex = 0;
-      updateNumberDataset();
-      syncSettingsUI();
-      if (currentModule === 'numbers') {
-        updateDisplay(false);
-        pendingSpeakOnClose = true;
-      }
-    }
-
-    function setAlphabetMode(mode) {
-      alphabetSoundMode = mode;
-      syncSettingsUI();
-      if (currentModule === 'alphabet') {
-        updateDisplay(false);
-        pendingSpeakOnClose = true;
-      }
-    }
-
-    function setReadingLevel(level) {
-      readingLevel = level;
-      currentIndex = 0;
-      updateReadingDataset();
-      syncSettingsUI();
-      if (currentModule === 'reading') {
-        updateDisplay(false);
-        pendingSpeakOnClose = true;
-      }
-    }
-
     function toggleAutoPlay() {
       autoPlayAudio = !autoPlayAudio;
       syncSettingsUI();
+    }
+
+    function toggleShowHelper() {
+      showHelper = !showHelper;
+      syncSettingsUI();
+      if (currentView === 'module') {
+        updateDisplay(false);
+      }
     }
 
     // Initialize voices on load
