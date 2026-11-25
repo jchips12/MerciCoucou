@@ -241,18 +241,22 @@
         <label class="block text-sm font-black text-cyan-900 uppercase tracking-wide">
           📖 Reading Level
         </label>
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-2 gap-2">
           <button id="btnRead1" onclick="setReadingLevel(1)"
                   class="py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition">
             Lvl 1: Syllables
           </button>
           <button id="btnRead2" onclick="setReadingLevel(2)"
                   class="py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition">
-            Lvl 2: Words
+            Lvl 2: Patterns & Clues
           </button>
           <button id="btnRead3" onclick="setReadingLevel(3)"
                   class="py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition">
-            Lvl 3: Sentences
+            Lvl 3: Words
+          </button>
+          <button id="btnRead4" onclick="setReadingLevel(4)"
+                  class="py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition">
+            Lvl 4: Sentences
           </button>
         </div>
       </div>
@@ -432,31 +436,31 @@
 
     const alphabetDataset = [
       { letter: "A", namePhonetic: "ah", soundPhonetic: '"ah"', soundSpeak: "ah", exampleFr: "abeille", exampleEn: "bee" },
-      { letter: "B", namePhonetic: "bay", soundPhonetic: '"buh"', soundSpeak: "beu", exampleFr: "ballon", exampleEn: "ball" },
+      { letter: "B", namePhonetic: "bay", soundPhonetic: '"buh"', soundSpeak: "be", exampleFr: "ballon", exampleEn: "ball" },
       { letter: "C", namePhonetic: "say", soundPhonetic: '"kuh"', soundSpeak: "keu", exampleFr: "carotte", exampleEn: "carrot" },
       { letter: "D", namePhonetic: "day", soundPhonetic: '"duh"', soundSpeak: "de", exampleFr: "dinosaure", exampleEn: "dinosaur" },
       { letter: "E", namePhonetic: "uh", soundPhonetic: '"uh"', soundSpeak: "euh", exampleFr: "cheval", exampleEn: "horse" },
-      { letter: "F", namePhonetic: "ef", soundPhonetic: '"fff"', soundSpeak: "feuh", exampleFr: "fleur", exampleEn: "flower" },
-      { letter: "G", namePhonetic: "zhay", soundPhonetic: '"guh"', soundSpeak: "gueu", exampleFr: "guitare", exampleEn: "guitar" },
+      { letter: "F", namePhonetic: "ef", soundPhonetic: '"fff"', soundSpeak: "fe", exampleFr: "fleur", exampleEn: "flower" },
+      { letter: "G", namePhonetic: "zhay", soundPhonetic: '"guh"', soundSpeak: "gue", exampleFr: "guitare", exampleEn: "guitar" },
       { letter: "H", namePhonetic: "ash", soundPhonetic: "Silent (no sound!)", soundSpeak: "", silent: true, exampleFr: "hibou", exampleEn: "owl" },
       { letter: "I", namePhonetic: "ee", soundPhonetic: '"ee"', soundSpeak: "i", exampleFr: "igloo", exampleEn: "igloo" },
-      { letter: "J", namePhonetic: "zhee", soundPhonetic: '"zhuh"', soundSpeak: "jeu", exampleFr: "jardin", exampleEn: "garden" },
+      { letter: "J", namePhonetic: "zhee", soundPhonetic: '"zhuh"', soundSpeak: "je", exampleFr: "jardin", exampleEn: "garden" },
       { letter: "K", namePhonetic: "kah", soundPhonetic: '"kuh"', soundSpeak: "keu", exampleFr: "kangourou", exampleEn: "kangaroo" },
-      { letter: "L", namePhonetic: "el", soundPhonetic: '"lll"', soundSpeak: "leuh", exampleFr: "lapin", exampleEn: "rabbit" },
-      { letter: "M", namePhonetic: "em", soundPhonetic: '"mmm"', soundSpeak: "meuh", exampleFr: "maman", exampleEn: "mom" },
-      { letter: "N", namePhonetic: "en", soundPhonetic: '"nnn"', soundSpeak: "neuh", exampleFr: "nuage", exampleEn: "cloud" },
+      { letter: "L", namePhonetic: "el", soundPhonetic: '"lll"', soundSpeak: "le", exampleFr: "lapin", exampleEn: "rabbit" },
+      { letter: "M", namePhonetic: "em", soundPhonetic: '"mmm"', soundSpeak: "me", exampleFr: "maman", exampleEn: "mom" },
+      { letter: "N", namePhonetic: "en", soundPhonetic: '"nnn"', soundSpeak: "ne", exampleFr: "nuage", exampleEn: "cloud" },
       { letter: "O", namePhonetic: "oh", soundPhonetic: '"oh"', soundSpeak: "o", exampleFr: "orange", exampleEn: "orange" },
-      { letter: "P", namePhonetic: "pay", soundPhonetic: '"puh"', soundSpeak: "peu", exampleFr: "panda", exampleEn: "panda" },
+      { letter: "P", namePhonetic: "pay", soundPhonetic: '"puh"', soundSpeak: "pe", exampleFr: "panda", exampleEn: "panda" },
       { letter: "Q", namePhonetic: "koo", soundPhonetic: '"kuh"', soundSpeak: "keu", exampleFr: "quiche", exampleEn: "quiche" },
-      { letter: "R", namePhonetic: "air", soundPhonetic: '"rrr"', soundSpeak: "reuh", exampleFr: "robot", exampleEn: "robot" },
-      { letter: "S", namePhonetic: "ess", soundPhonetic: '"sss"', soundSpeak: "seuh", exampleFr: "serpent", exampleEn: "snake" },
+      { letter: "R", namePhonetic: "air", soundPhonetic: '"rrr"', soundSpeak: "re", exampleFr: "robot", exampleEn: "robot" },
+      { letter: "S", namePhonetic: "ess", soundPhonetic: '"sss"', soundSpeak: "se", exampleFr: "serpent", exampleEn: "snake" },
       { letter: "T", namePhonetic: "tay", soundPhonetic: '"tuh"', soundSpeak: "te", exampleFr: "tortue", exampleEn: "turtle" },
       { letter: "U", namePhonetic: "oo", soundPhonetic: '"ew"', soundSpeak: "u", exampleFr: "usine", exampleEn: "factory" },
-      { letter: "V", namePhonetic: "vay", soundPhonetic: '"vvv"', soundSpeak: "veuh", exampleFr: "vélo", exampleEn: "bike" },
+      { letter: "V", namePhonetic: "vay", soundPhonetic: '"vvv"', soundSpeak: "ve", exampleFr: "vélo", exampleEn: "bike" },
       { letter: "W", namePhonetic: "doo-bluh-vay", soundPhonetic: '"wuh"', soundSpeak: "wouah", exampleFr: "wapiti", exampleEn: "elk" },
-      { letter: "X", namePhonetic: "eeks", soundPhonetic: '"ks"', soundSpeak: "kseuh", exampleFr: "xylophone", exampleEn: "xylophone" },
-      { letter: "Y", namePhonetic: "ee-grek", soundPhonetic: '"yuh"', soundSpeak: "yeuh", exampleFr: "yaourt", exampleEn: "yogurt" },
-      { letter: "Z", namePhonetic: "zed", soundPhonetic: '"zzz"', soundSpeak: "zeuh", exampleFr: "zèbre", exampleEn: "zebra" }
+      { letter: "X", namePhonetic: "eeks", soundPhonetic: '"ks"', soundSpeak: "kse", exampleFr: "xylophone", exampleEn: "xylophone" },
+      { letter: "Y", namePhonetic: "ee-grek", soundPhonetic: '"yuh"', soundSpeak: "ye", exampleFr: "yaourt", exampleEn: "yogurt" },
+      { letter: "Z", namePhonetic: "zed", soundPhonetic: '"zzz"', soundSpeak: "ze", exampleFr: "zèbre", exampleEn: "zebra" }
     ];
 
     const seasonsDataset = [
@@ -482,6 +486,7 @@
     ];
 
     const readingDataset = {
+      // Level 1: Original Syllables (unchanged)
       1: [
         { french: "ma", chunks: ["m", "a"], english: "Syllable: m + a", phonetic: "/mah/", icon: "🔤" },
         { french: "pa", chunks: ["p", "a"], english: "Syllable: p + a", phonetic: "/pah/", icon: "🔤" },
@@ -494,7 +499,21 @@
         { french: "mo", chunks: ["m", "o"], english: "Syllable: m + o", phonetic: "/moh/", icon: "🔤" },
         { french: "lu", chunks: ["l", "u"], english: "Syllable: l + u", phonetic: "/loo/", icon: "🔤" }
       ],
+      // Level 2: Progressive Syllable Families + Anchor Picture Clues + Blend Sequence
       2: [
+        { french: "ma", chunks: ["m", "a"], english: "comme maman (mom)", phonetic: "/mah/", icon: "👩" },
+        { french: "mi", chunks: ["m", "i"], english: "comme midi (noon)", phonetic: "/mee/", icon: "🕛" },
+        { french: "mo", chunks: ["m", "o"], english: "comme moto (motorcycle)", phonetic: "/moh/", icon: "🏍️" },
+        { french: "la", chunks: ["l", "a"], english: "comme lapin (rabbit)", phonetic: "/lah/", icon: "🐰" },
+        { french: "lu", chunks: ["l", "u"], english: "comme lune (moon)", phonetic: "/loo/", icon: "🌙" },
+        { french: "vé", chunks: ["v", "é"], english: "comme vélo (bicycle)", phonetic: "/vay/", icon: "🚲" },
+        { french: "ba", chunks: ["b", "a"], english: "comme banane (banana)", phonetic: "/bah/", icon: "🍌" },
+        { french: "ro", chunks: ["r", "o"], english: "comme robot (robot)", phonetic: "/roh/", icon: "🤖" },
+        { french: "to", chunks: ["t", "o"], english: "comme tortue (turtle)", phonetic: "/toh/", icon: "🐢" },
+        { french: "pa", chunks: ["p", "a"], english: "comme papa (dad)", phonetic: "/pah/", icon: "👨" }
+      ],
+      // Level 3: Beginner Words (previously Level 2)
+      3: [
         { french: "papa", chunks: ["pa", "pa"], english: "Dad", phonetic: "/pah-pah/", icon: "👨" },
         { french: "maman", chunks: ["ma", "man"], english: "Mom", phonetic: "/mah-mahn/", icon: "👩" },
         { french: "bébé", chunks: ["bé", "bé"], english: "Baby", phonetic: "/bay-bay/", icon: "👶" },
@@ -504,7 +523,8 @@
         { french: "ami", chunks: ["a", "mi"], english: "Friend", phonetic: "/ah-mee/", icon: "🤝" },
         { french: "banane", chunks: ["ba", "na", "ne"], english: "Banana", phonetic: "/bah-nahn/", icon: "🍌" }
       ],
-      3: [
+      // Level 4: Starter Sentences (previously Level 3)
+      4: [
         { french: "Le chat dort.", chunks: ["Le", "chat", "dort."], english: "The cat sleeps.", phonetic: "/luh shah dor/", icon: "😴" },
         { french: "Papa a un vélo.", chunks: ["Papa", "a", "un", "vélo."], english: "Dad has a bike.", phonetic: "/pah-pah ah uhn vay-loh/", icon: "🚲" },
         { french: "Maman aime la pomme.", chunks: ["Maman", "aime", "la", "pomme."], english: "Mom likes the apple.", phonetic: "/mah-mahn em lah pom/", icon: "🍎" },
@@ -514,29 +534,32 @@
       ]
     };
 
-    // Phonetic helper map for standalone Level 1 reading buttons (so "é" doesn't say "e accent aigu")
+    // Phonetic helper map for standalone Level 1 & 2 reading letter buttons
     const readingChunkPhonics = {
       "a": "ah",
       "é": "hé",
       "i": "i",
       "o": "o",
       "u": "u",
-      "b": "beu",
-      "l": "leuh",
-      "m": "meuh",
-      "p": "peu",
-      "r": "reuh",
-      "v": "veuh"
+      "b": "be",
+      "l": "le",
+      "m": "me",
+      "p": "pe",
+      "r": "re",
+      "t": "te",
+      "v": "ve"
     };
 
     // ==========================================
-    // 3. SPEECH SYNTHESIS (FRENCH VOICE)
+    // 3. SPEECH SYNTHESIS (FRENCH CANADA PRIORITY)
     // ==========================================
     function initVoices() {
       if (!window.speechSynthesis) return;
       const load = () => {
         const voices = window.speechSynthesis.getVoices();
-        frenchVoice = voices.find(v => v.lang === 'fr-FR' || v.lang === 'fr-CA') ||
+        frenchVoice = voices.find(v => v.lang && v.lang.toLowerCase() === 'fr-ca') ||
+                      voices.find(v => v.lang && v.lang.toLowerCase().startsWith('fr-ca')) ||
+                      voices.find(v => v.lang && v.lang.toLowerCase() === 'fr-fr') ||
                       voices.find(v => v.lang && v.lang.toLowerCase().startsWith('fr')) ||
                       null;
       };
@@ -551,13 +574,41 @@
         const utterance = new SpeechSynthesisUtterance(textToSpeak);
         if (frenchVoice) {
           utterance.voice = frenchVoice;
+          utterance.lang = frenchVoice.lang;
+        } else {
+          utterance.lang = 'fr-CA';
         }
-        utterance.lang = 'fr-FR';
         utterance.rate = speechRate;
         utterance.pitch = 1.08;
         window.speechSynthesis.speak(utterance);
       } catch (e) {
         console.warn("Speech synthesis unavailable:", e);
+      }
+    }
+
+    // Sequential blend helper for Level 2 Reading: speaks consonant -> vowel -> blended syllable
+    function speakBlendSequence(item) {
+      if (!window.speechSynthesis || !item || !item.chunks || item.chunks.length < 2) return;
+      try {
+        window.speechSynthesis.cancel();
+        const c1 = readingChunkPhonics[item.chunks[0].toLowerCase()] || item.chunks[0];
+        const c2 = readingChunkPhonics[item.chunks[1].toLowerCase()] || item.chunks[1];
+        const parts = [c1, c2, item.french];
+
+        parts.forEach((part, idx) => {
+          const u = new SpeechSynthesisUtterance(part);
+          if (frenchVoice) {
+            u.voice = frenchVoice;
+            u.lang = frenchVoice.lang;
+          } else {
+            u.lang = 'fr-CA';
+          }
+          u.rate = idx < 2 ? Math.max(0.6, speechRate - 0.1) : speechRate;
+          u.pitch = idx === 2 ? 1.12 : 1.04;
+          window.speechSynthesis.speak(u);
+        });
+      } catch (e) {
+        console.warn("Blend speech unavailable:", e);
       }
     }
 
@@ -637,6 +688,12 @@
     }
 
     function updateHeaderForModule() {
+      const readingLabels = {
+        1: 'Syllables',
+        2: 'Patterns & Clues',
+        3: 'Words',
+        4: 'Sentences'
+      };
       const titles = {
         colors: ['Les Couleurs', 'Colors in French'],
         vocab: ['Le Vocabulaire', 'Words A to Z'],
@@ -645,7 +702,7 @@
         alphabet: ["L'Alphabet", alphabetSoundMode === 'phonic' ? 'Phonic Sounds' : 'Letter Names'],
         seasons: ['Les Saisons', 'The 4 Seasons'],
         greetings: ['Les Salutations', 'Greetings & Polite Words'],
-        reading: ['Je Lis (Reading)', `Level ${readingLevel}: ${readingLevel === 1 ? 'Syllables' : readingLevel === 2 ? 'Words' : 'Sentences'}`]
+        reading: ['Je Lis (Reading)', `Level ${readingLevel}: ${readingLabels[readingLevel] || 'Syllables'}`]
       };
       const pair = titles[currentModule] || ['Apprendre le Français', ''];
       document.getElementById('headerTitle').textContent = pair[0];
@@ -760,7 +817,7 @@
         iconDiv.textContent = item.icon;
         visualContainer.appendChild(iconDiv);
 
-        primaryText.className = readingLevel === 3
+        primaryText.className = readingLevel === 4
           ? 'text-3xl sm:text-4xl font-black tracking-wide text-slate-800 mb-3'
           : 'text-5xl sm:text-6xl font-black tracking-wide text-slate-800 mb-3';
         primaryText.textContent = formatTextByCase(item.french);
@@ -768,6 +825,8 @@
         // Render interactive syllable/word pills
         if (item.chunks && item.chunks.length > 0) {
           readingBreakdown.classList.remove('hidden');
+          const isSyllableSplit = readingLevel === 1 || readingLevel === 2;
+
           item.chunks.forEach((chunk, idx) => {
             const pill = document.createElement('button');
             pill.type = 'button';
@@ -776,20 +835,33 @@
             pill.onclick = (e) => {
               e.stopPropagation();
               const cleanKey = chunk.toLowerCase().replace(/[.!?]/g, '');
-              const speakVal = (readingLevel === 1 && readingChunkPhonics[cleanKey])
+              const speakVal = (isSyllableSplit && readingChunkPhonics[cleanKey])
                 ? readingChunkPhonics[cleanKey]
                 : chunk;
               speakText(speakVal);
             };
             readingBreakdown.appendChild(pill);
 
-            if (readingLevel === 1 && idx < item.chunks.length - 1) {
+            if (isSyllableSplit && idx < item.chunks.length - 1) {
               const plus = document.createElement('span');
               plus.className = 'text-xl font-black text-cyan-500';
               plus.textContent = '+';
               readingBreakdown.appendChild(plus);
             }
           });
+
+          // Level 2: Add interactive "🎶 Blend" pill that speaks consonant -> vowel -> syllable
+          if (readingLevel === 2) {
+            const blendBtn = document.createElement('button');
+            blendBtn.type = 'button';
+            blendBtn.className = 'ml-1 px-3.5 py-1.5 rounded-xl bg-teal-500 hover:bg-teal-600 active:scale-95 text-white font-black text-base sm:text-lg border-b-2 border-teal-700 shadow-sm transition flex items-center gap-1';
+            blendBtn.innerHTML = `<span>🎶</span><span>${formatTextByCase(item.french)}</span>`;
+            blendBtn.onclick = (e) => {
+              e.stopPropagation();
+              speakBlendSequence(item);
+            };
+            readingBreakdown.appendChild(blendBtn);
+          }
         }
 
         englishText.textContent = item.english;
@@ -872,6 +944,7 @@
       document.getElementById('btnRead1').className = `py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition ${readingLevel === 1 ? activeClass : inactiveClass}`;
       document.getElementById('btnRead2').className = `py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition ${readingLevel === 2 ? activeClass : inactiveClass}`;
       document.getElementById('btnRead3').className = `py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition ${readingLevel === 3 ? activeClass : inactiveClass}`;
+      document.getElementById('btnRead4').className = `py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition ${readingLevel === 4 ? activeClass : inactiveClass}`;
 
       // Letter Case Buttons
       document.getElementById('btnCaseLower').className = `py-2.5 px-3 rounded-xl font-black text-base border-2 transition ${letterCaseMode === 'lower' ? activeClass : inactiveClass}`;
